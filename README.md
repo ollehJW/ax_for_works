@@ -275,3 +275,10 @@ Docker bridge 주소/서브넷이 달라지면 unit의 `bind`, `range`와 `.env`
 - 브라우저 검증: 전용 테스트 DB에서 `AX_TEST_SELF_SERVICE=1`과
   `AX_SELF_SERVICE_EMPLOYEE`(새 테스트 사번)를 지정하고 `selfservice.spec.js`를 실행합니다.
   검증 중 계정을 생성하고 비밀번호를 변경하므로 실제 사용자의 사번을 지정하지 마세요.
+
+## 공지사항 / 패치노트
+
+- 상단 공지사항 메뉴의 두 탭에서 목록·제목 검색·페이지 이동·상세 보기를 제공합니다.
+- 로그인한 사용자는 열람할 수 있으며, 초기 비밀번호 변경이 필요한 계정은 먼저 변경해야 합니다.
+- `platform.users.is_admin`이 true인 관리자만 작성·수정할 수 있습니다. 내용은 일반 텍스트로 표시합니다.
+- 게시글은 `platform.board_posts`에 보관합니다. 기존 서버 업데이트 시 `backend/sql/board.sql`을 DB에 적용한 뒤 배포하세요. 초기 DB 구성에는 자동 포함됩니다.

@@ -79,6 +79,27 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(response.json()['organization'], 'DX Lab')
         self.assertEqual(self.client.get('/api/agents').status_code, 200)
 
+    def test_board_permissions_categories_search_and_edit(self):
+        self.assertEqual(self.client.get('/api/board').status_code, 401)
+        self.login()
+        body = dict(category='notice', title='테스트 공지', content='안내 내용\n두 번째 줄')
+        self.assertEqual(self.client.post('/api/board', json=body).status_code, 403)
+        response = self.client.post('/api/board', json=body, headers=self.headers)
+        self.assertEqual(response.status_code, 201, response.text)
+        post_id = response.json()['post_id']
+        self.assertEqual(self.client.get('/api/board?category=notice&q=테스트').json()['total'], 1)
+        self.assertEqual(self.client.get('/api/board?category=patch').json()['total'], 0)
+        self.assertEqual(self.client.get('/api/board?category=notice&q=없음').json()['total'], 0)
+        self.assertEqual(self.client.get('/api/board/'+post_id).json()['content'], body['content'])
+        self.assertEqual(self.client.put('/api/board/'+post_id, json=body|dict(title='수정 공지'), headers=self.headers).status_code, 200)
+        self.assertEqual(self.client.post('/api/board', json=body|dict(title=' '), headers=self.headers).status_code, 422)
+        self.assertEqual(self.client.post('/api/board', json=body, headers=self.headers|{'Origin':'https://untrusted.test'}).status_code, 403)
+        with database() as db:
+            db.execute("UPDATE platform.users SET is_admin=FALSE WHERE user_id='test-user'")
+        self.assertEqual(self.client.get('/api/board/'+post_id).status_code, 200)
+        self.assertEqual(self.client.post('/api/board', json=body, headers=self.headers).status_code, 403)
+        self.assertEqual(self.client.put('/api/board/'+post_id, json=body, headers=self.headers).status_code, 403)
+
     def test_login_uses_org_directory_and_allows_unassigned_org(self):
         # Match production: no legacy users.organization column.
         with database() as db:

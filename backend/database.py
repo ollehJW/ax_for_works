@@ -33,3 +33,4 @@ def database():
 
 def initialize_schema(connection):
     connection.execute((ROOT / 'backend/sql/platform.sql').read_text())
+    connection.execute((ROOT / 'backend/sql/board.sql').read_text())

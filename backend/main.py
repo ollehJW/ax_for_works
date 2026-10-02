@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 from backend.gateway import lifespan, register_gateway
 from backend.auth import router as auth_router, ready_user
 from backend.database import database
+from backend.board import router as board_router
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -65,6 +66,7 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
     app = FastAPI(lifespan=lifespan, title="AX for Works", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None)
 
     app.include_router(auth_router)
+    app.include_router(board_router)
 
     @app.exception_handler(psycopg.Error)
     async def database_error(request, exc):
