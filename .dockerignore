@@ -1,0 +1,11 @@
+.git
+.venv
+**/node_modules
+**/dist
+**/__pycache__
+**/test-results
+**/playwright-report
+.env
+*.pem
+Main.dc.html
+support.js

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>WiaCanDX 홈</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3F5F9}
+a{color:#0A2A7A;text-decoration:none}a:hover{color:#2F5BEA}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #6C9CFF;outline-offset:3px}
+.navlink{color:#5B6578;font-size:14px;font-weight:500;padding:0 2px;height:72px;display:flex;align-items:center;border-bottom:2px solid transparent}
+.navlink:hover{color:#0A2A7A}
+.slide{animation:slideIn .55s cubic-bezier(.2,.7,.2,1) both}
+.preview{animation:previewIn .7s cubic-bezier(.2,.7,.2,1) .05s both}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes previewIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.tab{transition:background .2s}
+.tab:hover{background:rgba(255,255,255,.04)}
+.fill{animation:grow 6s linear both}
+.fill.paused{animation-play-state:paused}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.card{transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s}
+.card:hover{transform:translateY(-4px);border-color:#C9D5EE;box-shadow:0 18px 40px rgba(13,32,72,.10)}
+.card:hover .go{background:#0A2A7A;color:#fff;border-color:#0A2A7A}
+.go{transition:background .2s,color .2s,border-color .2s}
+.ctl:hover{background:rgba(255,255,255,.12)}
+.cta:hover{background:#E9F0FF}
+.overlay{animation:fade .2s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.slide,.preview,.overlay{animation:none}.card:hover{transform:none}}
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: #F3F5F9; color: #141A26; font-family: Pretendard, 'Noto Sans KR', -apple-system, 'Segoe UI', sans-serif; letter-spacing: -0.01em">
+
+  <!-- Header -->
+  <header style="background: #FFFFFF; border-bottom: 1px solid #E3E8F0; position: sticky; top: 0; z-index: 10">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 0 40px; height: 72px; display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <a href="#top" aria-label="WiaCanDX 홈" style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 34px; height: 34px; border-radius: 9px; background: #0A2A7A; color: #FFFFFF; display: grid; place-items: center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"></path></svg>
+          </span>
+          <span style="font-size: 21px; font-weight: 800; letter-spacing: -0.03em; color: #0A1B44">WiaCan<span style="color: #2F5BEA">DX</span></span>
+        </a>
+        <span style="width: 1px; height: 16px; background: #D7DDE7"></span>
+        <span style="font-size: 13px; color: #6B7588; font-weight: 500">AX for Works</span>
+      </div>
+      <nav aria-label="주요 메뉴" style="display: flex; align-items: center; gap: 32px">
+        <a class="navlink" href="#agents" style="color: #0A2A7A; font-weight: 700; border-bottom-color: #0A2A7A">AI Agents</a>
+        <a class="navlink" href="#guide">이용 가이드</a>
+        <a class="navlink" href="#notice">공지사항</a>
+      </nav>
+      <div style="display: flex; align-items: center; gap: 14px">
+        <span style="display: flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 999px; background: #F0F4FB; font-size: 12px; font-weight: 600; color: #3A4A6B">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #1FA971"></span>
+          WIA Workspace
+        </span>
+        <button aria-label="내 계정" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #D7DDE7; background: #EEF3FF; color: #0A2A7A; font-size: 13px; font-weight: 700; padding: 0">W</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" style="max-width: 1280px; margin: 0 auto; padding: 44px 40px 32px">
+
+    <!-- Intro -->
+    <section style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px">
+      <div>
+        <p style="margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.18em; color: #2F5BEA">
+          <span style="width: 18px; height: 2px; background: #2F5BEA"></span>MAKE WORK FLOW
+        </p>
+        <h1 style="margin: 0; font-size: 34px; line-height: 1.35; font-weight: 800; letter-spacing: -0.035em; color: #0A1B44">일하는 방식의 변화, <span style="color: #2F5BEA">AI와 함께.</span></h1>
+      </div>
+      <p style="margin: 0 0 6px; font-size: 15px; color: #5B6578">반복되는 일은 줄이고, 더 중요한 일에 집중하세요.</p>
+    </section>
+
+    <!-- Hero carousel -->
+    <section aria-roledescription="캐러셀" aria-label="AI Agent 소개" style="position: relative; overflow: hidden; border-radius: 24px; background: #0A1E52; color: #FFFFFF; box-shadow: 0 24px 60px rgba(10,30,82,.18)">
+      <div aria-hidden="true" style="position: absolute; width: 520px; height: 520px; right: -140px; top: -180px; border-radius: 50%; border: 1px solid rgba(156,200,255,.14)"></div>
+      <div aria-hidden="true" style="position: absolute; width: 360px; height: 360px; right: -60px; top: -100px; border-radius: 50%; border: 1px solid rgba(156,200,255,.10)"></div>
+      <div aria-hidden="true" style="position: absolute; width: 300px; height: 300px; left: -120px; bottom: -200px; border-radius: 50%; background: rgba(47,91,234,.22); filter: blur(60px)"></div>
+
+      <sc-for list="{{agents}}" as="a" hint-placeholder-count="1">
+        <sc-if value="{{a.active}}" hint-placeholder-val="{{true}}">
+          <div role="group" aria-roledescription="슬라이드" aria-label="{{a.slideLabel}}" style="position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center; padding: 56px 64px 52px; min-height: 420px; box-sizing: border-box">
+            <div class="slide">
+              <span style="display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: #CFE0FF">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"></path></svg>
+                YOUR AI PARTNER · {{a.num}}
+              </span>
+              <p style="margin: 26px 0 10px; font-size: 15px; font-weight: 700; color: #9CC8FF; letter-spacing: 0.01em">{{a.name}} <span style="font-weight: 500; color: #8FA3C8">· {{a.sub}}</span></p>
+              <h2 style="margin: 0; font-size: 42px; line-height: 1.28; font-weight: 800; letter-spacing: -0.04em; white-space: pre-line">{{a.title}}</h2>
+              <p style="margin: 18px 0 30px; font-size: 15px; line-height: 1.8; color: #BFCCE4; white-space: pre-line">{{a.detail}}</p>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <button class="cta" onClick="{{a.launch}}" style="display: inline-flex; align-items: center; gap: 14px; height: 48px; padding: 0 22px; border: 0; border-radius: 12px; background: #FFFFFF; color: #0A2A7A; font-size: 15px; font-weight: 700">
+                  {{a.name}} 시작하기
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"></path></svg>
+                </button>
+                <a href="#agents" style="display: inline-flex; align-items: center; height: 48px; padding: 0 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,.22); color: #E4ECFB; font-size: 14px; font-weight: 600">자세히 보기</a>
+              </div>
+            </div>
+
+            <div class="preview" style="position: relative; padding: 0 12px 0 8px">
+              <div aria-label="{{a.previewLabel}}" style="background: #FFFFFF; color: #2A3448; border-radius: 16px; overflow: hidden; box-shadow: 0 30px 60px rgba(3,10,32,.35)">
+                <div style="display: flex; align-items: center; gap: 6px; padding: 13px 16px; background: #F5F7FB; border-bottom: 1px solid #E6EAF2">
+                  <span style="width: 9px; height: 9px; border-radius: 50%; background: #E4E8EF"></span>
+                  <span style="width: 9px; height: 9px; border-radius: 50%; background: #E4E8EF"></span>
+                  <span style="width: 9px; height: 9px; border-radius: 50%; background: #E4E8EF"></span>
+                  <span style="margin-left: 10px; font-size: 12px; font-weight: 600; color: #6B7588">{{a.name}} / Workspace</span>
+                  <span style="margin-left: auto; font-size: 11px; color: #6B7588">예시 화면</span>
+                </div>
+                <div style="padding: 24px 26px 26px">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+                    <div>
+                      <div style="font-size: 18px; font-weight: 700; color: #141A26; letter-spacing: -0.02em">{{a.preview}}</div>
+                      <div style="margin-top: 6px; font-size: 12px; color: #6B7588">{{a.meta}}</div>
+                    </div>
+                    <span style="flex-shrink: 0; padding: 5px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; background: {{a.tint}}; color: {{a.color}}">{{a.tag}}</span>
+                  </div>
+                  <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #EDF0F6; display: flex; gap: 12px; align-items: flex-start">
+                    <span style="flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: {{a.tint}}; color: {{a.color}}">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{a.d}}"></path></svg>
+                    </span>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; color: #141A26">{{a.row1}}</div>
+                      <div style="margin-top: 4px; font-size: 12px; line-height: 1.6; color: #5B6578">{{a.text1}}</div>
+                    </div>
+                  </div>
+                  <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid #EDF0F6; display: flex; gap: 12px; align-items: flex-start">
+                    <span style="flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: #EAF7F1; color: #138A5A">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"></path></svg>
+                    </span>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; color: #141A26">{{a.row2}}</div>
+                      <div style="margin-top: 4px; font-size: 12px; line-height: 1.6; color: #5B6578">{{a.text2}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="position: absolute; left: -22px; bottom: -22px; display: flex; align-items: center; gap: 10px; padding: 12px 16px 12px 12px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 14px 34px rgba(3,10,32,.28); font-size: 13px; font-weight: 600; color: #2A3448">
+                <span style="width: 26px; height: 26px; border-radius: 50%; background: #EAF7F1; color: #138A5A; display: grid; place-items: center">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"></path></svg>
+                </span>
+                {{a.note}}
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-for>
+
+      <!-- Tab strip -->
+      <div style="position: relative; display: flex; align-items: stretch; border-top: 1px solid rgba(255,255,255,.10)">
+        <div role="tablist" aria-label="소개할 Agent 선택" style="flex-grow: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+          <sc-for list="{{agents}}" as="t" hint-placeholder-count="4">
+            <button class="tab" role="tab" aria-selected="{{t.selected}}" onClick="{{t.select}}" style="position: relative; display: flex; align-items: center; gap: 14px; padding: 20px 28px; border: 0; border-right: 1px solid rgba(255,255,255,.08); background: transparent; color: #FFFFFF; text-align: left">
+              <sc-if value="{{t.active}}" hint-placeholder-val="{{false}}">
+                <span class="{{fillCls}}" style="position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: #9CC8FF; transform-origin: left center; animation-duration: {{dur}}"></span>
+              </sc-if>
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: {{t.numColor}}">{{t.num}}</span>
+              <span style="display: flex; flex-direction: column; gap: 3px">
+                <span style="font-size: 15px; font-weight: 700; color: {{t.nameColor}}">{{t.name}}</span>
+                <span style="font-size: 12px; color: {{t.subColor}}">{{t.sub}}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; padding: 0 24px">
+          <button class="ctl" onClick="{{prev}}" aria-label="이전 슬라이드" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: transparent; color: #E4ECFB; display: grid; place-items: center; padding: 0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4m6-6-6 6 6 6"></path></svg>
+          </button>
+          <button class="ctl" onClick="{{toggle}}" aria-label="{{toggleLabel}}" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: transparent; color: #E4ECFB; display: grid; place-items: center; padding: 0">
+            <sc-if value="{{playing}}" hint-placeholder-val="{{true}}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 5v14M16 5v14"></path></svg>
+            </sc-if>
+            <sc-if value="{{paused}}" hint-placeholder-val="{{false}}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="m8 5 11 7-11 7Z"></path></svg>
+            </sc-if>
+          </button>
+          <button class="ctl" onClick="{{next}}" aria-label="다음 슬라이드" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: transparent; color: #E4ECFB; display: grid; place-items: center; padding: 0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"></path></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Agent cards -->
+    <section id="agents" style="margin-top: 56px">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <h2 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: #0A1B44">나의 AI 파트너</h2>
+          <span style="padding: 3px 9px; border-radius: 999px; background: #E6EDFB; color: #0A2A7A; font-size: 12px; font-weight: 700">4</span>
+        </div>
+        <p style="margin: 0; font-size: 14px; color: #5B6578">업무에 필요한 Agent를 선택해 바로 시작하세요.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
+        <sc-for list="{{agents}}" as="c" hint-placeholder-count="4">
+          <button class="card" onClick="{{c.launch}}" aria-label="{{c.cardLabel}}" style="display: flex; flex-direction: column; align-items: stretch; text-align: left; padding: 26px 24px 22px; background: #FFFFFF; border: 1px solid #E3E8F0; border-radius: 18px; box-shadow: 0 6px 18px rgba(13,32,72,.04); color: #141A26">
+            <span style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px">
+              <span style="width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: {{c.tint}}; color: {{c.color}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.d}}"></path></svg>
+              </span>
+              <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #8A94A6">{{c.num}}</span>
+            </span>
+            <span style="font-size: 22px; font-weight: 800; letter-spacing: -0.03em; color: #0A1B44">{{c.name}}</span>
+            <span style="margin-top: 6px; font-size: 14px; font-weight: 600; color: {{c.color}}">{{c.sub}} Agent</span>
+            <span style="margin: 12px 0 24px; font-size: 14px; line-height: 1.7; color: #5B6578; white-space: pre-line">{{c.desc}}</span>
+            <span style="margin-top: auto; padding-top: 16px; border-top: 1px solid #EEF1F6; display: flex; align-items: center; justify-content: space-between">
+              <span style="font-size: 14px; font-weight: 700; color: #0A2A7A">바로 시작하기</span>
+              <span class="go" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #D7DDE7; color: #0A2A7A; display: grid; place-items: center">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16m-6-6 6 6-6 6"></path></svg>
+              </span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- Bottom note -->
+    <div style="margin-top: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: #6B7588">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2F5BEA" stroke-width="1.9" stroke-linejoin="round"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"></path></svg>
+      작은 업무의 변화가 만드는 더 큰 가능성. <strong style="font-weight: 700; color: #0A2A7A">We can, with AI.</strong>
+    </div>
+
+    <footer style="margin-top: 36px; padding-top: 22px; border-top: 1px solid #E3E8F0; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #6B7588">
+      <span style="display: flex; align-items: center; gap: 14px">
+        <span style="font-weight: 800; font-size: 14px; letter-spacing: 0.12em; color: #3A4A6B">WIA</span>
+        © 2026 Hyundai WIA. All rights reserved.
+      </span>
+      <span style="display: flex; gap: 20px">
+        <span>WiaCanDX · AX for Works</span>
+        <span>함께 만드는 업무의 다음 단계</span>
+      </span>
+    </footer>
+  </main>
+
+  <!-- Launch dialog -->
+  <sc-if value="{{dialogOpen}}" hint-placeholder-val="{{false}}">
+    <div class="overlay" style="position: fixed; inset: 0; z-index: 50; background: rgba(7,24,54,.45); backdrop-filter: blur(4px); display: grid; place-items: center">
+      <div role="dialog" aria-modal="true" aria-labelledby="dlg-title" style="width: 420px; background: #FFFFFF; border-radius: 20px; padding: 30px 30px 24px; box-shadow: 0 30px 80px rgba(7,24,54,.3)">
+        <span style="width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: {{dlg.tint}}; color: {{dlg.color}}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{dlg.d}}"></path></svg>
+        </span>
+        <h2 id="dlg-title" style="margin: 18px 0 8px; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: #0A1B44">{{dlg.name}} 바로가기</h2>
+        <p style="margin: 0; font-size: 14px; line-height: 1.75; color: #5B6578">현재는 UI 목업입니다.<br>실제 서비스 주소를 연결하면 이 버튼으로 바로 이용할 수 있습니다.</p>
+        <div style="margin-top: 24px; display: flex; justify-content: flex-end">
+          <button onClick="{{closeDialog}}" style="height: 44px; padding: 0 22px; border: 0; border-radius: 10px; background: #0A2A7A; color: #FFFFFF; font-size: 14px; font-weight: 700">확인</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"interval":{"editor":"range","default":6,"min":3,"max":12,"step":1,"unit":"s"},"$preview":{"width":1440,"height":1320}}'>
+const AGENTS = [
+  { name: 'WiaMeet', sub: '회의록 자동 작성', desc: '회의의 순간을 기록하고,\n핵심과 실행할 일을 한눈에.', title: '회의에만 집중하세요.\n기록은 AI가 할게요.', detail: '놓치기 쉬운 대화부터 중요한 결정까지.\n회의가 끝나면, 잘 정리된 회의록이 기다립니다.', tint: '#EAF1FF', color: '#2F5BEA', d: 'M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3ZM5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8', preview: '제품 개발 정기 회의', meta: '2026.09.15 · 10:00–11:00 · 참석자 6명', tag: '요약 완료', row1: '주요 논의 사항', text1: '신규 프로젝트 일정 및 개발 진행 현황 공유', row2: '다음 할 일 · Action items', text2: '요구사항 정리 및 차주 진행 일정 확인', note: '회의록이 깔끔하게 정리됐어요', url: '' },
+  { name: 'WiaReport', sub: '주간보고 효율화', desc: '한 주의 성과를 모아,\n보고는 간결하게, 공유는 빠르게.', title: '한 주의 업무를,\n한눈에 보이는 보고로.', detail: '흩어진 업무 내용을 모으고 핵심 성과를 정리하세요.\n매주 반복되는 보고 준비가 한결 가벼워집니다.', tint: '#E8ECF8', color: '#0A2A7A', d: 'M14 3H6a2 2 0 0 0-2 2v15h16V9Zm0 0v6h6M8 16v-3m4 3v-5m4 5v-2', preview: '9월 3주차 주간 업무 보고', meta: '2026.09.14–09.18 · 개발팀', tag: '초안 작성', row1: '이번 주 주요 성과', text1: '신규 기능 개발 및 사용자 피드백 반영', row2: '다음 주 업무 계획', text2: '통합 테스트 진행 및 개선 사항 검토', note: '한 주의 업무가 한눈에 보여요', url: '' },
+  { name: 'WiaNews', sub: '기술 뉴스 자동 큐레이션', desc: '쏟아지는 기술 소식 속,\n우리에게 필요한 인사이트만.', title: '기술의 흐름을 읽는,\n나만의 뉴스 브리핑.', detail: '업무와 연결되는 기술 소식을 더 쉽게 만나세요.\n꼭 필요한 뉴스를 모아 새로운 관점을 전합니다.', tint: '#E4F4F3', color: '#0B7F7A', d: 'M4 4h14v16H4Zm14 5h3v9a2 2 0 0 1-2 2M8 8h6M8 16h6M8 11h6v2H8Z', preview: '오늘의 기술 인사이트', meta: '2026.09.15 · 관심 분야 맞춤 브리핑', tag: '예시 콘텐츠', row1: 'AI · 제조 현장의 새로운 가능성', text1: '스마트 팩토리와 업무 자동화의 활용 이야기', row2: 'TECH · 이번 주 주목할 기술 키워드', text2: '로보틱스, 디지털 트윈, 그리고 생성형 AI', note: '필요한 기술 소식만 모았어요', url: '' },
+  { name: 'WiaCoding', sub: '바이브코딩 길잡이', desc: '아이디어를 실제 도구로,\nAI와 함께 시작하는 코딩.', title: '만들고 싶은 아이디어,\n이제 직접 현실로.', detail: '무엇을 만들고 싶은지 이야기하는 것부터 시작하세요.\nAI와 함께 코딩하는 여정을 차근차근 안내합니다.', tint: '#EFEBFC', color: '#5B3FC4', d: 'm7 6-6 6 6 6m10-12 6 6-6 6m-3-15-4 18', preview: '나의 첫 바이브코딩 프로젝트', meta: 'AI 코딩 가이드 · 시작하기', tag: 'STEP 01', row1: '어떤 도구를 만들어볼까요?', text1: '팀의 반복 업무를 줄이는 간단한 웹 도구', row2: '아이디어에서 실행까지', text2: '요구사항 정리 → 함께 코딩 → 결과 확인', note: '아이디어가 도구가 되는 첫걸음', url: '' }
+];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { current: 0, playing: true, dialog: null };
+  }
+  componentDidMount() {
+    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.setState({ playing: false }); } catch (e) {}
+    this.restart();
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  ms() { return (this.props.interval ?? 6) * 1000; }
+  restart() {
+    clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      if (this.state.playing && this.state.dialog === null && !document.hidden) {
+        this.setState({ current: (this.state.current + 1) % AGENTS.length });
+      }
+    }, this.ms());
+  }
+  go(i) {
+    this.setState({ current: (i + AGENTS.length) % AGENTS.length });
+    this.restart();
+  }
+  launch(i) {
+    const a = AGENTS[i];
+    if (a.url) { window.location.assign(a.url); return; }
+    this.setState({ dialog: i });
+  }
+  renderVals() {
+    const { current, playing, dialog } = this.state;
+    const agents = AGENTS.map((a, i) => {
+      const active = i === current;
+      return Object.assign({}, a, {
+        num: '0' + (i + 1),
+        active: active,
+        selected: active ? 'true' : 'false',
+        numColor: active ? '#9CC8FF' : '#6F84AE',
+        nameColor: active ? '#FFFFFF' : '#A9B8D6',
+        subColor: active ? '#BFCCE4' : '#7F93BA',
+        slideLabel: (i + 1) + ' / 4: ' + a.name,
+        previewLabel: a.name + ' 예시 화면',
+        cardLabel: a.name + ' ' + a.sub + ' 바로가기',
+        select: () => this.go(i),
+        launch: () => this.launch(i)
+      });
+    });
+    return {
+      agents: agents,
+      playing: playing,
+      paused: !playing,
+      toggleLabel: playing ? '자동 재생 일시 정지' : '자동 재생 시작',
+      dur: (this.props.interval ?? 6) + 's',
+      fillCls: playing && dialog === null ? 'fill' : 'fill paused',
+      prev: () => this.go(current - 1),
+      next: () => this.go(current + 1),
+      toggle: () => { this.setState({ playing: !playing }); this.restart(); },
+      dialogOpen: dialog !== null,
+      dlg: dialog !== null ? AGENTS[dialog] : AGENTS[0],
+      closeDialog: () => { this.setState({ dialog: null }); this.restart(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

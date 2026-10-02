@@ -1,0 +1,15 @@
+# PostgreSQL remains on host loopback. Only the default Docker bridge can connect.
+# If Docker's bridge subnet changes, update bind/range and .env container overrides.
+[Unit]
+Description=AX for Works Docker to local PostgreSQL bridge
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/usr/bin/socat TCP4-LISTEN:15433,bind=172.17.0.1,reuseaddr,fork,range=172.17.0.0/16 TCP4:127.0.0.1:5432
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+LimitNOFILE=4096
+
+[Install]
+WantedBy=default.target

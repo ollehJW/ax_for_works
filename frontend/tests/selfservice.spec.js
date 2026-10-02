@@ -1,0 +1,56 @@
+import { test, expect } from '@playwright/test';
+
+test('account creation and password reset through login dialogs', async ({ page }) => {
+  test.skip(!process.env.AX_TEST_SELF_SERVICE || !process.env.AX_SELF_SERVICE_EMPLOYEE, 'Requires an explicitly provisioned disposable account ID');
+  const employee=process.env.AX_SELF_SERVICE_EMPLOYEE;
+  const name='계정 기능 검증';
+  const password='SelfServiceTest123!';
+  await page.goto('/login');
+  await expect(page.getByText('관리자에게 문의해 주세요.')).toHaveCount(0);
+  await page.getByRole('button',{name:'계정 생성',exact:true}).click();
+  let dialog=page.getByRole('dialog',{name:'계정 생성'});
+  await dialog.getByLabel('사번',{exact:true}).fill(employee);
+  await dialog.getByLabel('이름',{exact:true}).fill(name);
+  await dialog.getByLabel('패스워드',{exact:true}).fill(password);
+  await dialog.getByLabel('패스워드 확인',{exact:true}).fill('Mismatch123!');
+  await dialog.getByLabel('조직',{exact:true}).fill('가입 검증 조직');
+  await dialog.getByLabel('팀',{exact:true}).fill(process.env.AX_SELF_SERVICE_TEAM || '테스트팀');
+  await dialog.getByLabel('직급',{exact:true}).fill(process.env.AX_SELF_SERVICE_ROLE || '매니저');
+  await dialog.getByLabel('이메일',{exact:true}).fill(employee+'@example.com');
+  await dialog.getByRole('button',{name:'계정 생성',exact:true}).click();
+  await expect(dialog.getByRole('alert')).toContainText('서로 일치하지 않습니다');
+  await dialog.getByLabel('패스워드 확인',{exact:true}).fill(password);
+  await dialog.getByRole('button',{name:'계정 생성',exact:true}).click();
+  await expect(dialog.getByRole('status')).toContainText('계정이 생성되었습니다');
+  await dialog.getByRole('button',{name:'로그인으로 돌아가기'}).click();
+  await expect(page.getByLabel('사번',{exact:true})).toHaveValue(employee);
+  await page.getByLabel('비밀번호',{exact:true}).fill(password);
+  await page.getByRole('button',{name:'로그인',exact:true}).click();
+  await expect(page.locator('.card')).toHaveCount(4);
+  const user=await (await page.request.get('/api/auth/me')).json();
+  expect(user.must_change_password).toBe(false);expect(user.is_admin).toBe(false);expect(user.organization).toBe('가입 검증 조직');
+  if(process.env.AX_TEST_AGENTS) {
+    for(const service of ['wianews','wiacoding']) expect((await page.request.get('/'+service+'/api/auth/me')).status()).toBe(200);
+  }
+  await page.getByRole('button',{name:'로그아웃',exact:true}).click();
+  await page.getByRole('button',{name:'패스워드 초기화',exact:true}).click();
+  dialog=page.getByRole('dialog',{name:'패스워드 초기화'});
+  await dialog.getByLabel('사번',{exact:true}).fill(employee);
+  await dialog.getByLabel('이름',{exact:true}).fill('다른 이름');
+  await dialog.getByRole('button',{name:'패스워드 초기화',exact:true}).click();
+  await expect(dialog.getByRole('alert')).toContainText('일치하는 계정을 찾을 수 없습니다');
+  await dialog.getByLabel('이름',{exact:true}).fill(name);
+  await dialog.getByRole('button',{name:'패스워드 초기화',exact:true}).click();
+  await expect(dialog.getByRole('status')).toContainText('wia1234!로 초기화되었습니다');
+  await dialog.getByRole('button',{name:'로그인으로 돌아가기'}).click();
+  await page.getByLabel('비밀번호',{exact:true}).fill('wia1234!');
+  await page.getByRole('button',{name:'로그인',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'비밀번호를 변경해 주세요'})).toBeVisible();
+  await expect(page.locator('.card')).toHaveCount(0);
+  await page.getByLabel('현재 비밀번호',{exact:true}).fill('wia1234!');
+  await page.getByLabel('새 비밀번호',{exact:false}).first().fill('ChangedSelfService456!');
+  await page.getByLabel('새 비밀번호 확인',{exact:true}).fill('ChangedSelfService456!');
+  await page.getByRole('button',{name:'비밀번호 변경 후 시작'}).click();
+  await expect(page.locator('.card')).toHaveCount(4);
+  await page.getByRole('button',{name:'로그아웃',exact:true}).click();
+});

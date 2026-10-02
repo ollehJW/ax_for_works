@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+.env
+*.pem
+.build/
+
+# Local secrets, database files, and developer tools
+.env.*
+!.env.example
+*.key
+*.p12
+*.pfx
+*.db
+*.sqlite
+*.sqlite3
+*.log
+.codex/
+.agents/
