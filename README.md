@@ -286,3 +286,55 @@ Docker bridge 주소/서브넷이 달라지면 unit의 `bind`, `range`와 `.env`
 서식 편집 배포 시에도 `backend/sql/board.sql`을 적용해 `content_format` 컬럼을 추가하세요. 기본값은 `plain`이며 새 서식 글은 `html`로 저장합니다. 서버는 허용된 HTML 태그와 색상만 저장하고, 상세 화면에서도 HTML을 정화합니다.
 
 게시판 조회수는 `view_count` 합계만 저장하며 조회자 정보는 기록하지 않습니다. 상세 화면을 다시 열거나 새로고침할 때마다 증가합니다. 목록 조회와 수정 화면 로딩(`count_view=false`)은 집계하지 않습니다. 업데이트 시 `backend/sql/board.sql`을 적용하며 기존 글의 조회수는 0부터 시작합니다.
+
+## H200 Pod 배포
+
+소스와 가상환경은 `/home/jongwook/{ax_for_works,wianews,wiacoding}`에 두고,
+DB·환경설정·이미지·백업·로그는 `/data`에 보관합니다. 각 소스 디렉터리는 기존 GitHub
+저장소의 `main`을 추적합니다. WiaMeet와 WiaReport의 실행·설정은 이 스크립트에서 다루지 않습니다.
+
+- 플랫폼: 프론트 `1000`, 백엔드 `1010`.
+- WiaNews: 프론트 `1002`, 백엔드 `1012`.
+- WiaCoding: 포트 확인 후 해당 환경파일에 지정합니다. 기존 WiaReport `1003/1013`은 변경하지 않습니다.
+- 외부 도메인: `https://axforwork.wia.co.kr`. HTTPS 앞단이 Pod의 HTTP 프론트로 연결되는지 확인해야 합니다.
+- Pod에는 systemd가 없습니다. 아래 Supervisor는 새 세 서비스만 관리합니다.
+
+`/data/axforworks/runtime.env`, `/data/wianews/runtime.env`, `/data/wiacoding/runtime.env`를
+권한 `600`으로 생성하고 각 프로젝트의 `.env`에 링크합니다. 서비스 `config.yaml`도
+각 `/data/<서비스>/config.yaml`에 보관하고 프로젝트에 링크합니다. 비밀값은 Git에 넣지 않습니다.
+
+공통 실행 환경에는 `AX_DB_PASSWORD`, `FRONTEND_PORT`, `BACKEND_PORT`,
+`BACKEND_ORIGIN=http://127.0.0.1:<백엔드 포트>`, `FRONTEND_PROTOCOL=http`,
+`FRONTEND_HOST=0.0.0.0`, `NODE_EXECUTABLE=<node 절대경로>`를 지정합니다.
+HTTP 모드는 TLS를 종료하는 사내 프록시 뒤에서 사용합니다. 기존 단독 서버는
+`FRONTEND_PROTOCOL` 미지정 시 HTTPS를 계속 사용합니다.
+
+플랫폼에는 `AX_DB_HOST=127.0.0.1`, `AX_DB_PORT=5432`, DB명·계정,
+`AX_AGENTS_CONFIG=/data/axforworks/config/agents.json`,
+`AX_GATEWAY_CONFIG=/data/axforworks/config/config.yaml`을 추가합니다.
+뉴스·코딩에는 `AX_SERVICE_CONFIG=/data/<서비스>/config.yaml`을 지정합니다.
+해당 YAML의 `auth.platform_origin`은 새 도메인으로 설정합니다.
+게이트웨이는 같은 Pod의 HTTP 프론트에 연결하며, 백엔드는 loopback에만 바인딩합니다.
+
+```bash
+cd ~/ax_for_works
+.venv/bin/python ops/h200-runtime.py configure
+# 각 서비스의 비밀 환경파일과 DB 이관 및 포트 설정을 먼저 완료합니다.
+.venv/bin/supervisord -c /data/axforworks/supervisord.conf
+.venv/bin/supervisorctl -c /data/axforworks/supervisord.conf status
+# 서비스별 재시작 예시 (WiaMeet/WiaReport는 관리 대상 아님)
+.venv/bin/supervisorctl -c /data/axforworks/supervisord.conf restart wianews-backend
+```
+
+Pod 재생성 시 `/home` 소스·가상환경을 재구성하고 Supervisor를 다시 시작해야 합니다.
+이 설정만으로 Kubernetes 재시작 훅이 등록되지는 않습니다.
+
+H200 PostgreSQL 16 빌드는 ICU가 없어 원본의 `nocase` 정렬 규칙을 직접 복원할 수 없습니다.
+서비스 이관 시 사용하지 않는 `nocase` 정의를 제외하고, 유일하게 사용하는 구독 이메일의
+중복 방지는 `(subscription_id, lower(email_address))` 유일 인덱스로 유지합니다.
+공통 사용자·조직·팀·직급은 덮어쓰지 않으며, 사번은 같지만 내부 ID가 다른 계정은
+서비스 데이터의 참조를 대상 ID로 매핑한 뒤 모든 행을 대조합니다.
+새 도메인은 기존 세션을 가져오지 않고 다시 로그인합니다.
+WiaNews의 `backend/workspace`는 `/data/wianews/workspace`에 링크합니다.
+자동 수집·발송은 기존 서버와 중복되지 않도록 최종 전환 전까지
+`WIANEWS_SUBSCRIPTION_COLLECTION_ENABLED=0`, `WIANEWS_SUBSCRIPTION_PUBLICATION_ENABLED=0`으로 둡니다.
