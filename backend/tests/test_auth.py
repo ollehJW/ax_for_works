@@ -100,6 +100,23 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(self.client.post('/api/board', json=body, headers=self.headers).status_code, 403)
         self.assertEqual(self.client.put('/api/board/'+post_id, json=body, headers=self.headers).status_code, 403)
 
+    def test_board_repeated_views_increment_without_changing_edit_timestamp(self):
+        self.login()
+        response=self.client.post('/api/board',json=dict(category='notice',title='조회수 검증',content='내용'),headers=self.headers)
+        path='/api/board/'+response.json()['post_id']
+        initial=self.client.get(path+'?count_view=false').json()
+        self.assertEqual(initial['view_count'],0)
+        for expected in range(1,4):
+            viewed=self.client.get(path).json()
+            self.assertEqual(viewed['view_count'],expected)
+            self.assertEqual(viewed['updated_at'],initial['updated_at'])
+        self.assertEqual(self.client.get('/api/board').json()['posts'][0]['view_count'],3)
+        self.assertEqual(self.client.get(path+'?count_view=false').json()['view_count'],3)
+        self.client.post('/api/auth/logout',headers=self.headers)
+        self.assertEqual(self.client.get(path).status_code,401)
+        self.login()
+        self.assertEqual(self.client.get(path+'?count_view=false').json()['view_count'],3)
+
     def test_board_rich_text_sanitization_and_legacy_text(self):
         self.login()
         body=dict(category='patch',title='서식 검증',content_format='html',content='<p><strong>굵게</strong><u>밑줄</u><span style="color:#ff0000;background-color:#ffff00;position:fixed">색상</span><script>alert(1)</script><img src=x onerror=alert(1)><a href="javascript:alert(1)">링크</a></p>')

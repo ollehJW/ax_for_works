@@ -12,3 +12,6 @@ CREATE INDEX IF NOT EXISTS board_posts_category_created ON platform.board_posts(
 
 -- Existing posts remain plain text; rich text posts explicitly opt into HTML.
 ALTER TABLE platform.board_posts ADD COLUMN IF NOT EXISTS content_format TEXT NOT NULL DEFAULT 'plain' CHECK (content_format IN ('plain','html'));
+
+-- Aggregate only; no per-view user or visitor records.
+ALTER TABLE platform.board_posts ADD COLUMN IF NOT EXISTS view_count BIGINT NOT NULL DEFAULT 0 CHECK (view_count >= 0);

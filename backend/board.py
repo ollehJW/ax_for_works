@@ -52,14 +52,19 @@ def posts(category: Kind = 'notice', page: int = Query(1, ge=1), q: str = Query(
     params = (category, q.strip(), q.strip())
     with database() as db:
         total = db.execute('SELECT count(*) AS n FROM platform.board_posts WHERE '+where, params).fetchone()['n']
-        rows = db.execute('SELECT post_id,category,title,created_at,updated_at FROM platform.board_posts WHERE '+where+' ORDER BY created_at DESC,post_id DESC LIMIT 10 OFFSET %s', (*params, (page-1)*10)).fetchall()
+        rows = db.execute('SELECT post_id,category,title,view_count,created_at,updated_at FROM platform.board_posts WHERE '+where+' ORDER BY created_at DESC,post_id DESC LIMIT 10 OFFSET %s', (*params, (page-1)*10)).fetchall()
     return {'posts': rows, 'total': total, 'page': page, 'page_size': 10}
 
 
 @router.get('/{post_id}')
-def post(post_id: UUID):
+def post(post_id: UUID, count_view: bool = True):
     with database() as db:
-        row = db.execute('SELECT post_id,category,title,content,content_format,created_at,updated_at FROM platform.board_posts WHERE post_id=%s', (str(post_id),)).fetchone()
+        fields = 'post_id,category,title,content,content_format,view_count,created_at,updated_at'
+        if count_view:
+            # Atomic increment preserves every view, including repeated views.
+            row = db.execute('UPDATE platform.board_posts SET view_count=view_count+1 WHERE post_id=%s RETURNING '+fields, (str(post_id),)).fetchone()
+        else:
+            row = db.execute('SELECT '+fields+' FROM platform.board_posts WHERE post_id=%s', (str(post_id),)).fetchone()
     if not row:
         raise HTTPException(404, '게시글을 찾을 수 없습니다.')
     if row['content_format'] == 'html':

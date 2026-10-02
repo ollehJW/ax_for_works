@@ -284,3 +284,5 @@ Docker bridge 주소/서브넷이 달라지면 unit의 `bind`, `range`와 `.env`
 - 게시글은 `platform.board_posts`에 보관합니다. 기존 서버 업데이트 시 `backend/sql/board.sql`을 DB에 적용한 뒤 배포하세요. 초기 DB 구성에는 자동 포함됩니다.
 
 서식 편집 배포 시에도 `backend/sql/board.sql`을 적용해 `content_format` 컬럼을 추가하세요. 기본값은 `plain`이며 새 서식 글은 `html`로 저장합니다. 서버는 허용된 HTML 태그와 색상만 저장하고, 상세 화면에서도 HTML을 정화합니다.
+
+게시판 조회수는 `view_count` 합계만 저장하며 조회자 정보는 기록하지 않습니다. 상세 화면을 다시 열거나 새로고침할 때마다 증가합니다. 목록 조회와 수정 화면 로딩(`count_view=false`)은 집계하지 않습니다. 업데이트 시 `backend/sql/board.sql`을 적용하며 기존 글의 조회수는 0부터 시작합니다.
