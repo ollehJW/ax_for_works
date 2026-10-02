@@ -9,3 +9,6 @@ CREATE TABLE IF NOT EXISTS platform.board_posts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS board_posts_category_created ON platform.board_posts(category,created_at DESC,post_id DESC);
+
+-- Existing posts remain plain text; rich text posts explicitly opt into HTML.
+ALTER TABLE platform.board_posts ADD COLUMN IF NOT EXISTS content_format TEXT NOT NULL DEFAULT 'plain' CHECK (content_format IN ('plain','html'));

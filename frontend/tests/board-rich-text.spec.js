@@ -1,0 +1,27 @@
+import {test,expect} from '@playwright/test';
+for(const category of ['notice','patch'])test(`rich text persists in ${category} editor and detail`,async({page})=>{
+ let post;const id='00000000-0000-0000-0000-000000000001';
+ await page.route('**/api/auth/me',r=>r.fulfill({json:{full_name:'편집 검증',is_admin:true,must_change_password:false}}));
+ await page.route('**/api/agents',r=>r.fulfill({json:{agents:[]}}));
+ await page.route('**/api/board**',r=>{const req=r.request();if(['POST','PUT'].includes(req.method())){post={...req.postDataJSON(),post_id:id,created_at:'2026-10-02T00:00:00Z',updated_at:'2026-10-02T00:00:00Z'};return r.fulfill({json:{post_id:id}});}return r.fulfill({json:post||{posts:[],total:0}});});
+ await page.goto(`/#notices/${category}/new`);
+ await page.getByLabel('제목',{exact:true}).fill('서식 검증');
+ const input=page.getByRole('textbox',{name:'내용',exact:true});
+ await input.fill('강조할 문장');await input.press('ControlOrMeta+a');
+ await page.getByRole('button',{name:'굵게',exact:true}).click();
+ await page.getByRole('button',{name:'밑줄',exact:true}).click();
+ await page.getByRole('button',{name:'기울임',exact:true}).click();
+ await page.getByLabel('글자색',{exact:true}).fill('#e53935');
+ await expect(input.locator('strong')).toContainText('강조할 문장');
+ await expect(input.locator('u')).toContainText('강조할 문장');
+ await page.getByRole('button',{name:'게시글 저장',exact:true}).click();
+ await expect(page.locator('.board-content strong')).toHaveText('강조할 문장');
+ await expect(page.locator('.board-content u')).toHaveText('강조할 문장');
+ await expect(page.locator('.board-content em')).toHaveCSS('font-style','italic');
+ await expect(page.locator('.board-content span')).toHaveCSS('color','rgb(229, 57, 53)');
+ expect(post.content_format).toBe('html');
+ await page.getByRole('button',{name:'수정',exact:true}).click();
+ await expect(page.getByRole('textbox',{name:'내용'}).locator('u')).toHaveText('강조할 문장');
+ await page.getByRole('textbox',{name:'내용'}).fill('');
+ await expect(page.getByRole('button',{name:'게시글 저장'})).toBeDisabled();
+});

@@ -3,7 +3,8 @@ from typing import Literal
 from urllib.parse import urlsplit
 from uuid import UUID, uuid4
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from backend.rich_text import clean_html, has_text
 from backend.auth import ready_user
 from backend.database import database
 
@@ -15,6 +16,18 @@ class PostBody(BaseModel):
     category: Kind
     title: str = Field(min_length=1, max_length=160)
     content: str = Field(min_length=1, max_length=30000)
+
+    content_format: Literal['plain', 'html'] = 'plain'
+
+    @model_validator(mode='after')
+    def validate_html(self):
+        if self.content_format == 'html':
+            self.content = clean_html(self.content)
+            if not has_text(self.content):
+                raise ValueError('내용을 입력해 주세요.')
+            if len(self.content) > 30000:
+                raise ValueError('서식을 포함한 내용은 30,000자 이하로 입력해 주세요.')
+        return self
 
     @field_validator('title', 'content')
     @classmethod
@@ -46,25 +59,27 @@ def posts(category: Kind = 'notice', page: int = Query(1, ge=1), q: str = Query(
 @router.get('/{post_id}')
 def post(post_id: UUID):
     with database() as db:
-        row = db.execute('SELECT post_id,category,title,content,created_at,updated_at FROM platform.board_posts WHERE post_id=%s', (str(post_id),)).fetchone()
+        row = db.execute('SELECT post_id,category,title,content,content_format,created_at,updated_at FROM platform.board_posts WHERE post_id=%s', (str(post_id),)).fetchone()
     if not row:
         raise HTTPException(404, '게시글을 찾을 수 없습니다.')
+    if row['content_format'] == 'html':
+        row['content'] = clean_html(row['content'])
     return row
 
 
 @router.post('', status_code=201)
 def create(body: PostBody, user=Depends(editor)):
     with database() as db:
-        row = db.execute('''INSERT INTO platform.board_posts (post_id,category,title,content,created_by)
-            VALUES (%s,%s,%s,%s,%s) RETURNING post_id''', (str(uuid4()),body.category,body.title,body.content,user['user_id'])).fetchone()
+        row = db.execute('''INSERT INTO platform.board_posts (post_id,category,title,content,created_by,content_format)
+            VALUES (%s,%s,%s,%s,%s,%s) RETURNING post_id''', (str(uuid4()),body.category,body.title,body.content,user['user_id'],body.content_format)).fetchone()
     return row
 
 
 @router.put('/{post_id}')
 def update(post_id: UUID, body: PostBody, user=Depends(editor)):
     with database() as db:
-        row = db.execute('''UPDATE platform.board_posts SET category=%s,title=%s,content=%s,updated_at=now()
-            WHERE post_id=%s RETURNING post_id''', (body.category,body.title,body.content,str(post_id))).fetchone()
+        row = db.execute('''UPDATE platform.board_posts SET category=%s,title=%s,content=%s,content_format=%s,updated_at=now()
+            WHERE post_id=%s RETURNING post_id''', (body.category,body.title,body.content,body.content_format,str(post_id))).fetchone()
     if not row:
         raise HTTPException(404, '게시글을 찾을 수 없습니다.')
     return row

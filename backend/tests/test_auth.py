@@ -100,6 +100,28 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(self.client.post('/api/board', json=body, headers=self.headers).status_code, 403)
         self.assertEqual(self.client.put('/api/board/'+post_id, json=body, headers=self.headers).status_code, 403)
 
+    def test_board_rich_text_sanitization_and_legacy_text(self):
+        self.login()
+        body=dict(category='patch',title='서식 검증',content_format='html',content='<p><strong>굵게</strong><u>밑줄</u><span style="color:#ff0000;background-color:#ffff00;position:fixed">색상</span><script>alert(1)</script><img src=x onerror=alert(1)><a href="javascript:alert(1)">링크</a></p>')
+        response=self.client.post('/api/board',json=body,headers=self.headers)
+        self.assertEqual(response.status_code,201,response.text)
+        post_id=response.json()['post_id']
+        result=self.client.get('/api/board/'+post_id).json()
+        self.assertEqual(result['content_format'],'html')
+        for expected in ['<strong>굵게</strong>','<u>밑줄</u>','color:', 'background-color:']:
+            self.assertIn(expected,result['content'])
+        for unwanted in ['script','onerror','javascript:','position:', '<img']:
+            self.assertNotIn(unwanted,result['content'])
+        for empty in ['<p><br></p>','<p>&nbsp;</p>','<script>alert(1)</script>']:
+            self.assertEqual(self.client.post('/api/board',json=body|dict(content=empty),headers=self.headers).status_code,422)
+        plain=dict(category='notice',title='기존 글',content='<b>일반 텍스트</b>\n줄바꿈')
+        result=self.client.post('/api/board',json=plain,headers=self.headers)
+        saved=self.client.get('/api/board/'+result.json()['post_id']).json()
+        self.assertEqual(saved['content_format'],'plain')
+        self.assertEqual(saved['content'],plain['content'])
+        self.assertEqual(self.client.put('/api/board/'+post_id,json=body|dict(content='<h2>수정</h2><ul><li><p>목록</p></li></ul>'),headers=self.headers).status_code,200)
+        self.assertIn('<h2>수정</h2>',self.client.get('/api/board/'+post_id).json()['content'])
+
     def test_login_uses_org_directory_and_allows_unassigned_org(self):
         # Match production: no legacy users.organization column.
         with database() as db:

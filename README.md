@@ -280,5 +280,7 @@ Docker bridge 주소/서브넷이 달라지면 unit의 `bind`, `range`와 `.env`
 
 - 상단 공지사항 메뉴의 두 탭에서 목록·제목 검색·페이지 이동·상세 보기를 제공합니다.
 - 로그인한 사용자는 열람할 수 있으며, 초기 비밀번호 변경이 필요한 계정은 먼저 변경해야 합니다.
-- `platform.users.is_admin`이 true인 관리자만 작성·수정할 수 있습니다. 내용은 일반 텍스트로 표시합니다.
+- `platform.users.is_admin`이 true인 관리자만 작성·수정할 수 있습니다. 본문은 서식 편집기에서 글자색·배경색·굵게·밑줄·목록 등을 적용할 수 있습니다. 기존 일반 텍스트 글도 유지됩니다.
 - 게시글은 `platform.board_posts`에 보관합니다. 기존 서버 업데이트 시 `backend/sql/board.sql`을 DB에 적용한 뒤 배포하세요. 초기 DB 구성에는 자동 포함됩니다.
+
+서식 편집 배포 시에도 `backend/sql/board.sql`을 적용해 `content_format` 컬럼을 추가하세요. 기본값은 `plain`이며 새 서식 글은 `html`로 저장합니다. 서버는 허용된 HTML 태그와 색상만 저장하고, 상세 화면에서도 HTML을 정화합니다.
