@@ -4,6 +4,14 @@ import './agent-introduction.css';
 
 // Add a service here to enable its introduction tab. Tab labels/order follow /api/agents.
 const introductions = {
+  wiameet: {
+    eyebrow: 'MEETING INTELLIGENCE', title: '대화에 집중하는 회의,\n기록을 완성하는 AI,',
+    description: '회의의 흐름은 놓치지 않고, 기록의 부담은 가볍게.\n녹음 속 대화를 분석하고 화자를 확인해\n우리 회의에 맞는 회의록을 완성합니다.',
+    film: '/wiameet/media/Wiameet_intro.mp4',
+    caption: '회의를 기록하는 시간은 줄이고, 대화와 결정에 집중하세요.',
+    guideDescription: '녹음 준비와 화자 확인부터 회의록 검토·보관까지.', guideUrl: null,
+    guideFilename: 'WiaMeet-사용-가이드.pptx', tags: ['회의 녹음·업로드', '화자 확인', 'AI 회의록 작성'],
+  },
   wianews: {
     eyebrow: 'TECH INTELLIGENCE', title: '기술의 흐름을 읽는\n나만의 뉴스레터,',
     description: '관심 있는 기술은 깊게, 읽어야 할 소식은 간결하게.\n신뢰할 수 있는 출처에서 찾은 기술 뉴스를\nAI가 정리하고, 원하는 주기로 전해드립니다.',
