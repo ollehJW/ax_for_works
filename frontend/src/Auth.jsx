@@ -1,3 +1,5 @@
+import ProfileDialog from './ProfileDialog';
+import {missingProfileFields} from './profileFields';
 import AccountDialog from './AccountDialogs.jsx';
 import { safeDestination } from './loginDestination.js';
 import React, { useEffect, useRef, useState } from 'react';
@@ -44,6 +46,18 @@ function Login({onLogin,notice}) {
 }
 export default function AuthGate({children}) {
   const [user,setUser]=useState(null);const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
+  const [profileOpen,setProfileOpen]=useState(false);
+  const [requestHandled,setRequestHandled]=useState(false);
+  const skipKey=user?'ax-profile-dismissed:'+user.user_id:'';
+  const requested=new URLSearchParams(window.location.search).get('profile')==='complete';
+  const shouldPrompt=Boolean(user&&!user.must_change_password&&((requested&&!requestHandled)||(!user.is_admin&&missingProfileFields(user).length&&!sessionStorage.getItem(skipKey))));
+  useEffect(()=>{if(shouldPrompt)setProfileOpen(true);},[shouldPrompt]);
+  function closeProfile(){
+    if(skipKey)sessionStorage.setItem(skipKey,'1');
+    setRequestHandled(true);setProfileOpen(false);
+    if(requested){const url=new URL(window.location.href);url.searchParams.delete('profile');window.history.replaceState(null,'',url.pathname+url.search+url.hash);}
+  }
+
   useEffect(()=>{
     let active=true;
     async function refresh(){try{const value=await authRequest('/auth/me');if(active){setUser(value);setNotice('');}}catch(err){if(active){if(err.status===401){setUser(null);if(window.location.pathname!=='/login')window.location.replace('/login');}else setNotice(err.message);}}finally{if(active)setLoading(false);}}
@@ -51,15 +65,15 @@ export default function AuthGate({children}) {
     refresh();window.addEventListener('ax-session-expired',expired);window.addEventListener('focus',refresh);
     return()=>{active=false;window.removeEventListener('ax-session-expired',expired);window.removeEventListener('focus',refresh);};
   },[]);
-  async function logout(){try{await postAuth('/auth/logout');setUser(null);setNotice('');window.location.replace('/login');}catch(err){setNotice(err.message);}}
+  async function logout(){try{await postAuth('/auth/logout');if(skipKey)sessionStorage.removeItem(skipKey);setUser(null);setNotice('');window.location.replace('/login');}catch(err){setNotice(err.message);}}
   useEffect(()=>{
-    if(!loading && user && !user.must_change_password && window.location.pathname==='/login'){
+    if(!loading && user && !user.must_change_password && !profileOpen && !shouldPrompt && window.location.pathname==='/login'){
       const target=safeDestination(new URLSearchParams(window.location.search).get('next'));
       window.location.replace(target);
     }
-  },[loading,user]);
+  },[loading,user,profileOpen,shouldPrompt]);
   if(loading)return <div className="auth-page"><Loader2 className="spin" size={32}/><span>로그인 확인 중</span></div>;
   if(!user)return <Login notice={notice} onLogin={value=>{setUser(value);setNotice('');}}/>;
   if(user.must_change_password)return <PasswordChange key={user.user_id} notice={notice} user={user} onChanged={setUser} onLogout={logout}/>;
-  return <>{notice&&<div className="auth-global-error" role="alert">{notice}</div>}{children(user,logout)}</>;
+  return <>{notice&&<div className="auth-global-error" role="alert">{notice}</div>}{children(user,logout,()=>setProfileOpen(true),profileOpen)}{profileOpen&&<ProfileDialog user={user} onClose={closeProfile} onUpdated={setUser} returnToService={window.location.pathname==='/login'&&safeDestination(new URLSearchParams(window.location.search).get('next'))!=='/'}/>}</>;
 }

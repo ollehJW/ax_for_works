@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import AuthGate from './Auth.jsx';
@@ -15,22 +15,7 @@ function Icon({ d = STAR, size = 20, ...props }) {
 function Badge({ agent, children }) {
   return <span className="agent-icon" style={{ background: agent.tint, color: agent.color }}>{children || <Icon d={agent.d} size={24}/>}</span>;
 }
-function InfoDialog({ kind, agents, close, user }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const trigger = document.activeElement;
-    ref.current.showModal();
-    return () => trigger?.focus();
-  }, []);
-  const title = '내 계정';
-  return <dialog ref={ref} onCancel={close} onClick={e => { if (e.target === e.currentTarget) close(); }} aria-labelledby="dialog-title">
-    <div className="dialog-content"><span className="brand-symbol"><Icon/></span><h2 id="dialog-title">{title}</h2>
-      {kind === 'account' && <div className="account-details"><p><strong>{user.full_name}</strong> · {user.employee_id}</p>{user.organization && <p>{user.organization}</p>}<p>{user.team_name} · {user.role_name}</p><p>{user.email}</p><p>{user.is_admin ? '관리자' : '일반 사용자'}</p></div>}
-      <button className="primary" onClick={close}>확인</button>
-    </div>
-  </dialog>;
-}
-function App({ user, onLogout }) {
+function App({ user, onLogout, onProfile, profileOpen }) {
   const [route, setRoute] = useState(() => window.location.hash);
   const introductionsPage = route.startsWith('#introductions');
   const noticesPage = route.startsWith('#notices');
@@ -48,7 +33,6 @@ function App({ user, onLogout }) {
   const [playing, setPlaying] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [interacting, setInteracting] = useState(false);
   const [visible, setVisible] = useState(!document.hidden);
-  const [dialog, setDialog] = useState(null);
   useEffect(() => {
     const update = () => setVisible(!document.hidden);
     document.addEventListener('visibilitychange', update);
@@ -66,7 +50,7 @@ function App({ user, onLogout }) {
       .finally(() => { clearTimeout(timeout); if (active) setLoading(false); });
     return () => { active = false; clearTimeout(timeout); controller.abort(); };
   }, [attempt]);
-  const running = playing && !interacting && !dialog && visible && !introductionsPage && !noticesPage;
+  const running = playing && !interacting && !profileOpen && visible && !introductionsPage && !noticesPage;
   useEffect(() => {
     if (!running || agents.length < 2) return;
     const timer = setTimeout(() => setCurrent(i => (i + 1) % agents.length), 6000);
@@ -87,7 +71,7 @@ function App({ user, onLogout }) {
     <header><div className="header-inner">
       <a className="brand" href="#top" aria-label="AX for Works 홈"><span className="brand-symbol"><Icon size={18}/></span><span>AX <em>for Works</em></span></a>
       <nav aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage ? 'page' : undefined}>AI Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Agent 소개</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>공지사항</a></nav>
-      <div className="workspace"><button className="workspace-identity" aria-label="내 계정" onClick={() => setDialog('account')}>
+      <div className="workspace"><button className="workspace-identity" aria-label="내 계정" onClick={onProfile}>
         {user.team_name && user.team_name !== '미지정' && <span className="workspace-team">{user.team_name}</span>}
         <span className="workspace-person"><strong>{user.full_name}</strong>{user.role_name && user.role_name !== '미지정' && <span> {user.role_name}</span>}</span>
       </button><span className="workspace-divider" aria-hidden="true"/><button className="logout-button" onClick={onLogout}><Icon d="M9 5H5v14h4 M14 8l4 4-4 4 M9 12h9" size={16}/>로그아웃</button></div>
@@ -99,7 +83,7 @@ function App({ user, onLogout }) {
           <div className="hero-circle circle-one"/><div className="hero-circle circle-two"/>
           <div className="hero-body" id={`panel-${a.id}`} role="tabpanel" aria-labelledby={`tab-${a.id}`} key={a.id}>
             <div className="hero-copy"><span className="partner"><Icon size={13}/>YOUR AI PARTNER · {String(current + 1).padStart(2, '0')}</span><p className="hero-name">{a.name} <span>· {a.sub}</span></p><h2>{a.title}</h2><p className="hero-detail">{a.detail}</p><div className="hero-actions"><a className="launch" href={a.launch_url}>{a.name} 시작하기 <Icon d={ARROW} size={18}/></a></div></div>
-            <AgentPreview agent={a} playing={playing && visible && !dialog}/>
+            <AgentPreview agent={a} playing={playing && visible && !profileOpen}/>
           </div>
           <div className="hero-bottom"><div className="tabs" role="tablist" aria-label="소개할 Agent 선택" style={{ gridTemplateColumns: `repeat(${agents.length}, minmax(150px, 1fr))` }}>
             {agents.map((agent, i) => <button key={agent.id} id={`tab-${agent.id}`} role="tab" aria-selected={i === current} aria-controls={i === current ? `panel-${agent.id}` : undefined} tabIndex={i === current ? 0 : -1} className={`tab ${i === current ? 'selected' : ''}`} onClick={() => select(i)} onKeyDown={e => tabKey(e, i)}>
@@ -115,7 +99,6 @@ function App({ user, onLogout }) {
       </>}
       <footer><span><b>WIA</b>© {new Date().getFullYear()} Hyundai WIA. All rights reserved.</span><span>AX for Works <span className="footer-tagline">함께 만드는 업무의 다음 단계</span></span></footer>
     </main>
-    {dialog && <InfoDialog kind={dialog} agents={agents} user={user} close={() => setDialog(null)}/>}
   </>;
 }
-createRoot(document.getElementById('root')).render(<React.StrictMode><AuthGate>{(user,onLogout)=><App user={user} onLogout={onLogout}/>}</AuthGate></React.StrictMode>);
+createRoot(document.getElementById('root')).render(<React.StrictMode><AuthGate>{(user,onLogout,onProfile,profileOpen)=><App user={user} onLogout={onLogout} onProfile={onProfile} profileOpen={profileOpen}/>}</AuthGate></React.StrictMode>);

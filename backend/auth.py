@@ -323,3 +323,74 @@ def register(body: RegisterBody, request: Request):
     except psycopg.errors.UniqueViolation:
         raise HTTPException(409, '이미 등록된 사번입니다.') from None
     return {'ok': True, 'message': '계정이 생성되었습니다. 설정한 비밀번호로 로그인해 주세요.'}
+
+
+class CompleteProfileBody(BaseModel):
+    """Only missing profile values may be supplied; identity and privileges are immutable."""
+    model_config = ConfigDict(extra='forbid')
+    full_name: str | None = Field(default=None, min_length=1, max_length=80)
+    organization: str | None = Field(default=None, min_length=1, max_length=80)
+    team_name: str | None = Field(default=None, min_length=1, max_length=80)
+    role_name: str | None = Field(default=None, min_length=1, max_length=80)
+    email: str | None = Field(default=None, min_length=3, max_length=254)
+
+    @field_validator('full_name', 'organization', 'team_name', 'role_name')
+    @classmethod
+    def valid_label(cls, value):
+        if value is None:
+            return value
+        value = normalized_name(value)
+        if not value or value == '미지정':
+            raise ValueError('누락된 정보를 입력해 주세요. 미지정은 사용할 수 없습니다.')
+        return value
+
+    @field_validator('email')
+    @classmethod
+    def valid_email(cls, value):
+        return RegisterBody.valid_email(value) if value is not None else value
+
+
+def missing_profile_fields(row):
+    return [field for field in ('full_name', 'organization', 'team_name', 'role_name', 'email')
+            if normalized_name(str(row.get(field) or '')) in ('', '미지정')]
+
+
+@router.post('/profile/complete')
+def complete_profile(body: CompleteProfileBody, request: Request, user=Depends(ready_user)):
+    supplied = body.model_dump(exclude_none=True)
+    with database() as db:
+        # Use the same directory lock as registration; lock the session's user row
+        # before deciding which values are missing, to avoid concurrent overwrites.
+        db.execute('SELECT pg_advisory_xact_lock(741902630)')
+        row = find_session_user(db, request.cookies.get(COOKIE), lock=True)
+        if not row:
+            raise HTTPException(401, '로그인이 필요합니다.')
+        if row['must_change_password']:
+            raise HTTPException(403, '초기 비밀번호를 먼저 변경해 주세요.')
+        missing = set(missing_profile_fields(row))
+        if set(supplied) - missing:
+            raise HTTPException(409, '이미 등록된 정보는 변경할 수 없습니다. 계정 정보를 새로 확인해 주세요.')
+        if missing - set(supplied):
+            raise HTTPException(422, '입력이 필요한 항목을 모두 채워 주세요.')
+        if not supplied:
+            return public_user(row)
+        changes = {}
+        stamp = now()
+        for field, table, column in [('organization','orgs','org_id'), ('team_name','teams','team_id'), ('role_name','roles','role_id')]:
+            if field not in supplied:
+                continue
+            name = supplied[field]
+            entries = db.execute(f'SELECT {column},name FROM platform.{table}').fetchall()
+            existing = next((entry for entry in entries if normalized_name(entry['name']).casefold() == name.casefold()), None)
+            item_id = existing[column] if existing else str(uuid.uuid4())
+            if not existing:
+                db.execute(f'INSERT INTO platform.{table} ({column},name,created_at) VALUES (%s,%s,%s)', (item_id,name,stamp))
+            changes[column] = item_id
+        for field in ('full_name','email'):
+            if field in supplied:
+                changes[field] = supplied[field]
+        changes['updated_at'] = stamp
+        # Column names above are fixed server constants, never client input.
+        assignments = ', '.join(f'{field}=%s' for field in changes)
+        db.execute(f'UPDATE platform.users SET {assignments} WHERE user_id=%s', (*changes.values(),row['user_id']))
+        return public_user(db.execute(USER_QUERY + ' WHERE u.user_id=%s', (row['user_id'],)).fetchone())

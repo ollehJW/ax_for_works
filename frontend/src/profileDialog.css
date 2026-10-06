@@ -1,0 +1,32 @@
+.profile-dialog { width:640px; max-width:calc(100vw - 64px); min-height:min(730px,calc(100vh - 64px)); max-height:calc(100vh - 64px); margin:auto; padding:32px 36px; overflow:auto; border:1px solid #e2e8f1; border-radius:20px; box-shadow:0 24px 90px #142c4b33; color:#253b56; font-family:'Wia Pretendard',Pretendard,sans-serif; }
+.profile-dialog::backdrop { background:#142e5066; backdrop-filter:blur(3px); }
+.profile-dialog * { box-sizing:border-box; }
+.profile-heading { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.profile-symbol { display:grid; place-items:center; width:46px; height:46px; border-radius:14px; background:#edf3fc; color:#3f6598; }
+.profile-dialog .profile-close { display:grid; place-items:center; padding:8px; border:0; border-radius:8px; background:transparent; color:#8190a3; cursor:pointer; }
+.profile-close:hover { background:#f1f5fa; }
+.profile-dialog .profile-eyebrow { margin:0 0 8px; font-size:10px; font-weight:700; letter-spacing:1.2px; color:#7f93ad; }
+.profile-dialog h2 { font-size:25px; margin:0 0 10px; letter-spacing:-.6px; }
+.profile-dialog #profile-help { margin:0 0 26px; color:#77889e; font-size:13px; line-height:1.7; }
+.profile-dialog fieldset { border:0; padding:0; margin:0; min-width:0; }
+.profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 20px; }
+.profile-dialog label { font-size:13px; color:#5b6f89; font-weight:600; position:relative; }
+.profile-dialog input { border:1px solid #dbe4ef; border-radius:8px; padding:11px 12px; color:#263d5b; font:inherit; font-size:14px; height:44px; outline:none; width:100%; }
+.profile-dialog input:focus { border-color:#8fabd2; box-shadow:0 0 0 3px #668cbf12; }
+.profile-dialog input[readonly] { background:#f5f7fa; color:#8190a3; border-color:#e9edf3; }
+.profile-needed { position:absolute; right:0; top:0; font-size:10px; color:#6081ad; font-weight:500; }
+.profile-dialog .registration-suggestion-field { min-width:0; }
+.profile-dialog .profile-note { display:flex; align-items:flex-start; gap:8px; color:#8090a5; font-size:11px; line-height:1.8; margin:6px 0 20px; }
+.profile-note svg { flex-shrink:0; margin-top:2px; }
+.profile-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
+.profile-dialog .profile-primary,.profile-dialog .profile-secondary { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:44px; padding:11px 20px; border-radius:9px; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.profile-dialog .profile-primary { background:#28569d; color:#fff; border:1px solid #28569d; }
+.profile-dialog .profile-primary:hover:not(:disabled) { background:#204781; }
+.profile-dialog .profile-secondary { background:#fff; color:#6a7c95; border:1px solid #dfe6ef; }
+.profile-dialog button:disabled { opacity:.55; cursor:default; }
+.profile-dialog button:focus-visible { outline:3px solid #98b6e0; outline-offset:3px; }
+.profile-saved { display:flex; flex-direction:column; align-items:center; text-align:center; padding:58px 0; color:#378473; gap:18px; }
+.profile-saved strong { color:#345572; font-size:19px; }
+.profile-saved p { margin:0; font-size:13px; color:#8292a5; }
+.profile-saved .profile-primary { margin-top:22px; }
+.profile-dialog .spin { animation:spin 1s linear infinite; }
