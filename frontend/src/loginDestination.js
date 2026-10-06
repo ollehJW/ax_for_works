@@ -3,7 +3,7 @@ export function safeDestination(value, origin = window.location.origin) {
   try {
     const parsed=new URL(value,origin);
     if(parsed.origin!==origin || parsed.pathname.includes('%'))return '/';
-    if(parsed.pathname==='/' || /^\/(wianews|wiacoding)(\/|$)/.test(parsed.pathname))return parsed.pathname+parsed.search+parsed.hash;
+    if(parsed.pathname==='/' || /^\/(wianews|wiacoding|wiameet)(\/|$)/.test(parsed.pathname))return parsed.pathname+parsed.search+parsed.hash;
   } catch {}
   return '/';
 }
