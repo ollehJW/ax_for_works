@@ -25,8 +25,8 @@ const introductions = {
     description: '만들고 싶은 것이 있다면, 대화부터 시작하세요.\nAI와 함께 해결할 과제를 정리하고\n나에게 맞는 첫 개발 프롬프트를 완성합니다.',
     film: '/wiacoding/media/WiaCoding_intro.mp4',
     caption: '막연한 아이디어를 정리하고, 만드는 일에 한 걸음 가까이.',
-    guideDescription: '과제 정의부터 개발 프롬프트 활용까지.', guideUrl: null,
-    guideFilename: 'WiaCoding-사용-가이드.pptx', tags: ['대화로 과제 정의', '맞춤 질문', '개발 프롬프트 완성'],
+    guideDescription: '과제 정의와 맞춤 설문부터 프롬프트 수정·공유·보관까지.', guideUrl: '/wiacoding/media/WIACoding_Guide.pdf', guideFormat: 'PDF', guidePages: 10,
+    guideFilename: 'WIACoding_Guide.pdf', tags: ['대화로 과제 정의', '맞춤 질문', '개발 프롬프트 완성'],
   },
 };
 const icons = { wiameet: AudioLines, wiareport: ChartNoAxesCombined, wianews: Layers3, wiacoding: CodeXml };
