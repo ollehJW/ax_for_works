@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Layers3, CodeXml, AudioLines, ChartNoAxesCombined, Presentation, Download, ArrowUpRight, Sparkles } from 'lucide-react';
+import { Layers3, CodeXml, AudioLines, ChartNoAxesCombined, Presentation, FileText, Download, ArrowUpRight, Sparkles } from 'lucide-react';
 import './agent-introduction.css';
 
 // Add a service here to enable its introduction tab. Tab labels/order follow /api/agents.
@@ -9,8 +9,8 @@ const introductions = {
     description: '회의의 흐름은 놓치지 않고, 기록의 부담은 가볍게.\n녹음 속 대화를 분석하고 화자를 확인해\n우리 회의에 맞는 회의록을 완성합니다.',
     film: '/wiameet/media/Wiameet_intro.mp4',
     caption: '회의를 기록하는 시간은 줄이고, 대화와 결정에 집중하세요.',
-    guideDescription: '녹음 준비와 화자 확인부터 회의록 검토·보관까지.', guideUrl: null,
-    guideFilename: 'WiaMeet-사용-가이드.pptx', tags: ['회의 녹음·업로드', '화자 확인', 'AI 회의록 작성'],
+    guideDescription: '참석자 그룹 설정부터 녹음·화자 검토·회의록 확정, Confluence 공유까지.', guideUrl: '/wiameet/media/WIAMeet_Guide.pdf', guideFormat: 'PDF', guidePages: 20,
+    guideFilename: 'WIAMeet_Guide.pdf', tags: ['회의 녹음·업로드', '화자 매핑 검토', '회의록 확정·공유'],
   },
   wianews: {
     eyebrow: 'TECH INTELLIGENCE', title: '기술의 흐름을 읽는\n나만의 뉴스레터,',
@@ -44,6 +44,8 @@ export default function AgentIntroduction({ agents, loading, error, onRetry, sel
     tab?.focus(); tab?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
   const content = selected && introductions[selected.id];
+  const guideFormat = content?.guideFormat || 'PPT';
+  const GuideIcon = guideFormat === 'PDF' ? FileText : Presentation;
   return <div className="agent-introductions">
     <div className="ai-page-heading"><p className="eyebrow"><span/>MEET YOUR AGENTS</p><h1>Agent 소개</h1><p>어떤 일을 도와주는지, 어떻게 시작하는지 알아보세요.</p></div>
     {loading ? <div className="state-panel" role="status">Agent 소개를 불러오고 있습니다.</div> : error ? <div className="state-panel" role="alert"><p>Agent 목록을 불러오지 못했습니다.</p><button className="primary" onClick={onRetry}>다시 시도</button></div> : <>
@@ -56,7 +58,7 @@ export default function AgentIntroduction({ agents, loading, error, onRetry, sel
         <div className="ai-overview"><div className="ai-overview-copy"><span className="ai-kicker">{content.eyebrow}</span><h2>{content.title}<br/><em>{selected.name}.</em></h2><p>{content.description}</p><div className="ai-tags">{content.tags.map(tag=><span key={tag}>{tag}</span>)}</div></div>
           <div className="ai-film"><div className="ai-film-heading"><span>SERVICE FILM</span><small>{selected.name} 이야기</small></div><video key={content.film} controls preload="metadata" aria-label={`${selected.name} 서비스 소개 영상`}><source src={content.film} type="video/mp4"/>이 브라우저는 영상 재생을 지원하지 않습니다.</video><p>{content.caption}</p></div>
         </div>
-        <section className="ai-guide" aria-labelledby={`guide-${selected.id}`}><div className="ai-guide-icon"><Presentation size={31}/><span>PPT GUIDE</span></div><div className="ai-guide-copy"><span className="ai-kicker">QUICK START GUIDE</span><h3 id={`guide-${selected.id}`}>처음이라면, 가이드와 함께.</h3><p>{content.guideDescription}<br/>{content.guideUrl ? '단계별 사용 방법을 담은 가이드를 내려받아 확인하세요.' : '단계별 사용 방법을 담은 가이드를 준비하고 있습니다.'}</p></div><div className="ai-guide-action">{content.guideUrl ? <a href={content.guideUrl} download={content.guideFilename}><Download size={16}/>PPT 가이드 다운로드<ArrowUpRight size={16}/></a> : <><button disabled><Download size={16}/>PPT 가이드 준비 중</button><small>등록 후 다운로드할 수 있습니다.</small></>}</div></section>
+        <section className="ai-guide" aria-labelledby={`guide-${selected.id}`}><div className="ai-guide-icon"><GuideIcon size={31}/><span>{guideFormat} GUIDE</span></div><div className="ai-guide-copy"><span className="ai-kicker">QUICK START GUIDE</span><h3 id={`guide-${selected.id}`}>처음이라면, 가이드와 함께.</h3><p>{content.guideDescription}<br/>{content.guideUrl ? `${content.guidePages ? content.guidePages + '페이지 ' : ''}${guideFormat} 가이드로 단계별 사용 방법을 확인하세요.` : '단계별 사용 방법을 담은 가이드를 준비하고 있습니다.'}</p></div><div className="ai-guide-action">{content.guideUrl ? <a href={content.guideUrl} download={content.guideFilename}><Download size={16}/>{guideFormat} 가이드 다운로드<ArrowUpRight size={16}/></a> : <><button disabled><Download size={16}/>{guideFormat} 가이드 준비 중</button><small>등록 후 다운로드할 수 있습니다.</small></>}</div></section>
       </section> : <div className="state-panel">서비스 소개를 준비하고 있습니다.</div>}
     </>}
   </div>;
