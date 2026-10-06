@@ -17,8 +17,8 @@ const introductions = {
     description: '관심 있는 기술은 깊게, 읽어야 할 소식은 간결하게.\n신뢰할 수 있는 출처에서 찾은 기술 뉴스를\nAI가 정리하고, 원하는 주기로 전해드립니다.',
     film: '/wianews/media/WiaNews_intro.mp4',
     caption: '뉴스를 찾는 시간은 줄이고, 새로운 아이디어에 집중하세요.',
-    guideDescription: '주제 설정부터 뉴스레터 구독까지.', guideUrl: null,
-    guideFilename: 'WiaNews-사용-가이드.pptx', tags: ['기술 뉴스 선별', 'AI 요약', '정기 이메일 구독'],
+    guideDescription: '주제·도메인 설정부터 뉴스 선정, 보관함·메일 발송·정기 구독까지.', guideUrl: '/wianews/media/WIANews_Guide.pdf', guideFormat: 'PDF', guidePages: 13,
+    guideFilename: 'WIANews_Guide.pdf', tags: ['기술 뉴스 선별', 'AI 요약', '정기 이메일 구독'],
   },
   wiacoding: {
     eyebrow: 'YOUR FIRST CODING PROMPT', title: '업무의 아이디어를\n첫 개발 프롬프트로,',
