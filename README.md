@@ -347,3 +347,11 @@ WiaNews의 `backend/workspace`는 `/data/wianews/workspace`에 링크합니다.
 전환 직전에 두 서버의 뉴스 데이터와 발송 이력이 동일하고 실행 중인 작업이 없음을 확인했습니다.
 정기 수집은 한국시간 05:00, 발송은 08:00 기준이며, 활성 구독의 발행 주기를 따릅니다.
 재전환할 때도 현재 자동 작업을 먼저 끄고 이력을 동기화한 뒤 대상 서버에서 활성화하세요.
+
+
+H200 전용 WiaMeet 게이트웨이는 `/data/ax_for_works/config/config.yaml`에
+`/wiameet` → `https://axforwork.wia.co.kr:31001`로 등록했습니다.
+소개는 `/wiameet/`, 기존 WiaMeet 로그인·서비스는 `/wiameet/agent`입니다.
+WiaMeet 자체 인증을 사용하므로 이 경로의 `require_login`은 `false`입니다.
+`__Host-` 쿠키는 브라우저 규칙상 Path=/가 필수이므로 게이트웨이에서 유지하고,
+그 외 서비스 쿠키는 기존처럼 서비스 접두어를 붙입니다.

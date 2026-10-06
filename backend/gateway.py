@@ -52,7 +52,7 @@ def without_hop(headers):
 def response_headers(headers, prefix, upstream, public_host, redirect_hosts=()):
     result = []
     for key, value in without_hop(headers):
-        if key == b'set-cookie' and not value.startswith(b'ax_platform_session='):
+        if key == b'set-cookie' and not value.startswith((b'ax_platform_session=', b'__Host-')):
             # Preserve every Set-Cookie header, including logout expiry and flags.
             value = re.sub(rb'(?i)(;\s*path=)(/[^;]*)', lambda m: m[1] + prefix.encode() + m[2], value)
         elif key == b'location':
