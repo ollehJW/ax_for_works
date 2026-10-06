@@ -338,3 +338,12 @@ H200 PostgreSQL 16 빌드는 ICU가 없어 원본의 `nocase` 정렬 규칙을 �
 WiaNews의 `backend/workspace`는 `/data/wianews/workspace`에 링크합니다.
 자동 수집·발송은 기존 서버와 중복되지 않도록 최종 전환 전까지
 `WIANEWS_SUBSCRIPTION_COLLECTION_ENABLED=0`, `WIANEWS_SUBSCRIPTION_PUBLICATION_ENABLED=0`으로 둡니다.
+
+
+2026-10-06 자동 작업 전환을 완료했습니다. H200의 `/data/wianews/runtime.env`에서
+위 두 스케줄러 값을 `1`로 설정하고 WiaNews 백엔드를 재시작했습니다.
+기존 서버는 `.env`와 사용자 systemd의 `wianews-backend.service.d/h200-cutover.conf`에서
+두 값을 `0`으로 고정했습니다. 기존 웹/API는 유지하며 자동 수집·발송만 중지합니다.
+전환 직전에 두 서버의 뉴스 데이터와 발송 이력이 동일하고 실행 중인 작업이 없음을 확인했습니다.
+정기 수집은 한국시간 05:00, 발송은 08:00 기준이며, 활성 구독의 발행 주기를 따릅니다.
+재전환할 때도 현재 자동 작업을 먼저 끄고 이력을 동기화한 뒤 대상 서버에서 활성화하세요.
