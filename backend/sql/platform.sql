@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS platform.users (
     employee_id TEXT NOT NULL,
     password_hash TEXT NOT NULL,
     full_name TEXT NOT NULL,
-    team_id TEXT NOT NULL REFERENCES platform.teams(team_id),
-    role_id TEXT NOT NULL REFERENCES platform.roles(role_id),
+    team_id TEXT REFERENCES platform.teams(team_id),
+    role_id TEXT REFERENCES platform.roles(role_id),
     email TEXT NOT NULL DEFAULT '',
     must_change_password BOOLEAN NOT NULL DEFAULT TRUE,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -52,3 +52,7 @@ CREATE TABLE IF NOT EXISTS platform.login_attempts (
 
 -- Organization membership uses the shared organization directory.
 ALTER TABLE platform.users ADD COLUMN IF NOT EXISTS org_id TEXT REFERENCES platform.orgs(org_id);
+
+-- Affiliation can be pending; authentication is independent of team/position.
+ALTER TABLE platform.users ALTER COLUMN team_id DROP NOT NULL;
+ALTER TABLE platform.users ALTER COLUMN role_id DROP NOT NULL;

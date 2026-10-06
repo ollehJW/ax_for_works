@@ -23,8 +23,8 @@ PUBLIC_FIELDS = ('user_id', 'employee_id', 'full_name', 'team_id', 'team_name', 
 USER_QUERY = '''SELECT u.*, t.name AS team_name, r.name AS role_name,
                        COALESCE(o.name, '') AS organization
                 FROM platform.users u
-                JOIN platform.teams t ON t.team_id=u.team_id
-                JOIN platform.roles r ON r.role_id=u.role_id
+                LEFT JOIN platform.teams t ON t.team_id=u.team_id
+                LEFT JOIN platform.roles r ON r.role_id=u.role_id
                 LEFT JOIN platform.orgs o ON o.org_id=u.org_id'''
 
 
