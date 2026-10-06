@@ -295,11 +295,11 @@ DB·환경설정·이미지·백업·로그는 `/data`에 보관합니다. 각 �
 
 - 플랫폼: 프론트 `1000`, 백엔드 `1010`.
 - WiaNews: 프론트 `1002`, 백엔드 `1012`.
-- WiaCoding: 포트 확인 후 해당 환경파일에 지정합니다. 기존 WiaReport `1003/1013`은 변경하지 않습니다.
+- WiaCoding: 프론트 `1004`, 백엔드 `1014`. 기존 WiaReport `1003/1013`은 변경하지 않습니다.
 - 외부 도메인: `https://axforwork.wia.co.kr`. HTTPS 앞단이 Pod의 HTTP 프론트로 연결되는지 확인해야 합니다.
 - Pod에는 systemd가 없습니다. 아래 Supervisor는 새 세 서비스만 관리합니다.
 
-`/data/axforworks/runtime.env`, `/data/wianews/runtime.env`, `/data/wiacoding/runtime.env`를
+`/data/ax_for_works/runtime.env`, `/data/wianews/runtime.env`, `/data/wiacoding/runtime.env`를
 권한 `600`으로 생성하고 각 프로젝트의 `.env`에 링크합니다. 서비스 `config.yaml`도
 각 `/data/<서비스>/config.yaml`에 보관하고 프로젝트에 링크합니다. 비밀값은 Git에 넣지 않습니다.
 
@@ -310,8 +310,8 @@ HTTP 모드는 TLS를 종료하는 사내 프록시 뒤에서 사용합니다. �
 `FRONTEND_PROTOCOL` 미지정 시 HTTPS를 계속 사용합니다.
 
 플랫폼에는 `AX_DB_HOST=127.0.0.1`, `AX_DB_PORT=5432`, DB명·계정,
-`AX_AGENTS_CONFIG=/data/axforworks/config/agents.json`,
-`AX_GATEWAY_CONFIG=/data/axforworks/config/config.yaml`을 추가합니다.
+`AX_AGENTS_CONFIG=/data/ax_for_works/config/agents.json`,
+`AX_GATEWAY_CONFIG=/data/ax_for_works/config/config.yaml`을 추가합니다.
 뉴스·코딩에는 `AX_SERVICE_CONFIG=/data/<서비스>/config.yaml`을 지정합니다.
 해당 YAML의 `auth.platform_origin`은 새 도메인으로 설정합니다.
 게이트웨이는 같은 Pod의 HTTP 프론트에 연결하며, 백엔드는 loopback에만 바인딩합니다.
@@ -320,10 +320,10 @@ HTTP 모드는 TLS를 종료하는 사내 프록시 뒤에서 사용합니다. �
 cd ~/ax_for_works
 .venv/bin/python ops/h200-runtime.py configure
 # 각 서비스의 비밀 환경파일과 DB 이관 및 포트 설정을 먼저 완료합니다.
-.venv/bin/supervisord -c /data/axforworks/supervisord.conf
-.venv/bin/supervisorctl -c /data/axforworks/supervisord.conf status
+.venv/bin/supervisord -c /data/ax_for_works/supervisord.conf
+.venv/bin/supervisorctl -c /data/ax_for_works/supervisord.conf status
 # 서비스별 재시작 예시 (WiaMeet/WiaReport는 관리 대상 아님)
-.venv/bin/supervisorctl -c /data/axforworks/supervisord.conf restart wianews-backend
+.venv/bin/supervisorctl -c /data/ax_for_works/supervisord.conf restart wianews-backend
 ```
 
 Pod 재생성 시 `/home` 소스·가상환경을 재구성하고 Supervisor를 다시 시작해야 합니다.

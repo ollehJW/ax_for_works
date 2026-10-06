@@ -7,7 +7,7 @@ import shutil
 import sys
 from dotenv import dotenv_values
 
-SERVICES = {'ax_for_works': 'axforworks', 'wianews': 'wianews', 'wiacoding': 'wiacoding'}
+SERVICES = {'ax_for_works': 'ax_for_works', 'wianews': 'wianews', 'wiacoding': 'wiacoding'}
 HOME = Path.home()
 DATA = Path('/data')
 
@@ -35,7 +35,7 @@ def launch(service, component):
 
 
 def configure():
-    root = DATA / 'axforworks'
+    root = DATA / 'ax_for_works'
     for path in [root / 'run', root / 'logs']:
         path.mkdir(parents=True, exist_ok=True, mode=0o700)
     text = f'''[unix_http_server]
