@@ -1,3 +1,4 @@
+import AXAccount from './AXAccount';
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
@@ -71,10 +72,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
     <header><div className="header-inner">
       <a className="brand" href="#top" aria-label="AX for Works 홈"><span className="brand-symbol"><Icon size={18}/></span><span>AX <em>for Works</em></span></a>
       <nav aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage ? 'page' : undefined}>AI Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Agent 소개</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>공지사항</a></nav>
-      <div className="workspace"><button className="workspace-identity" aria-label="내 계정" onClick={onProfile}>
-        {user.team_name && user.team_name !== '미지정' && <span className="workspace-team">{user.team_name}</span>}
-        <span className="workspace-person"><strong>{user.full_name}</strong>{user.role_name && user.role_name !== '미지정' && <span> {user.role_name}</span>}</span>
-      </button><span className="workspace-divider" aria-hidden="true"/><button className="logout-button" onClick={onLogout}><Icon d="M9 5H5v14h4 M14 8l4 4-4 4 M9 12h9" size={16}/>로그아웃</button></div>
+      <AXAccount header name={user.full_name} team={user.team_name} admin={user.is_admin} onProfile={onProfile} onLogout={onLogout}/>
     </div></header>
     <main id="main">{noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
       <section className="intro"><div><p className="eyebrow"><span/>MAKE WORK FLOW</p><h1>일하는 방식의 변화, <em>AI와 함께.</em></h1></div><p className="intro-caption">반복되는 일은 줄이고, 더 중요한 일에 집중하세요.</p></section>
