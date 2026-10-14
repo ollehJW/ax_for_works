@@ -66,3 +66,14 @@ gateways:
       - 127.0.0.1:9901
       - localhost:9901
     read_timeout_seconds: 660
+
+
+  # WiaReport: introduction /wiareport/, team-login service /wiareport/agent.
+  # Platform SSO migration is a separate step; keep existing team authentication.
+  - prefix: /wiareport
+    upstream: https://axforwork.wia.co.kr:31003
+    enabled: true
+    require_login: false
+    redirect_hosts:
+      - 127.0.0.1:1013
+    read_timeout_seconds: 660

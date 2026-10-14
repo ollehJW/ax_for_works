@@ -37,7 +37,7 @@
     "row2": "차주 계획 · 작성 완료",
     "text2": "다음 주 할 일과 목표 일정을 작성하고 완료 상태로 저장",
     "note": "팀원별 작성 현황과 완료 보고서를 한곳에서",
-    "url": "https://dev-axforwork.wia.co.kr:9602/",
+    "url": "https://axforwork.wia.co.kr/wiareport/",
     "id": "wiareport",
     "enabled": true
   },
