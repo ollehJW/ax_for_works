@@ -32,7 +32,15 @@ function Coding() {
     <div className="demo-connector"><ArrowDown size={15}/><span>과제 정의와 맞춤 질문 답변으로 생성</span></div>
     <div className="demo-prompt demo-reveal"><div><FileText size={15}/><strong>초기 개발 프롬프트.md</strong><span><Copy size={13}/>복사</span></div><p><b># 개발 목표</b><br/>팀 업무 요청을 등록하고 진행 상태를<br/>조회하는 웹 도구를 만들어 주세요.</p><small>완성한 프롬프트를 바이브코딩 도구에 붙여넣기</small></div></>;
 }
-const previews = { wiameet: Meet, wiareport: Report, wianews: News, wiacoding: Coding };
+function Voice() {
+  return <><div className="demo-heading"><span>AI VOICE STUDIO</span><h3>문장에서 나만의 내레이션까지</h3></div>
+    <div className="demo-voice-script demo-reveal"><FileText size={17}/><div><small>읽을 문장</small><p>함께 만드는 업무의 다음 단계, AX for Works.</p></div></div>
+    <div className="demo-answer-tags demo-reveal"><span>목소리 선택</span><span>감정 · 차분하게</span><span>샘플 듣기</span></div>
+    <div className="demo-connector"><ArrowDown size={15}/><span>선택한 목소리와 감정으로 생성</span></div>
+    <div className="demo-voice-output demo-reveal"><div className="demo-wave" aria-hidden="true">{[13,22,35,20,28,40,18,32,24,38,16,29,36,21,12,26,34,17].map((height,i)=><i key={i} style={{height,animationDelay:`${i*.08}s`}}/>)}</div><strong><AudioLines size={16}/>나의 내레이션.wav<Check size={15}/></strong><div className="demo-voice-actions"><span>WAV 다운로드</span><span>My Voice 저장</span></div></div>
+    <div className="demo-voice-footer"><span>음성을 이어 붙여 더 긴 이야기로</span><span>좋은 목소리는 마켓에서 공유</span></div></>;
+}
+const previews = { wiameet: Meet, wiareport: Report, wianews: News, wiacoding: Coding, wiavoice: Voice };
 export default function AgentPreview({ agent: a, playing }) {
   const Content = previews[a.id];
   return <div className={`preview service-preview ${playing ? '' : 'demo-paused'}`} style={{'--demo-color':a.color,'--demo-tint':a.tint}}>

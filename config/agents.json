@@ -82,5 +82,26 @@
     "url": "https://dev-axforwork.wia.co.kr/wiacoding/",
     "id": "wiacoding",
     "enabled": true
+  },
+  {
+    "id": "wiavoice",
+    "name": "WiaVoice",
+    "enabled": true,
+    "url": "https://axforwork.wia.co.kr/wiavoice/",
+    "sub": "음성 생성·보관·공유",
+    "desc": "문장에 어울리는 목소리를 만들고,\n보관·병합·공유까지 한곳에서.",
+    "title": "전하고 싶은 이야기에,\n어울리는 목소리를.",
+    "detail": "문장을 입력하고 목소리와 감정을 골라 음성을 생성하세요.\nMy Voice에 보관하고, 이어 붙이거나 커스텀 목소리를 공유합니다.",
+    "tint": "#F0EBFF",
+    "color": "#7353B6",
+    "d": "M4 10v4m4-8v12m4-15v18m4-15v12m4-8v4",
+    "preview": "Voice 생성",
+    "meta": "문장 입력 → 목소리·감정 선택 → 음성 생성",
+    "tag": "음성 제작",
+    "row1": "문장에 어울리는 목소리",
+    "text1": "음성 모델과 감정 선택 · 샘플 듣기 · WAV 다운로드",
+    "row2": "나의 음성 보관·병합",
+    "text2": "My Voice 저장 · 순서와 간격을 조절해 병합 · 커스텀 목소리 공유",
+    "note": "음성 생성부터 보관·병합, 좋은 목소리 공유까지"
   }
 ]

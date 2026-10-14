@@ -1,5 +1,5 @@
 import AXAccount from './AXAccount';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import AuthGate from './Auth.jsx';
@@ -59,13 +59,22 @@ function App({ user, onLogout, onProfile, profileOpen }) {
   }, [running, current, agents.length]);
   const select = i => setCurrent((i + agents.length) % agents.length);
   const a = agents[current];
+  const tabWindowStart = Math.max(0, current - 3);
+  const visibleAgents = agents.slice(tabWindowStart, tabWindowStart + 4);
+  const pendingTabFocus = useRef(null);
+  useEffect(() => {
+    if (pendingTabFocus.current !== null) {
+      document.getElementById(`tab-${agents[pendingTabFocus.current]?.id}`)?.focus();
+      pendingTabFocus.current = null;
+    }
+  }, [current, agents]);
   function tabKey(e, i) {
     let target;
     if (e.key === 'ArrowRight') target = (i + 1) % agents.length;
     if (e.key === 'ArrowLeft') target = (i - 1 + agents.length) % agents.length;
     if (e.key === 'Home') target = 0;
     if (e.key === 'End') target = agents.length - 1;
-    if (target !== undefined) { e.preventDefault(); select(target); document.getElementById(`tab-${agents[target].id}`).focus(); }
+    if (target !== undefined) { e.preventDefault(); pendingTabFocus.current = target; select(target); if (target === current) pendingTabFocus.current = null; }
   }
   return <>
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
@@ -83,10 +92,10 @@ function App({ user, onLogout, onProfile, profileOpen }) {
             <div className="hero-copy"><span className="partner"><Icon size={13}/>YOUR AI PARTNER · {String(current + 1).padStart(2, '0')}</span><p className="hero-name">{a.name} <span>· {a.sub}</span></p><h2>{a.title}</h2><p className="hero-detail">{a.detail}</p><div className="hero-actions"><a className="launch" href={a.launch_url}>{a.name} 시작하기 <Icon d={ARROW} size={18}/></a></div></div>
             <AgentPreview agent={a} playing={playing && visible && !profileOpen}/>
           </div>
-          <div className="hero-bottom"><div className="tabs" role="tablist" aria-label="소개할 Agent 선택" style={{ gridTemplateColumns: `repeat(${agents.length}, minmax(150px, 1fr))` }}>
-            {agents.map((agent, i) => <button key={agent.id} id={`tab-${agent.id}`} role="tab" aria-selected={i === current} aria-controls={i === current ? `panel-${agent.id}` : undefined} tabIndex={i === current ? 0 : -1} className={`tab ${i === current ? 'selected' : ''}`} onClick={() => select(i)} onKeyDown={e => tabKey(e, i)}>
+          <div className="hero-bottom"><div className="tabs" role="tablist" aria-label="소개할 Agent 선택" style={{ gridTemplateColumns: `repeat(${Math.min(4, agents.length)}, minmax(0, 1fr))` }}>
+            {visibleAgents.map((agent, offset) => { const i = tabWindowStart + offset; return <button key={agent.id} id={`tab-${agent.id}`} role="tab" aria-selected={i === current} aria-controls={i === current ? `panel-${agent.id}` : undefined} tabIndex={i === current ? 0 : -1} className={`tab ${i === current ? 'selected' : ''}`} onClick={() => select(i)} onKeyDown={e => tabKey(e, i)}>
               {i === current && <span key={`${current}-${running}`} className={`progress ${running ? 'running' : ''}`}/>}<span className="tab-number">{String(i + 1).padStart(2, '0')}</span><span><strong>{agent.name}</strong><small>{agent.sub}</small></span>
-            </button>)}
+            </button>; })}
           </div><div className="controls"><button onClick={() => select(current - 1)} aria-label="이전 슬라이드"><Icon d="M20 12H4m6-6-6 6 6 6" size={16}/></button><button onClick={() => setPlaying(v => !v)} aria-label={playing ? '자동 재생 일시 정지' : '자동 재생 시작'}><Icon d={playing ? 'M8 5v14M16 5v14' : 'm8 5 11 7-11 7Z'} size={14}/></button><button onClick={() => select(current + 1)} aria-label="다음 슬라이드"><Icon d={ARROW} size={16}/></button></div></div>
         </section>
         <section id="agents" className="agents"><div className="section-heading"><div><h2>나의 AI 파트너</h2><span className="count">{agents.length}</span></div><p>업무에 필요한 Agent를 선택해 바로 시작하세요.</p></div>
