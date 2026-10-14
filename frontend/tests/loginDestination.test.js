@@ -12,3 +12,8 @@ test('WiaMeet login destination preserves path and query', () => {
   assert.equal(safeDestination('/wiameet/agent?from=login', 'https://axforwork.wia.co.kr'), '/wiameet/agent?from=login');
   assert.equal(safeDestination('/wiameet-evil/agent', 'https://axforwork.wia.co.kr'), '/');
 });
+
+test('WiaVoice returns after central login with strict path boundaries', () => {
+  for(const value of ['/wiavoice','/wiavoice/','/wiavoice/?from=login'])assert.equal(safeDestination(value,origin),value);
+  for(const value of ['/wiavoice-evil/','/wiavoice/../../login','/wiavoice/%2f%2fevil.example'])assert.equal(safeDestination(value,origin),'/');
+});
