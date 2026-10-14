@@ -36,8 +36,17 @@ const introductions = {
     guideDescription: '과제 정의와 맞춤 설문부터 프롬프트 수정·공유·보관까지.', guideUrl: '/wiacoding/media/WIACoding_Guide.pdf', guideFormat: 'PDF', guidePages: 10,
     guideFilename: 'WIACoding_Guide.pdf', tags: ['대화로 과제 정의', '맞춤 질문', '개발 프롬프트 완성'],
   },
+  wiavoice: {
+    eyebrow: 'AI VOICE STUDIO', title: '전하고 싶은 이야기에\n어울리는 목소리,',
+    description: '문장을 준비하고, 원하는 분위기를 골라 보세요.\n영상 내레이션부터 업무 안내까지,\nAI가 텍스트에 나만의 목소리를 더해 드립니다.',
+    film: '/wiavoice/media/WiaVoice_intro.mp4',
+    caption: '전달할 내용에 집중하세요. 어울리는 목소리는 WiaVoice와 함께.',
+    guideDescription: '문장 입력과 목소리 선택부터 My Voice 보관·병합, 커스텀 목소리 공유까지.',
+    guideUrl: '/wiavoice/media/WIAVoice_Guide.pdf', guideFormat: 'PDF', guidePages: 11,
+    guideFilename: 'WIAVoice_Guide.pdf', tags: ['목소리·말투 선택', '음성 보관·병합', '커스텀 목소리 공유'],
+  },
 };
-const icons = { wiameet: AudioLines, wiareport: ChartNoAxesCombined, wianews: Layers3, wiacoding: CodeXml };
+const icons = { wiameet: AudioLines, wiareport: ChartNoAxesCombined, wianews: Layers3, wiacoding: CodeXml, wiavoice: AudioLines };
 export default function AgentIntroduction({ agents, loading, error, onRetry, selection }) {
   const tabs = useRef(null);
   const available = agents.filter(a => introductions[a.id]);
