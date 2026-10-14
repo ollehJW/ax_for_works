@@ -12,6 +12,14 @@ const introductions = {
     guideDescription: '참석자 그룹 설정부터 녹음·화자 검토·회의록 확정, Confluence 공유까지.', guideUrl: '/wiameet/media/WIAMeet_Guide.pdf', guideFormat: 'PDF', guidePages: 20,
     guideFilename: 'WIAMeet_Guide.pdf', tags: ['회의 녹음·업로드', '화자 매핑 검토', '회의록 확정·공유'],
   },
+  wiareport: {
+    eyebrow: 'TEAM WORK INTELLIGENCE', title: '한 주의 기록을 모아,\n우리 팀의 다음을 잇는,',
+    description: '흩어진 업무 기록은 한곳에, 팀의 진행 상황은 한눈에.\n과제와 일정, 주간보고를 연결해\n이번 주의 성과와 다음 계획을 함께 확인합니다.',
+    film: '/wiareport/media/WiaReport_intro.mp4',
+    caption: '보고를 모으는 시간은 줄이고, 팀의 실행에 집중하세요.',
+    guideDescription: '팀·과제 설정부터 일정 관리, 주간보고 작성과 팀 단위 공유까지.', guideUrl: '/wiareport/media/WIAReport_Guide.pdf', guideFormat: 'PDF', guidePages: 24,
+    guideFilename: 'WIAReport_Guide.pdf', tags: ['과제·일정 관리', '주간보고 작성', '팀 기록 공유'],
+  },
   wianews: {
     eyebrow: 'TECH INTELLIGENCE', title: '기술의 흐름을 읽는\n나만의 뉴스레터,',
     description: '관심 있는 기술은 깊게, 읽어야 할 소식은 간결하게.\n신뢰할 수 있는 출처에서 찾은 기술 뉴스를\nAI가 정리하고, 원하는 주기로 전해드립니다.',
