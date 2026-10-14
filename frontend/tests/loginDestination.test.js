@@ -17,3 +17,9 @@ test('WiaVoice returns after central login with strict path boundaries', () => {
   for(const value of ['/wiavoice','/wiavoice/','/wiavoice/?from=login'])assert.equal(safeDestination(value,origin),value);
   for(const value of ['/wiavoice-evil/','/wiavoice/../../login','/wiavoice/%2f%2fevil.example'])assert.equal(safeDestination(value,origin),'/');
 });
+
+// WiaReport returns to its application after unified login.
+test('WiaReport returns after central login with strict path boundaries', () => {
+  assert.equal(safeDestination('/wiareport/agent?guide=1', origin), '/wiareport/agent?guide=1');
+  for (const value of ['/wiareport-evil/agent', '/wiareport/../../login']) assert.equal(safeDestination(value, origin), '/');
+});

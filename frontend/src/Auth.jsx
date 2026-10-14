@@ -59,7 +59,7 @@ export default function AuthGate({children}) {
     const destination=safeDestination(url.searchParams.get('next'));
     // An incomplete profile cannot enter these services. Cancelling returns home
     // instead of bouncing between the service gate and this dialog.
-    const cancelledEntry=url.pathname==='/login'&&!user.is_admin&&missingProfileFields(user).length&&/^\/(wianews|wiacoding)(\/|$)/.test(destination);
+    const cancelledEntry=url.pathname==='/login'&&!user.is_admin&&missingProfileFields(user).length&&/^\/(wianews|wiacoding|wiareport)(\/|$)/.test(destination);
     if(cancelledEntry)url.searchParams.set('next','/');
     if(requested)url.searchParams.delete('profile');
     if(requested||cancelledEntry)window.history.replaceState(null,'',url.pathname+url.search+url.hash);
