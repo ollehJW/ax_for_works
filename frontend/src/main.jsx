@@ -1,3 +1,4 @@
+import hyundaiWiaLogo from './assets/hyundai-wia-logo.png';
 import AXAccount from './AXAccount';
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -104,7 +105,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
       </>}
       <div className="bottom-note"><Icon size={15}/><span>작은 업무의 변화가 만드는 더 큰 가능성. <strong>We can, with AI.</strong></span></div>
       </>}
-      <footer><span><b>WIA</b>© {new Date().getFullYear()} Hyundai WIA. All rights reserved.</span><span>AX for Works <span className="footer-tagline">함께 만드는 업무의 다음 단계</span></span></footer>
+      <footer><span><img className="footer-company-logo" src={hyundaiWiaLogo} alt="HYUNDAI WIA" width="100" height="36"/>© {new Date().getFullYear()} Hyundai WIA. All rights reserved.</span><span>AX for Works <span className="footer-tagline">함께 만드는 업무의 다음 단계</span></span></footer>
     </main>
   </>;
 }
