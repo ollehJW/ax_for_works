@@ -26,10 +26,10 @@ for(const width of [1280,1440,1920]){
  assert.equal(await page.evaluate(()=>{const nav=document.querySelector('.platform-nav').getBoundingClientRect(),brand=document.querySelector('.brand').getBoundingClientRect(),account=document.querySelector('.header-inner').lastElementChild.getBoundingClientRect();return nav.left<brand.right||nav.right>account.left;}),false);
 }
 await page.setViewportSize({width:1440,height:1100});
-for(const kind of ['agent_bug','agent_improvement','new_agent','other']){
+for(const kind of ['agent_bug','agent_improvement','agent_usage','new_agent','platform_inquiry','other']){
  await page.locator(`input[value="${kind}"]`).check();assert.equal(await page.locator('#feedback-agent').count(),kind.startsWith('agent_')?1:0);
 }
-await page.locator('input[value="agent_bug"]').check();await page.locator('#feedback-agent').selectOption('wiavoice');await page.locator('#feedback-content').fill('음성 생성 화면에서 확인한 개선 의견입니다.\n재현 방법과 예상 결과를 확인해 주세요.');
+await page.locator('input[value="agent_usage"]').check();await page.locator('#feedback-agent').selectOption('wiavoice');await page.locator('#feedback-content').fill('음성 생성 화면에서 확인한 개선 의견입니다.\n재현 방법과 예상 결과를 확인해 주세요.');
 await page.locator('input[type=file]').setInputFiles(fixture);await page.locator('.feedback-previews img').waitFor();assert.equal(await page.locator('.feedback-previews img').count(),1);
 await page.getByRole('button',{name:/첨부 삭제/}).click();assert.equal(await page.locator('.feedback-previews img').count(),0);
 await page.locator('input[type=file]').setInputFiles({name:'bad.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg/>')});await page.getByRole('alert').filter({hasText:'PNG, JPG, WebP'}).waitFor();
@@ -38,7 +38,7 @@ await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});
 failNext=true;await page.getByRole('button',{name:'피드백 보내기'}).click();await page.getByRole('alert').filter({hasText:'테스트 저장 오류'}).waitFor();assert.ok((await page.locator('#feedback-content').inputValue()).length>0);assert.equal(await page.locator('.feedback-previews img').count(),1);
 await page.getByRole('button',{name:'피드백 보내기'}).click();await page.getByRole('heading',{name:'의견을 보내주셔서 감사합니다.'}).waitFor();assert.equal(saved.length,1);assert.equal(saved[0].agent_id,'wiavoice');assert.equal(saved[0].images.length,1);assert.ok(saved[0].images[0].data.length>0);
 await page.locator('.feedback-item summary').click();assert.ok(await page.locator('.feedback-detail').isVisible());
-await page.getByRole('button',{name:'새 피드백 작성'}).click();await page.locator('input[value="new_agent"]').check();await page.locator('#feedback-content').fill('새 Agent 제안');await page.getByRole('button',{name:'피드백 보내기'}).click();await page.getByRole('heading',{name:'의견을 보내주셔서 감사합니다.'}).waitFor();assert.equal(saved[1].agent_id,null);assert.equal(saved[1].images.length,0);
+await page.getByRole('button',{name:'새 피드백 작성'}).click();await page.locator('input[value="platform_inquiry"]').check();await page.locator('#feedback-content').fill('플랫폼 이용 문의');await page.getByRole('button',{name:'피드백 보내기'}).click();await page.getByRole('heading',{name:'의견을 보내주셔서 감사합니다.'}).waitFor();assert.equal(saved[1].agent_id,null);assert.equal(saved[1].images.length,0);
 await context.route('**/api/auth/me',r=>r.fulfill({json:{user_id:'ui-admin',employee_id:'ui-admin',full_name:'관리자 검증',organization:'검증 조직',team_name:'검증 팀',role_name:'매니저',email:'admin@example.invalid',is_admin:true,must_change_password:false}}));await page.reload();await page.getByRole('heading',{name:'접수된 피드백',exact:true}).waitFor();assert.deepEqual(errors,[]);console.log('PASS: four menu layout; conditional Agent selection; image preview/removal/rejection; failed submit retains draft; submit/reset/history; no JS errors. UI fixtures only; no live account/session writes.');
 const publicContext=await browser.newContext();const health=await publicContext.request.get(origin+'/api/health');assert.equal(health.status(),200);const privateAPI=await publicContext.request.get(origin+'/api/feedbacks');assert.equal(privateAPI.status(),401);await publicContext.close();
 }finally{await browser.close();}

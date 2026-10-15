@@ -66,13 +66,13 @@ class FeedbackTests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/feedbacks').json()['total'],1)
         self.assertEqual(self.client.get(attachment['url']).status_code,200)
 
-    def test_four_types_and_agent_requirements(self):
-        for kind in ['agent_bug','agent_improvement','new_agent','other']:
+    def test_six_types_and_agent_requirements(self):
+        for kind in ['agent_bug','agent_improvement','agent_usage','new_agent','platform_inquiry','other']:
             needs_agent=kind.startswith('agent_')
             self.assertEqual(self.submit(feedback_type=kind,agent_id='wiameet' if needs_agent else None,images=[]).status_code,201)
-        for changes in [{'agent_id':None},{'agent_id':'unknown-agent'},{'feedback_type':'other'},{'content':'   '},{'content':'x'*10001},{'feedback_type':'unknown'},{'images':[self.image]*6}]:
+        for changes in [{'agent_id':None},{'feedback_type':'agent_usage','agent_id':None},{'feedback_type':'platform_inquiry'},{'agent_id':'unknown-agent'},{'feedback_type':'other'},{'content':'   '},{'content':'x'*10001},{'feedback_type':'unknown'},{'images':[self.image]*6}]:
             self.assertEqual(self.submit(**changes).status_code,422,changes.keys())
-        self.assertEqual(self.client.get('/api/feedbacks').json()['total'],4)
+        self.assertEqual(self.client.get('/api/feedbacks').json()['total'],6)
 
     def test_attachment_validation_and_request_size(self):
         for data in ['not-base64!',base64.b64encode(b'<svg onload="alert(1)"></svg>').decode(),base64.b64encode(b'not a png').decode()]:

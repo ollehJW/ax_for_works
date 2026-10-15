@@ -358,7 +358,7 @@ WiaMeet 자체 인증을 사용하므로 이 경로의 `require_login`은 `false
 
 ## Feedbacks
 
-- 화면: `/#feedbacks`. 버그 제보·기능 개선은 현재 활성 Agent 선택이 필수이며, 신규 Agent 제안·기타는 내용만 입력합니다.
+- 화면: `/#feedbacks`. 버그 제보·기능 개선·사용 방법 문의는 현재 활성 Agent 선택이 필수이며, 신규 Agent 제안·플랫폼 이용 문의·기타는 Agent 선택 없이 작성합니다.
 - 데이터: `platform.feedbacks`에 유형, Agent ID/이름, 내용, 작성자, 작성 시각, 이미지 메타데이터(JSONB)를 저장합니다. `backend/sql/feedbacks.sql`은 기존 데이터에 영향을 주지 않는 추가 마이그레이션입니다.
 - 이미지: 기본 저장 경로는 프로젝트의 `feedbacks/<feedback_id>/`입니다. H200에서는 `feedbacks`가 `/data/ax_for_works/feedbacks`를 가리킵니다. 다른 환경은 `AX_FEEDBACKS_DIR`로 영구 저장 경로를 지정할 수 있습니다. DB와 이미지 디렉터리를 함께 백업하세요.
 - 파일명은 서버가 생성한 UUID를 사용합니다. PNG/JPG/WebP 정지 이미지를 실제 디코딩·재인코딩하여 저장하며, 파일당 5MB·최대 5장·2,000만 화소 제한이 있습니다. 내용은 최대 10,000자입니다.

@@ -35,14 +35,14 @@ class Attachment(BaseModel):
 
 class FeedbackBody(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
-    feedback_type: Literal['agent_bug', 'agent_improvement', 'new_agent', 'other']
+    feedback_type: Literal['agent_bug', 'agent_improvement', 'new_agent', 'platform_inquiry', 'agent_usage', 'other']
     agent_id: str | None = Field(default=None, max_length=64)
     content: str = Field(min_length=1, max_length=10000)
     images: list[Attachment] = Field(default_factory=list, max_length=5)
 
     @model_validator(mode='after')
     def agent_required(self):
-        if self.feedback_type in ('agent_bug', 'agent_improvement'):
+        if self.feedback_type in ('agent_bug', 'agent_improvement', 'agent_usage'):
             if not self.agent_id:
                 raise ValueError('Agent를 선택해 주세요.')
         elif self.agent_id is not None:

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bug, WandSparkles, Lightbulb, MessageSquare, ImagePlus, X, Send, CheckCircle2, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { Bug, WandSparkles, Lightbulb, MessageSquare, Monitor, CircleHelp, ImagePlus, X, Send, CheckCircle2, ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { authRequest } from './authApi';
 import './feedbacks.css';
 
@@ -7,9 +7,11 @@ const types = [
   {id:'agent_bug',name:'Agent 버그 제보',hint:'오류나 예상과 다른 동작',Icon:Bug},
   {id:'agent_improvement',name:'Agent 기능 개선',hint:'더 편리해지는 기능과 경험',Icon:WandSparkles},
   {id:'new_agent',name:'신규 Agent 제안',hint:'새롭게 도와주었으면 하는 업무',Icon:Lightbulb},
+  {id:'platform_inquiry',name:'플랫폼 이용 문의',hint:'로그인·계정·접속 관련 문의',Icon:Monitor},
+  {id:'agent_usage',name:'사용 방법 문의',hint:'Agent 기능과 활용 방법 문의',Icon:CircleHelp},
   {id:'other',name:'기타',hint:'그 밖에 전하고 싶은 의견',Icon:MessageSquare},
 ];
-const placeholders={agent_bug:'어떤 작업 중 문제가 발생했나요?\n발생한 상황과 예상했던 결과를 알려 주세요.',agent_improvement:'어떤 기능이 어떻게 개선되면 좋을까요?\n현재의 불편함과 원하는 사용 방식을 알려 주세요.',new_agent:'어떤 업무를 도와주는 Agent가 필요하신가요?\n현재 업무 방식과 해결하고 싶은 문제를 알려 주세요.',other:'AX for Works에 전하고 싶은 의견을 자유롭게 작성해 주세요.'};
+const placeholders={agent_bug:'어떤 작업 중 문제가 발생했나요?\n발생한 상황과 예상했던 결과를 알려 주세요.',agent_improvement:'어떤 기능이 어떻게 개선되면 좋을까요?\n현재의 불편함과 원하는 사용 방식을 알려 주세요.',new_agent:'어떤 업무를 도와주는 Agent가 필요하신가요?\n현재 업무 방식과 해결하고 싶은 문제를 알려 주세요.',platform_inquiry:'플랫폼 이용 중 어떤 도움이 필요하신가요?\n로그인, 계정 정보, 서비스 접속 등 궁금한 점을 알려 주세요.',agent_usage:'선택한 Agent의 어떤 기능이 궁금하신가요?\n하려는 작업과 도움이 필요한 단계를 알려 주세요.',other:'AX for Works에 전하고 싶은 의견을 자유롭게 작성해 주세요.'};
 const readFile=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('이미지를 읽지 못했습니다. 다시 첨부해 주세요.'));r.readAsDataURL(file);});
 const date=value=>new Date(value).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -18,7 +20,7 @@ export default function Feedbacks({agents,loading:agentsLoading,error:agentsErro
   const [error,setError]=useState(''),[busy,setBusy]=useState(false),[reading,setReading]=useState(false),[success,setSuccess]=useState(null);
   const [history,setHistory]=useState(null),[historyError,setHistoryError]=useState(''),[page,setPage]=useState(1),[revision,setRevision]=useState(0);
   const input=useRef(null),locked=useRef(false),mounted=useRef(true);
-  const needsAgent=['agent_bug','agent_improvement'].includes(type);
+  const needsAgent=['agent_bug','agent_improvement','agent_usage'].includes(type);
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
   useEffect(()=>{
     const controller=new AbortController();setHistory(null);setHistoryError('');
