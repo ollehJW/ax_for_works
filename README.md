@@ -355,3 +355,14 @@ H200 전용 WiaMeet 게이트웨이는 `/data/ax_for_works/config/config.yaml`�
 WiaMeet 자체 인증을 사용하므로 이 경로의 `require_login`은 `false`입니다.
 `__Host-` 쿠키는 브라우저 규칙상 Path=/가 필수이므로 게이트웨이에서 유지하고,
 그 외 서비스 쿠키는 기존처럼 서비스 접두어를 붙입니다.
+
+## Feedbacks
+
+- 화면: `/#feedbacks`. 버그 제보·기능 개선은 현재 활성 Agent 선택이 필수이며, 신규 Agent 제안·기타는 내용만 입력합니다.
+- 데이터: `platform.feedbacks`에 유형, Agent ID/이름, 내용, 작성자, 작성 시각, 이미지 메타데이터(JSONB)를 저장합니다. `backend/sql/feedbacks.sql`은 기존 데이터에 영향을 주지 않는 추가 마이그레이션입니다.
+- 이미지: 기본 저장 경로는 프로젝트의 `feedbacks/<feedback_id>/`입니다. H200에서는 `feedbacks`가 `/data/ax_for_works/feedbacks`를 가리킵니다. 다른 환경은 `AX_FEEDBACKS_DIR`로 영구 저장 경로를 지정할 수 있습니다. DB와 이미지 디렉터리를 함께 백업하세요.
+- 파일명은 서버가 생성한 UUID를 사용합니다. PNG/JPG/WebP 정지 이미지를 실제 디코딩·재인코딩하여 저장하며, 파일당 5MB·최대 5장·2,000만 화소 제한이 있습니다. 내용은 최대 10,000자입니다.
+- 조회: 일반 사용자는 본인 제출 내역과 이미지만, 관리자는 전체를 조회할 수 있습니다. 이미지 폴더는 정적 공개 경로가 아니며 인증 API로만 제공합니다.
+- API: `POST /api/feedbacks`, `GET /api/feedbacks?page=1`, `GET /api/feedbacks/{feedback_id}/images/{image_id}`. POST는 동일 출처와 `X-AX-Request: 1` 검증을 거칩니다.
+- 백엔드 검증: `AX_RUN_FEEDBACK_TESTS=1 .venv/bin/python -m unittest backend.tests.test_feedbacks -v`. PostgreSQL 세션 임시 테이블과 가상 인증 정보를 이용하며 실제 계정·세션·피드백은 수정하지 않습니다.
+- 브라우저 검증: `frontend`에서 `node tests/feedbacks.mjs`. 필요하면 `PLAYWRIGHT_CHROMIUM_EXECUTABLE`, `AX_TEST_URL`, `AX_TEST_CATALOG`를 지정합니다. 인증·제출 API는 브라우저 테스트에서만 가상 응답으로 대체합니다.

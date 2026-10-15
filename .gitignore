@@ -21,3 +21,6 @@ frontend/playwright-report/
 *.log
 .codex/
 .agents/
+
+# Private feedback image storage (symlink to /data on H200)
+/feedbacks

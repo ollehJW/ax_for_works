@@ -16,6 +16,7 @@ from backend.gateway import lifespan, register_gateway
 from backend.auth import router as auth_router, ready_user
 from backend.database import database
 from backend.board import router as board_router
+from backend.feedbacks import router as feedbacks_router
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -67,6 +68,8 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
 
     app.include_router(auth_router)
     app.include_router(board_router)
+    app.include_router(feedbacks_router)
+    app.state.agent_registry = registry
 
     @app.exception_handler(psycopg.Error)
     async def database_error(request, exc):
@@ -75,7 +78,7 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
 
     @app.middleware("http")
     async def headers(request, call_next):
-        if request.url.path.startswith('/api/auth/') and request.method in {'POST', 'PUT', 'PATCH', 'DELETE'}:
+        if (request.url.path.startswith('/api/auth/') or request.url.path == '/api/feedbacks') and request.method in {'POST', 'PUT', 'PATCH', 'DELETE'}:
             origin = request.headers.get('origin')
             try:
                 valid_origin = not origin or (urlsplit(origin).scheme in {'http', 'https'} and urlsplit(origin).netloc == request.headers.get('host'))

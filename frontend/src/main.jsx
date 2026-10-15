@@ -7,6 +7,7 @@ import AuthGate from './Auth.jsx';
 import AgentPreview from './AgentPreview.jsx';
 import AgentIntroduction from './AgentIntroduction.jsx';
 import NoticeBoard from './NoticeBoard.jsx';
+import Feedbacks from './Feedbacks.jsx';
 
 const STAR = 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z';
 const ARROW = 'M4 12h16m-6-6 6 6-6 6';
@@ -21,12 +22,14 @@ function App({ user, onLogout, onProfile, profileOpen }) {
   const [route, setRoute] = useState(() => window.location.hash);
   const introductionsPage = route.startsWith('#introductions');
   const noticesPage = route.startsWith('#notices');
+  const feedbacksPage = route.startsWith('#feedbacks');
   useEffect(() => {
     const update = () => { setRoute(window.location.hash); };
     window.addEventListener('hashchange', update);
     return () => window.removeEventListener('hashchange', update);
   }, []);
   useEffect(() => { if (introductionsPage) window.scrollTo(0, 0); }, [introductionsPage]);
+  useEffect(() => { if (feedbacksPage) window.scrollTo(0, 0); }, [feedbacksPage]);
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -52,7 +55,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
       .finally(() => { clearTimeout(timeout); if (active) setLoading(false); });
     return () => { active = false; clearTimeout(timeout); controller.abort(); };
   }, [attempt]);
-  const running = playing && !interacting && !profileOpen && visible && !introductionsPage && !noticesPage;
+  const running = playing && !interacting && !profileOpen && visible && !introductionsPage && !noticesPage && !feedbacksPage;
   useEffect(() => {
     if (!running || agents.length < 2) return;
     const timer = setTimeout(() => setCurrent(i => (i + 1) % agents.length), 6000);
@@ -81,10 +84,10 @@ function App({ user, onLogout, onProfile, profileOpen }) {
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
     <header><div className="header-inner">
       <a className="brand" href="#top" aria-label="AX for Works 홈"><span className="brand-symbol"><Icon size={18}/></span><span>AX <em>for Works</em></span></a>
-      <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage ? 'page' : undefined}>Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Guides</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>Updates</a></nav>
+      <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage && !feedbacksPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage && !feedbacksPage ? 'page' : undefined}>Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Guides</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>Updates</a><a className={`navlink ${feedbacksPage ? 'active' : ''}`} href="#feedbacks" aria-current={feedbacksPage ? 'page' : undefined}>Feedbacks</a></nav>
       <AXAccount header name={user.full_name} team={user.team_name} admin={user.is_admin} onProfile={onProfile} onLogout={onLogout}/>
     </div></header>
-    <main id="main">{noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
+    <main id="main">{feedbacksPage ? <Feedbacks agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} user={user}/> : noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
       <section className="intro"><div><p className="eyebrow"><span/>MAKE WORK FLOW</p><h1>일하는 방식의 변화, <em>AI와 함께.</em></h1></div><p className="intro-caption">반복되는 일은 줄이고, 더 중요한 일에 집중하세요.</p></section>
       {loading ? <div className="state-panel" role="status"><span className="loader"/>AI 파트너를 불러오고 있습니다.</div> : error ? <div className="state-panel" role="alert"><h2>Agent 목록을 불러오지 못했습니다.</h2><p>잠시 후 다시 시도해 주세요.</p><button className="primary" onClick={() => setAttempt(v => v + 1)}>다시 시도</button></div> : !a ? <div className="state-panel"><h2>준비 중인 AI 파트너</h2><p>현재 이용 가능한 Agent가 없습니다.</p></div> : <>
         <section className="hero" aria-roledescription="캐러셀" aria-label="AI Agent 소개" onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)} onFocusCapture={() => setInteracting(true)} onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) setInteracting(false); }}>

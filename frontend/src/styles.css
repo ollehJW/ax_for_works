@@ -5,7 +5,7 @@
 .hero-bottom .tabs{overflow:hidden}.hero-bottom .tab{min-width:0;padding:20px 18px;gap:10px}.hero-bottom .tab>span:last-child{min-width:0}.hero-bottom .tab small{overflow:hidden;text-overflow:ellipsis}.cards{grid-template-columns:repeat(4,minmax(0,1fr))}
 
 /* Text navigation with consistent underlines and clearer typography. */
-.platform-nav{display:flex;align-items:center;gap:28px;flex-shrink:0}
+.platform-nav{display:flex;align-items:center;gap:18px;flex-shrink:0}
 .platform-nav .navlink{position:relative;display:flex;align-items:center;justify-content:center;width:104px;height:72px;padding:0 4px;border:0;background:none;color:#536078;font-size:15px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;transition:color .18s}
 .platform-nav .navlink::after{content:"";position:absolute;bottom:0;left:8px;right:8px;height:3px;border-radius:3px 3px 0 0;background:transparent;transition:background .18s}
 .platform-nav .navlink:hover{color:#173c85}
