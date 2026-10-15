@@ -81,7 +81,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
     <header><div className="header-inner">
       <a className="brand" href="#top" aria-label="AX for Works 홈"><span className="brand-symbol"><Icon size={18}/></span><span>AX <em>for Works</em></span></a>
-      <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage ? 'page' : undefined}>AI Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Agent 소개</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>공지사항</a></nav>
+      <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage ? 'page' : undefined}>Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Guides</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>Updates</a></nav>
       <AXAccount header name={user.full_name} team={user.team_name} admin={user.is_admin} onProfile={onProfile} onLogout={onLogout}/>
     </div></header>
     <main id="main">{noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
