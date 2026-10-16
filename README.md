@@ -369,7 +369,7 @@ WiaMeet 자체 인증을 사용하므로 이 경로의 `require_login`은 `false
 
 ## 관리자 운영 화면
 
-- 관리자 기본 화면: `/#admin/agents`(Agent 관리), `/#admin/feedbacks`(피드백 관리). 사용자 화면 미리보기에서 Agents/Guides/Updates/Feedbacks를 확인하고 관리 화면으로 돌아올 수 있습니다.
+- 관리자 기본 화면: `/#admin/agents`(Agent 관리), `/#admin/feedbacks`(피드백 관리). 관리자 상단에는 두 관리 메뉴만 표시합니다.
 - `platform.agents`: `agent_id`, `name`, `enabled`, `sort_order`, `updated_by`, `updated_at`. 처음 등록할 때만 `agents.json`의 `enabled`를 사용합니다. 이후 공개 여부는 DB가 기준이며 재시작해도 유지됩니다. 서버 시작 시 새 Agent를 추가하고 이름/정렬 순서를 동기화합니다. 설명·색상·서비스 주소와 게이트웨이 경로는 기존 설정에서 관리합니다.
 - 비활성 Agent는 공개 목록, 홈 애니메이션/카드, Guides, 피드백의 Agent 선택에서 제외됩니다. 남은 목록 기준으로 번호를 01부터 다시 매깁니다. 공개 launch API는 비활성 Agent를 거부하지만, 관리자 전용 launch API는 비활성 상태에서도 서비스의 `/agent`로 이동합니다. 서비스 자체 종료나 게이트웨이 차단 설정은 변경하지 않습니다.
 - 사용자 화면은 페이지 전환/창 복귀/30초 주기로 목록을 갱신합니다. 같은 브라우저의 다른 탭에는 저장 알림으로 갱신합니다.

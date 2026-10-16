@@ -25,17 +25,17 @@ await context.route('**/api/admin/feedbacks/'+fid,r=>{
  if(r.request().method()==='PATCH'){const body=r.request().postDataJSON();assert.equal(body.revision,feedback.revision);Object.assign(feedback,body,{revision:feedback.revision+1,updated_at:new Date().toISOString()});}
  return r.fulfill({json:feedback});
 });
-const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin);await page.getByRole('heading',{name:'Agent 관리',exact:true}).waitFor();await page.getByRole('switch').last().waitFor();assert.equal(await page.getByRole('switch').count(),5);
+const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(origin);await page.getByRole('heading',{name:'Agent 관리',exact:true}).waitFor();await page.getByRole('switch').last().waitFor();assert.equal(await page.getByRole('switch').count(),5);assert.equal(await page.getByRole('link',{name:'사용자 화면',exact:true}).count(),0);assert.equal(await page.locator('.admin-panel-note').count(),0);
 for(const width of [1280,1440,1920]){await page.setViewportSize({width,height:1100});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
 await page.getByRole('switch',{name:'WiaMeet 활성화',exact:true}).click();await page.waitForFunction(()=>document.querySelector('[role=switch]').getAttribute('aria-checked')==='false');
-assert.equal(await page.getByRole('link',{name:'WiaMeet 운영 화면 열기'}).getAttribute('href'),'/api/admin/agents/wiameet/launch');
-await page.getByRole('link',{name:'사용자 화면',exact:true}).click();await page.locator('.card').nth(3).waitFor();
+assert.equal(await page.locator('.admin-success').count(),0);assert.equal(await page.getByRole('link',{name:'WiaMeet 운영 화면 열기'}).getAttribute('href'),'/api/admin/agents/wiameet/launch');
+await page.evaluate(()=>{location.hash='agents';});await page.locator('.card').nth(3).waitFor();
 assert.equal(await page.locator('.card').count(),4);assert.deepEqual(await page.locator('.tab-number').allTextContents(),['01','02','03','04']);assert.equal(await page.locator('.card h3').first().innerText(),'WiaReport');
 await page.getByRole('link',{name:'Guides',exact:true}).click();await page.locator('.ai-tabs button').nth(3).waitFor();assert.equal(await page.locator('.ai-tabs button').count(),4);const ys=await page.locator('.ai-tabs button').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().y));assert.ok(ys.every(y=>y===ys[0]));assert.equal(await page.locator('#intro-tab-wiameet').count(),0);
 await page.getByRole('link',{name:'Feedbacks',exact:true}).click();await page.locator('input[value=agent_bug]').check();assert.equal(await page.locator('#feedback-agent option[value=wiameet]').count(),0);
 await page.getByRole('link',{name:'관리 화면으로 돌아가기 →'}).click();await page.getByRole('switch').last().waitFor();
-for(const a of agents.filter(a=>a.enabled)){await page.getByRole('switch',{name:a.name+' 활성화',exact:true}).click();await page.getByRole('status').filter({hasText:a.name+' 비활성화'}).waitFor();}
-await page.getByRole('link',{name:'사용자 화면',exact:true}).click();await page.getByRole('heading',{name:'준비 중인 AI 파트너'}).waitFor();assert.equal(await page.locator('.card').count(),0);
+for(const a of agents.filter(a=>a.enabled)){await page.getByRole('switch',{name:a.name+' 활성화',exact:true}).click();await page.getByRole('switch',{name:a.name+' 활성화',exact:true,checked:false}).waitFor();}
+await page.evaluate(()=>{location.hash='agents';});await page.getByRole('heading',{name:'준비 중인 AI 파트너'}).waitFor();assert.equal(await page.locator('.card').count(),0);
 await page.getByRole('link',{name:'Guides',exact:true}).click();await page.getByText('서비스 소개를 준비하고 있습니다.',{exact:true}).waitFor();
 for(const a of agents)a.enabled=true;await page.getByRole('link',{name:'관리 화면으로 돌아가기 →'}).click();await page.getByRole('switch').last().waitFor();await page.setViewportSize({width:1440,height:1100});await page.screenshot({path:'/tmp/ax-admin-agents.png',fullPage:true});
 await page.getByRole('link',{name:'피드백 관리',exact:true}).click();await page.locator('.admin-feedback-item').click();await page.getByLabel(/관리자 메모/).waitFor();
