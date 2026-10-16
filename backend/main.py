@@ -2,6 +2,8 @@
 import json
 import os
 import logging
+from contextlib import asynccontextmanager
+from starlette.concurrency import run_in_threadpool
 from urllib.parse import urlsplit
 
 import psycopg
@@ -17,6 +19,8 @@ from backend.auth import router as auth_router, ready_user
 from backend.database import database
 from backend.board import router as board_router
 from backend.feedbacks import router as feedbacks_router
+from backend.admin import router as admin_router
+from backend.agent_catalog import sync_agents, active_registry
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -63,12 +67,18 @@ def load_agents(path: Path) -> list[Agent]:
 
 def create_app(config_path: Path | None = None, dist_path: Path | None = None, gateway_config_path: Path | None = None):
     agents = load_agents(config_path or Path(os.getenv("AX_AGENTS_CONFIG", ROOT / "config/agents.json")))
-    registry = {a.id: a for a in agents if a.enabled}
-    app = FastAPI(lifespan=lifespan, title="AX for Works", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None)
+    registry = {a.id: a for a in agents}
+    @asynccontextmanager
+    async def platform_lifespan(app):
+        await run_in_threadpool(sync_agents, registry)
+        async with lifespan(app):
+            yield
+    app = FastAPI(lifespan=platform_lifespan, title="AX for Works", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None)
 
     app.include_router(auth_router)
     app.include_router(board_router)
     app.include_router(feedbacks_router)
+    app.include_router(admin_router)
     app.state.agent_registry = registry
 
     @app.exception_handler(psycopg.Error)
@@ -78,7 +88,7 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
 
     @app.middleware("http")
     async def headers(request, call_next):
-        if (request.url.path.startswith('/api/auth/') or request.url.path == '/api/feedbacks') and request.method in {'POST', 'PUT', 'PATCH', 'DELETE'}:
+        if (request.url.path.startswith('/api/auth/') or request.url.path == '/api/feedbacks' or request.url.path.startswith('/api/admin/')) and request.method in {'POST', 'PUT', 'PATCH', 'DELETE'}:
             origin = request.headers.get('origin')
             try:
                 valid_origin = not origin or (urlsplit(origin).scheme in {'http', 'https'} and urlsplit(origin).netloc == request.headers.get('host'))
@@ -95,8 +105,8 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
         return response
 
     @app.get("/api/health")
-    async def health():
-        return {"status": "ok", "service": "AX for Works", "agent_count": len(registry), "gateway_config": app.state.gateway_config.status()}
+    def health():
+        return {"status": "ok", "service": "AX for Works", "agent_count": len(active_registry(registry)), "gateway_config": app.state.gateway_config.status()}
 
     @app.get('/api/ready')
     def readiness():
@@ -106,11 +116,11 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
 
     @app.get("/api/agents", dependencies=[Depends(ready_user)])
     def list_agents():
-        return {"agents": [{**a.model_dump(mode="json", exclude={"url", "enabled"}), "launch_url": f"/api/agents/{a.id}/launch"} for a in registry.values()]}
+        return {"agents": [{**a.model_dump(mode="json", exclude={"url", "enabled"}), "launch_url": f"/api/agents/{a.id}/launch"} for a in active_registry(registry).values()]}
 
     @app.get("/api/agents/{agent_id}/launch", dependencies=[Depends(ready_user)])
     def launch(agent_id: str):
-        agent = registry.get(agent_id)
+        agent = active_registry(registry).get(agent_id)
         if agent is None:
             raise HTTPException(status_code=404, detail="사용할 수 없는 Agent입니다.")
         return RedirectResponse(str(agent.url), status_code=302)

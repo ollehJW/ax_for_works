@@ -19,6 +19,7 @@ from starlette.concurrency import run_in_threadpool
 
 from backend.auth import ready_user
 from backend.database import ROOT, database
+from backend.agent_catalog import active_registry
 
 router = APIRouter(prefix='/api/feedbacks')
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -88,7 +89,7 @@ def prepare_image(attachment):
 
 
 def save_feedback(body, user, registry):
-    agent = registry.get(body.agent_id) if body.agent_id else None
+    agent = active_registry(registry).get(body.agent_id) if body.agent_id else None
     if body.agent_id and agent is None:
         raise HTTPException(422, '현재 이용 가능한 Agent를 선택해 주세요.')
     prepared = [prepare_image(image) for image in body.images]
@@ -140,7 +141,7 @@ def list_feedbacks(page: int = Query(1, ge=1), user=Depends(ready_user)):
     where, params = ('TRUE', ()) if user['is_admin'] else ('f.created_by=%s', (user['user_id'],))
     with database() as db:
         total = db.execute('SELECT count(*) AS n FROM platform.feedbacks f WHERE ' + where, params).fetchone()['n']
-        rows = db.execute('''SELECT f.feedback_id,f.feedback_type,f.agent_name,f.content,f.images,f.created_at,
+        rows = db.execute('''SELECT f.feedback_id,f.feedback_type,f.agent_name,f.content,f.images,f.created_at,f.status,f.reply,f.updated_at,
                 u.full_name AS author_name FROM platform.feedbacks f
                 LEFT JOIN platform.users u ON u.user_id=f.created_by WHERE ''' + where +
                 ' ORDER BY f.created_at DESC,f.feedback_id DESC LIMIT 10 OFFSET %s', (*params, (page - 1) * 10)).fetchall()

@@ -31,15 +31,21 @@ class FeedbackTests(unittest.TestCase):
         self.db.execute("INSERT INTO feedback_test_users VALUES ('fixture-owner','Fixture Owner'),('fixture-other','Fixture Other')")
         sql = (ROOT/'backend/sql/feedbacks.sql').read_text().replace('CREATE TABLE IF NOT EXISTS platform.feedbacks','CREATE TEMP TABLE feedback_test_records').replace('platform.feedbacks','feedback_test_records').replace('platform.users','feedback_test_users')
         self.db.execute(sql)
+        self.db.execute('ALTER TABLE feedback_test_users ADD COLUMN employee_id TEXT')
+        self.db.execute((ROOT/'backend/sql/feedback_management.sql').read_text().replace('platform.feedbacks','feedback_test_records').replace('platform.users','feedback_test_users'))
+        self.db.execute((ROOT/'backend/sql/agents.sql').read_text().replace('CREATE TABLE IF NOT EXISTS platform.agents','CREATE TEMP TABLE agent_test_records').replace('platform.users','feedback_test_users'))
         connection = self.db
         class IsolatedDB:
             def execute(self, sql, args=None):
-                return connection.execute(sql.replace('platform.feedbacks','feedback_test_records').replace('platform.users','feedback_test_users'), args)
+                return connection.execute(sql.replace('platform.feedbacks','feedback_test_records').replace('platform.users','feedback_test_users').replace('platform.agents','agent_test_records'), args)
         @contextmanager
         def database(): yield IsolatedDB()
-        self.patch = patch('backend.feedbacks.database', database); self.patch.start();self.addCleanup(self.patch.stop)
+        for module in ['backend.feedbacks','backend.admin','backend.agent_catalog','backend.main']:
+            patched = patch(module+'.database',database);patched.start();self.addCleanup(patched.stop)
         env = patch.dict(os.environ, {'AX_FEEDBACKS_DIR':self.temp.name});env.start();self.addCleanup(env.stop)
         self.app=create_app()
+        from backend.agent_catalog import sync_agents
+        sync_agents(self.app.state.agent_registry)
         self.user={'user_id':'fixture-owner','is_admin':False}
         self.app.dependency_overrides[ready_user]=lambda:self.user
         self.client=TestClient(self.app,raise_server_exceptions=False);self.addCleanup(self.client.close)
@@ -101,5 +107,54 @@ class FeedbackTests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/feedbacks?page=0').status_code,422)
         with self.assertRaises(psycopg.errors.CheckViolation):
             self.db.execute("INSERT INTO feedback_test_records(feedback_id,feedback_type,content) VALUES ('invalid','agent_bug','content')")
+
+    def test_admin_permissions_and_csrf(self):
+        for path in ['/api/admin/agents','/api/admin/feedbacks','/api/admin/agents/wiameet/launch']:
+            self.assertEqual(self.client.get(path,follow_redirects=False).status_code,403)
+        self.assertEqual(self.client.patch('/api/admin/agents/wiameet',json={'enabled':False,'expected_enabled':True},headers=self.headers).status_code,403)
+        self.user['is_admin']=True
+        self.assertEqual(self.client.patch('/api/admin/agents/wiameet',json={'enabled':False,'expected_enabled':True}).status_code,403)
+        self.assertEqual(self.client.patch('/api/admin/agents/wiameet',json={'enabled':False,'expected_enabled':True},headers={'X-AX-Request':'1','Origin':'https://untrusted.example'}).status_code,403)
+
+    def test_catalog_toggle_persistence_and_disabled_launch(self):
+        self.user['is_admin']=True
+        original=self.client.get('/api/agents').json()['agents']
+        first=original[0]['id']
+        result=self.client.patch('/api/admin/agents/'+first,json={'enabled':False,'expected_enabled':True},headers=self.headers)
+        self.assertEqual(result.status_code,200,result.text)
+        public=self.client.get('/api/agents').json()['agents']
+        self.assertEqual([a['id'] for a in public],[a['id'] for a in original[1:]])
+        self.assertEqual(self.client.get('/api/agents/'+first+'/launch',follow_redirects=False).status_code,404)
+        launch=self.client.get('/api/admin/agents/'+first+'/launch',follow_redirects=False)
+        self.assertEqual(launch.status_code,302);self.assertTrue(launch.headers['location'].endswith('/agent'))
+        self.assertEqual(self.submit(agent_id=first,images=[]).status_code,422)
+        from backend.agent_catalog import sync_agents
+        sync_agents(self.app.state.agent_registry)
+        self.assertFalse(self.client.get('/api/admin/agents').json()['agents'][0]['enabled'])
+        stale=self.client.patch('/api/admin/agents/'+first,json={'enabled':False,'expected_enabled':True},headers=self.headers)
+        self.assertEqual(stale.status_code,409)
+        restored=self.client.patch('/api/admin/agents/'+first,json={'enabled':True,'expected_enabled':False},headers=self.headers)
+        self.assertEqual(restored.status_code,200)
+        self.db.execute('UPDATE agent_test_records SET enabled=false')
+        self.assertEqual(self.client.get('/api/agents').json()['agents'],[])
+        self.assertEqual(self.client.get('/api/health').json()['agent_count'],0)
+
+    def test_feedback_management_filters_reply_and_conflict(self):
+        fid=self.submit(content='Searchable feedback',images=[]).json()['feedback_id']
+        second=self.submit(feedback_type='platform_inquiry',agent_id=None,images=[],content='Account question').json()['feedback_id']
+        self.user['is_admin']=True
+        listing=self.client.get('/api/admin/feedbacks').json();self.assertEqual(listing['total'],2);self.assertEqual(listing['counts']['received'],2)
+        self.assertEqual(self.client.get('/api/admin/feedbacks?q=SEARCHABLE').json()['total'],1)
+        self.assertEqual(self.client.get('/api/admin/feedbacks?agent_id=wiameet&feedback_type=agent_bug').json()['total'],1)
+        detail=self.client.get('/api/admin/feedbacks/'+fid).json();self.assertEqual(detail['revision'],0)
+        update={'status':'resolved','reply':'Public response','admin_note':'Private note','revision':0}
+        response=self.client.patch('/api/admin/feedbacks/'+fid,json=update,headers=self.headers);self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(self.client.patch('/api/admin/feedbacks/'+fid,json=update,headers=self.headers).status_code,409)
+        filtered=self.client.get('/api/admin/feedbacks?status=resolved').json();self.assertEqual(filtered['total'],1);self.assertEqual(filtered['counts']['resolved'],1)
+        self.user['is_admin']=False
+        mine=self.client.get('/api/feedbacks').json()['feedbacks'];item=next(f for f in mine if f['feedback_id']==fid)
+        self.assertEqual(item['status'],'resolved');self.assertEqual(item['reply'],'Public response');self.assertNotIn('admin_note',item)
+        self.assertEqual(self.client.patch('/api/admin/feedbacks/'+fid,json={**update,'revision':1},headers=self.headers).status_code,403)
+        self.assertEqual(self.client.get('/api/admin/feedbacks/'+fid).status_code,403)
 
 if __name__=='__main__':unittest.main()

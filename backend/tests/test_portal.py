@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
@@ -16,6 +17,11 @@ class PortalTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.config = Path(self.temp.name) / 'agents.json'
         self.data = json.loads((ROOT / 'config/agents.json').read_text())
+        # Unit tests avoid deployment DB writes; temporary-table tests cover persistence.
+        active = patch('backend.main.active_registry', lambda registry: {key:a for key,a in registry.items() if a.enabled})
+        active.start();self.addCleanup(active.stop)
+        sync = patch('backend.main.sync_agents')
+        sync.start();self.addCleanup(sync.stop)
 
     def client(self):
         self.config.write_text(json.dumps(self.data))
@@ -26,7 +32,7 @@ class PortalTests(unittest.TestCase):
     def test_catalog_and_configured_destinations(self):
         client = self.client()
         catalog = client.get('/api/agents').json()['agents']
-        self.assertEqual(len(catalog), 4)
+        self.assertEqual(len(catalog), len(self.data))
         for actual, configured in zip(catalog, self.data):
             self.assertNotIn('url', actual)
             response = client.get(actual['launch_url'], follow_redirects=False)
@@ -37,7 +43,7 @@ class PortalTests(unittest.TestCase):
     def test_disabled_and_unknown_agents_cannot_launch(self):
         self.data[0]['enabled'] = False
         client = self.client()
-        self.assertEqual(client.get('/api/health').json()['agent_count'], 3)
+        self.assertEqual(client.get('/api/health').json()['agent_count'], len(self.data)-1)
         self.assertEqual(client.get('/api/agents/wiameet/launch').status_code, 404)
         self.assertEqual(client.get('/api/agents/unknown/launch').status_code, 404)
 
@@ -48,7 +54,7 @@ class PortalTests(unittest.TestCase):
     def test_additional_agent_needs_only_configuration(self):
         self.data.append({**self.data[0], 'id': 'new-agent', 'name': 'New Agent', 'url': 'https://example.org/'})
         client = self.client()
-        self.assertEqual(len(client.get('/api/agents').json()['agents']), 5)
+        self.assertEqual(len(client.get('/api/agents').json()['agents']), len(self.data))
         self.assertEqual(client.get('/api/agents/new-agent/launch', follow_redirects=False).headers['location'], 'https://example.org/')
 
     def test_empty_catalog(self):

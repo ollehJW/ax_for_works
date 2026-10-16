@@ -8,6 +8,8 @@ import AgentPreview from './AgentPreview.jsx';
 import AgentIntroduction from './AgentIntroduction.jsx';
 import NoticeBoard from './NoticeBoard.jsx';
 import Feedbacks from './Feedbacks.jsx';
+import AdminAgents from './AdminAgents.jsx';
+import AdminFeedbacks from './AdminFeedbacks.jsx';
 
 const STAR = 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z';
 const ARROW = 'M4 12h16m-6-6 6 6-6 6';
@@ -20,6 +22,9 @@ function Badge({ agent, children }) {
 }
 function App({ user, onLogout, onProfile, profileOpen }) {
   const [route, setRoute] = useState(() => window.location.hash);
+  const adminRoute = route.startsWith('#admin');
+  const adminPage = user.is_admin && (adminRoute || !route);
+  const adminFeedbackPage = adminPage && route.startsWith('#admin/feedbacks');
   const introductionsPage = route.startsWith('#introductions');
   const noticesPage = route.startsWith('#notices');
   const feedbacksPage = route.startsWith('#feedbacks');
@@ -30,6 +35,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
   }, []);
   useEffect(() => { if (introductionsPage) window.scrollTo(0, 0); }, [introductionsPage]);
   useEffect(() => { if (feedbacksPage) window.scrollTo(0, 0); }, [feedbacksPage]);
+  const catalogSignature = useRef(null);
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -44,18 +50,44 @@ function App({ user, onLogout, onProfile, profileOpen }) {
     return () => document.removeEventListener('visibilitychange', update);
   }, []);
   useEffect(() => {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    let active = true;
-    setLoading(true); setError(false);
-    fetch('/api/agents', { signal: controller.signal })
-      .then(r => { if (r.status === 401) window.dispatchEvent(new Event('ax-session-expired')); if (!r.ok) throw new Error('API failed'); return r.json(); })
-      .then(data => { if (!Array.isArray(data.agents)) throw new Error('Invalid response'); if (active) { setAgents(data.agents); setCurrent(0); } })
-      .catch(() => { if (active) setError(true); })
-      .finally(() => { clearTimeout(timeout); if (active) setLoading(false); });
-    return () => { active = false; clearTimeout(timeout); controller.abort(); };
-  }, [attempt]);
-  const running = playing && !interacting && !profileOpen && visible && !introductionsPage && !noticesPage && !feedbacksPage;
+    let disposed = false, pending = false;
+    let controller;
+    async function refresh() {
+      if (pending || disposed) return;
+      pending = true;
+      controller = new AbortController();
+      const requestController = controller;
+      const timeout = setTimeout(() => requestController.abort(), 10000);
+      try {
+        const response = await fetch('/api/agents', {signal:requestController.signal});
+        if (response.status === 401) window.dispatchEvent(new Event('ax-session-expired'));
+        if (!response.ok) throw new Error('API failed');
+        const data = await response.json();
+        if (!Array.isArray(data.agents)) throw new Error('Invalid response');
+        if (!disposed) {
+          const signature = JSON.stringify(data.agents);
+          if (catalogSignature.current !== signature) {
+            catalogSignature.current = signature;setAgents(data.agents);setCurrent(0);
+          }
+          setError(false);
+        }
+      } catch { if (!disposed) setError(true); }
+      finally { clearTimeout(timeout);pending=false;if(!disposed)setLoading(false); }
+    }
+    refresh();
+    const timer = setInterval(refresh,30000);
+    window.addEventListener('focus',refresh);
+    window.addEventListener('ax-agents-changed',refresh);
+    const crossTab = e => {if(e.key==='ax-agents-updated')refresh();};
+    window.addEventListener('storage',crossTab);
+    return () => {disposed=true;controller?.abort();clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener('ax-agents-changed',refresh);window.removeEventListener('storage',crossTab);};
+  }, [attempt, adminPage, introductionsPage, feedbacksPage]);
+  function catalogChanged() {
+    setAttempt(v=>v+1);
+    try {localStorage.setItem('ax-agents-updated',String(Date.now()));} catch {}
+    window.dispatchEvent(new Event('ax-agents-changed'));
+  }
+  const running = playing && !interacting && !profileOpen && visible && !introductionsPage && !noticesPage && !feedbacksPage && !adminPage;
   useEffect(() => {
     if (!running || agents.length < 2) return;
     const timer = setTimeout(() => setCurrent(i => (i + 1) % agents.length), 6000);
@@ -83,11 +115,11 @@ function App({ user, onLogout, onProfile, profileOpen }) {
   return <>
     <a className="skip-link" href="#main">본문으로 건너뛰기</a>
     <header><div className="header-inner">
-      <a className="brand" href="#top" aria-label="AX for Works 홈"><span className="brand-symbol"><Icon size={18}/></span><span>AX <em>for Works</em></span></a>
-      <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage && !feedbacksPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage && !feedbacksPage ? 'page' : undefined}>Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Guides</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>Updates</a><a className={`navlink ${feedbacksPage ? 'active' : ''}`} href="#feedbacks" aria-current={feedbacksPage ? 'page' : undefined}>Feedbacks</a></nav>
+      <a className="brand" href={adminPage ? "#admin/agents" : "#top"} aria-label="AX for Works 홈"><span className="brand-symbol"><Icon size={18}/></span><span>AX <em>for Works</em></span></a>
+      {adminPage ? <nav className="platform-nav" aria-label="관리자 메뉴"><a className={`navlink ${!adminFeedbackPage?'active':''}`} aria-current={!adminFeedbackPage?'page':undefined} href="#admin/agents">Agent 관리</a><a className={`navlink ${adminFeedbackPage?'active':''}`} aria-current={adminFeedbackPage?'page':undefined} href="#admin/feedbacks">피드백 관리</a><a className="navlink" href="#agents">사용자 화면</a></nav> : <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !noticesPage && !feedbacksPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !noticesPage && !feedbacksPage ? 'page' : undefined}>Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Guides</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>Updates</a><a className={`navlink ${feedbacksPage ? 'active' : ''}`} href="#feedbacks" aria-current={feedbacksPage ? 'page' : undefined}>Feedbacks</a></nav>}
       <AXAccount header name={user.full_name} team={user.team_name} admin={user.is_admin} onProfile={onProfile} onLogout={onLogout}/>
     </div></header>
-    <main id="main">{feedbacksPage ? <Feedbacks agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} user={user}/> : noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
+    <main id="main">{user.is_admin&&!adminPage&&<div className="admin-preview-note"><span>사용자 화면 미리보기</span><a href="#admin/agents">관리 화면으로 돌아가기 →</a></div>}{adminPage ? (adminFeedbackPage ? <AdminFeedbacks/> : <AdminAgents onCatalogChange={catalogChanged}/>) : adminRoute ? <div className="state-panel" role="alert">관리자만 이용할 수 있는 화면입니다.</div> : feedbacksPage ? <Feedbacks agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} user={user}/> : noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
       <section className="intro"><div><p className="eyebrow"><span/>MAKE WORK FLOW</p><h1>일하는 방식의 변화, <em>AI와 함께.</em></h1></div><p className="intro-caption">반복되는 일은 줄이고, 더 중요한 일에 집중하세요.</p></section>
       {loading ? <div className="state-panel" role="status"><span className="loader"/>AI 파트너를 불러오고 있습니다.</div> : error ? <div className="state-panel" role="alert"><h2>Agent 목록을 불러오지 못했습니다.</h2><p>잠시 후 다시 시도해 주세요.</p><button className="primary" onClick={() => setAttempt(v => v + 1)}>다시 시도</button></div> : !a ? <div className="state-panel"><h2>준비 중인 AI 파트너</h2><p>현재 이용 가능한 Agent가 없습니다.</p></div> : <>
         <section className="hero" aria-roledescription="캐러셀" aria-label="AI Agent 소개" onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)} onFocusCapture={() => setInteracting(true)} onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) setInteracting(false); }}>
