@@ -32,9 +32,9 @@ export default function Awards() {
       <section className="awards-category awards-creator" aria-labelledby="awards-creator-title">
         <div className="awards-category-top"><span className="awards-category-icon"><MessageSquareHeart size={23} aria-hidden="true"/></span><span className="awards-category-count">FEEDBACK · 1명</span></div>
         <p className="awards-category-kicker">좋은 의견이 만드는 더 나은 내일</p><h3 id="awards-creator-title">AX Co-Creator</h3>
-        <p className="awards-category-description">한 달 동안 가장 많은 피드백을 나눠준 동료에게.</p>
-        <div className="awards-waiting"><span className="awards-waiting-icon"><MessageSquareHeart size={25} strokeWidth={1.5} aria-hidden="true"/></span><div><strong>첫 번째 Co-Creator를 기다립니다</strong><p>서비스 오픈 후 피드백 활동 집계가 시작됩니다.</p></div></div>
-        <div className="awards-category-foot"><span>선정 기준</span><strong>피드백 작성 건수 1위</strong></div>
+        <p className="awards-category-description">의미 있는 피드백으로 서비스 개선에 기여한 동료에게.</p>
+        <div className="awards-waiting"><span className="awards-waiting-icon"><MessageSquareHeart size={25} strokeWidth={1.5} aria-hidden="true"/></span><div><strong>첫 번째 Co-Creator를 기다립니다</strong><p>서비스 오픈 후 피드백의 개선 기여를 살펴봅니다.</p></div></div>
+        <div className="awards-category-foot"><span>선정 기준</span><strong>서비스 개선에 기여한 우수 피드백</strong></div>
       </section>
     </div>
 

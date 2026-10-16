@@ -369,7 +369,7 @@ WiaMeet 자체 인증을 사용하므로 이 경로의 `require_login`은 `false
 
 ## 관리자 운영 화면
 
-- 관리자 기본 화면: `/#admin/agents`(Agent 관리), `/#admin/feedbacks`(피드백 관리). 관리자 상단에는 두 관리 메뉴만 표시합니다.
+- 관리자 기본 화면: `/#admin/agents`(Agent 관리), `/#admin/feedbacks`(피드백 관리). 관리자 상단에는 Agent 관리, 피드백 관리, Awards 관리를 표시합니다.
 - `platform.agents`: `agent_id`, `name`, `enabled`, `sort_order`, `updated_by`, `updated_at`. 처음 등록할 때만 `agents.json`의 `enabled`를 사용합니다. 이후 공개 여부는 DB가 기준이며 재시작해도 유지됩니다. 서버 시작 시 새 Agent를 추가하고 이름/정렬 순서를 동기화합니다. 설명·색상·서비스 주소와 게이트웨이 경로는 기존 설정에서 관리합니다.
 - 비활성 Agent는 공개 목록, 홈 애니메이션/카드, Guides, 피드백의 Agent 선택에서 제외됩니다. 남은 목록 기준으로 번호를 01부터 다시 매깁니다. 공개 launch API는 비활성 Agent를 거부하지만, 관리자 전용 launch API는 비활성 상태에서도 서비스의 `/agent`로 이동합니다. 서비스 자체 종료나 게이트웨이 차단 설정은 변경하지 않습니다.
 - 사용자 화면은 페이지 전환/창 복귀/30초 주기로 목록을 갱신합니다. 같은 브라우저의 다른 탭에는 저장 알림으로 갱신합니다.
@@ -377,3 +377,9 @@ WiaMeet 자체 인증을 사용하므로 이 경로의 `require_login`은 `false
 - `reply`는 작성자에게 표시되고 `admin_note`는 관리자만 조회합니다. 변경자/시각을 저장하며 `revision`을 비교해 다른 관리자의 수정 내용을 덮어쓰지 않습니다.
 - 새 환경에서는 `backend.database.initialize_schema()` 또는 `backend/sql/agents.sql` 및 `backend/sql/feedback_management.sql`을 적용한 뒤 서버를 시작합니다. 마이그레이션은 기존 피드백을 유지합니다.
 - 검증: `AX_RUN_FEEDBACK_TESTS=1 .venv/bin/python -m unittest backend.tests.test_feedbacks backend.tests.test_portal -v`. DB 변경 검증은 세션 임시 테이블만 사용합니다. 브라우저는 `frontend/tests/admin.mjs`에서 가상 인증/API로 검증합니다.
+
+### Awards 관리 화면
+
+- `/#admin/awards`: 월 선택, 팀·개인별 순위 영역과 수상 대상 영역, Co-Creator 임직원 검색 UI를 제공합니다.
+- 현재 프론트 UI만 구현했습니다. 순위 집계, 임직원 검색 API, 수상자 선택·저장·공개는 연결하지 않았으며 실제 수상 데이터는 생성하지 않습니다.
+- Co-Creator는 피드백 작성 건수 순위 대신 서비스 개선에 대한 기여를 기준으로 관리자가 선정하는 부문입니다.
