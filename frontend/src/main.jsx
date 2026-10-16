@@ -8,6 +8,7 @@ import AgentPreview from './AgentPreview.jsx';
 import AgentIntroduction from './AgentIntroduction.jsx';
 import NoticeBoard from './NoticeBoard.jsx';
 import Feedbacks from './Feedbacks.jsx';
+import Awards from './Awards.jsx';
 import AdminAgents from './AdminAgents.jsx';
 import AdminFeedbacks from './AdminFeedbacks.jsx';
 
@@ -35,7 +36,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
     return () => window.removeEventListener('hashchange', update);
   }, []);
   useEffect(() => { if (introductionsPage) window.scrollTo(0, 0); }, [introductionsPage]);
-  useEffect(() => { if (feedbacksPage) window.scrollTo(0, 0); }, [feedbacksPage]);
+  useEffect(() => { if (feedbacksPage || awardsPage) window.scrollTo(0, 0); }, [feedbacksPage, awardsPage]);
   const catalogSignature = useRef(null);
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +121,7 @@ function App({ user, onLogout, onProfile, profileOpen }) {
       {adminPage ? <nav className="platform-nav" aria-label="관리자 메뉴"><a className={`navlink ${!adminFeedbackPage?'active':''}`} aria-current={!adminFeedbackPage?'page':undefined} href="#admin/agents">Agent 관리</a><a className={`navlink ${adminFeedbackPage?'active':''}`} aria-current={adminFeedbackPage?'page':undefined} href="#admin/feedbacks">피드백 관리</a></nav> : <nav className="platform-nav" aria-label="주요 메뉴"><a className={`navlink ${!introductionsPage && !awardsPage && !noticesPage && !feedbacksPage ? 'active' : ''}`} href="#agents" aria-current={!introductionsPage && !awardsPage && !noticesPage && !feedbacksPage ? 'page' : undefined}>Agents</a><a className={`navlink ${introductionsPage ? 'active' : ''}`} href="#introductions" aria-current={introductionsPage ? 'page' : undefined}>Guides</a><a className={`navlink ${awardsPage ? 'active' : ''}`} href="#awards" aria-current={awardsPage ? 'page' : undefined}>Awards</a><a className={`navlink ${noticesPage ? 'active' : ''}`} href="#notices/notice" aria-current={noticesPage ? 'page' : undefined}>Updates</a><a className={`navlink ${feedbacksPage ? 'active' : ''}`} href="#feedbacks" aria-current={feedbacksPage ? 'page' : undefined}>Feedbacks</a></nav>}
       <AXAccount header name={user.full_name} team={user.team_name} admin={user.is_admin} onProfile={onProfile} onLogout={onLogout}/>
     </div></header>
-    <main id="main">{user.is_admin&&!adminPage&&<div className="admin-preview-note"><span>사용자 화면 미리보기</span><a href="#admin/agents">관리 화면으로 돌아가기 →</a></div>}{adminPage ? (adminFeedbackPage ? <AdminFeedbacks/> : <AdminAgents onCatalogChange={catalogChanged}/>) : adminRoute ? <div className="state-panel" role="alert">관리자만 이용할 수 있는 화면입니다.</div> : awardsPage ? null : feedbacksPage ? <Feedbacks agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} user={user}/> : noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
+    <main id="main">{user.is_admin&&!adminPage&&<div className="admin-preview-note"><span>사용자 화면 미리보기</span><a href="#admin/agents">관리 화면으로 돌아가기 →</a></div>}{adminPage ? (adminFeedbackPage ? <AdminFeedbacks/> : <AdminAgents onCatalogChange={catalogChanged}/>) : adminRoute ? <div className="state-panel" role="alert">관리자만 이용할 수 있는 화면입니다.</div> : awardsPage ? <Awards/> : feedbacksPage ? <Feedbacks agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} user={user}/> : noticesPage ? <NoticeBoard user={user} route={route}/> : introductionsPage ? <AgentIntroduction agents={agents} loading={loading} error={error} onRetry={()=>setAttempt(v=>v+1)} selection={route.split('/')[1]}/> : <><div id="top"/>
       <section className="intro"><div><p className="eyebrow"><span/>MAKE WORK FLOW</p><h1>일하는 방식의 변화, <em>AI와 함께.</em></h1></div><p className="intro-caption">반복되는 일은 줄이고, 더 중요한 일에 집중하세요.</p></section>
       {loading ? <div className="state-panel" role="status"><span className="loader"/>AI 파트너를 불러오고 있습니다.</div> : error ? <div className="state-panel" role="alert"><h2>Agent 목록을 불러오지 못했습니다.</h2><p>잠시 후 다시 시도해 주세요.</p><button className="primary" onClick={() => setAttempt(v => v + 1)}>다시 시도</button></div> : !a ? <div className="state-panel"><h2>준비 중인 AI 파트너</h2><p>현재 이용 가능한 Agent가 없습니다.</p></div> : <>
         <section className="hero" aria-roledescription="캐러셀" aria-label="AI Agent 소개" onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)} onFocusCapture={() => setInteracting(true)} onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) setInteracting(false); }}>
