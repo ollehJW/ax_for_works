@@ -36,8 +36,8 @@
 .account-dialog-close:hover{background:#edf3fb}
 .account-dialog>p{margin:0 0 24px;font-size:14px;line-height:1.7}
 .registration-fields{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
-.registration-hint{grid-column:1/-1;color:#60738c;font-size:12px;line-height:1.7;margin:-8px 0 20px}
-.account-reset-note{color:#60738c;font-size:13px;line-height:1.8;margin:0 0 20px}
+.registration-hint{grid-column:1/-1;color:#64748b;font-size:13px;line-height:1.7;margin:-8px 0 20px}
+.account-reset-note{color:#64748b;font-size:13px;line-height:1.7;margin:0 0 20px}
 .account-success{display:flex;align-items:flex-start;gap:12px;background:#eef8f2;border:1px solid #c8e4d2;color:#2b6545;border-radius:9px;padding:18px;margin-bottom:20px;line-height:1.8;font-size:14px}
 .account-success svg{flex-shrink:0;margin-top:2px}.account-success p{margin:0}
 .login-account-actions button:focus-visible,.account-dialog button:focus-visible{outline:2px solid #476d9c;outline-offset:3px}
@@ -47,12 +47,12 @@
 .registration-autocomplete{position:relative}
 .registration-autocomplete.is-open input{border-color:#9fb8d5;border-radius:9px 9px 0 0;background:#fff}
 .registration-suggestions{position:absolute;top:100%;left:0;right:0;z-index:10;background:#fff;border:1px solid #9fb8d5;border-top:0;border-radius:0 0 9px 9px;box-shadow:0 10px 20px #283f591a;padding:6px}
-.registration-suggestion-heading{display:flex;justify-content:space-between;padding:8px 10px;color:#697c93;font-size:11px;border-top:1px solid #edf1f6}
+.registration-suggestion-heading{display:flex;justify-content:space-between;padding:8px 10px;color:#64748b;font-size:12px;border-top:1px solid #edf1f6}
 .registration-options{max-height:180px;overflow-y:auto;overscroll-behavior:contain}
 .registration-option{display:flex;align-items:center;gap:9px;padding:10px;border-radius:6px;color:#34465c;font-size:13px;line-height:1.5;cursor:pointer}
 .registration-option>span{flex:1;min-width:0;overflow-wrap:anywhere}.registration-option>svg{flex-shrink:0;color:#7890ac}
 .registration-option strong{color:#315f94;font-weight:700}.registration-option.is-active{background:#edf4fb}
-.registration-no-results{padding:12px 10px;margin:0;font-size:12px;color:#64748b;line-height:1.6}
+.registration-no-results{padding:12px 10px;margin:0;font-size:13px;color:#64748b;line-height:1.7}
 
 .workspace{gap:14px;white-space:nowrap}
 .workspace-identity{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:10px;padding:9px 10px;background:transparent;color:#263c57;transition:background .15s}
