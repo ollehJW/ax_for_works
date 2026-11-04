@@ -2,6 +2,14 @@
 
 Deployment date: 2026-11-04.
 
+## Current status: original service restored (2026-11-05)
+
+The temporary backend and frontend have been stopped. Only their Supervisor program sections were replaced with the original WiaReport sections from the pre-cutover backup. Original `wiareport-backend` and `wiareport-frontend` reached RUNNING, and backend health and frontend readiness checks passed. Public `/wiareport/` and `/wiareport/agent` returned HTTP 200, with successful TLS certificate verification.
+
+Use `https://axforwork.wia.co.kr/wiareport/agent` for the restored platform-integrated service. The original frontend binds to loopback, so the temporary external 31003 entry is no longer used. `/home/jongwook/wiareport_temp` and `/data/wiareport_temp` remain preserved and inactive. No temporary SQLite data was merged into the original PostgreSQL database. Other services were not restarted.
+
+The sections below describe the preceding temporary deployment.
+
 ## Version and access
 
 - Exact application commit: `0fd2ad0936f9b32685eb5e6de3744bfbbc3f44e5` (Require HTTPS transport and restrict backend to loopback).
