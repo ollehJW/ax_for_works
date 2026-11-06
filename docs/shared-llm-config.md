@@ -8,7 +8,7 @@ Common keys:
 - `OPENAI_BASE_URL`
 - `OPENAI_API_VERSION`
 
-An optional service prefix overrides a common value, for example `WIAREPORT_OPENAI_MODEL` or `WIACODING_OPENAI_API_KEY`. All values, including overrides, are managed in this one file. Removing an override opts that service into the common value. The initial migration preserves existing model and credential differences; it does not rotate keys or switch deployments.
+An optional service prefix overrides a common value, for example `WIAREPORT_OPENAI_MODEL` or `WIACODING_OPENAI_API_KEY`. All values, including overrides, are managed in this one file. Removing an override opts that service into the common value. As of 2026-11-06, all four services use the common gpt-5.6-terra model and the same API key (the existing WiaMeet/WiaNews credentials). No service-specific model or key overrides are configured.
 
 Supervisor invokes `ops/shared-llm.py <service> -- <existing command>` using the platform virtualenv. The loader validates all four required settings before starting the service and passes them as environment variables without logging their values. The corresponding keys have been removed from service-local runtime files. Do not reintroduce them: existing launchers may overwrite inherited environment variables.
 
