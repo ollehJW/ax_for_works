@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import re
 import secrets
+import string
 import time
 import uuid
 import unicodedata
@@ -127,18 +128,37 @@ class LoginBody(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
+PASSWORD_GUIDE = "영문 대문자·소문자·숫자·특수문자를 모두 포함해 9자 이상 입력하세요. 'wia'는 대소문자 구분 없이 사용할 수 없습니다."
+
+
+def validate_new_password(value):
+    if not (9 <= len(value) <= 128 and re.search('[A-Z]', value)
+            and re.search('[a-z]', value) and re.search('[0-9]', value)
+            and any(char in string.punctuation for char in value)):
+        raise ValueError(PASSWORD_GUIDE)
+    if 'wia' in value.casefold():
+        raise ValueError(PASSWORD_GUIDE)
+    return value
+
+
+def generate_temporary_password():
+    alphabet = string.ascii_letters + string.digits + '!@#$%*_+-'
+    while True:
+        value = ''.join(secrets.choice(alphabet) for _ in range(16))
+        try:
+            return validate_new_password(value)
+        except ValueError:
+            continue
+
+
 class PasswordBody(BaseModel):
-    current_password: str = Field(min_length=1, max_length=128)
-    new_password: str = Field(min_length=8, max_length=128)
+    current_password: str = Field(min_length=1, max_length=128, repr=False)
+    new_password: str = Field(min_length=9, max_length=128, repr=False)
 
     @field_validator('new_password')
     @classmethod
     def strong_password(cls, value):
-        if not (re.search('[A-Za-z]', value) and re.search('[0-9]', value) and re.search(r'[^\w\s]', value)):
-            raise ValueError('영문, 숫자, 특수문자를 포함해 8자 이상 입력해 주세요.')
-        if value in ('wia1234!', 'admin123'):
-            raise ValueError('초기 비밀번호는 새 비밀번호로 사용할 수 없습니다.')
-        return value
+        return validate_new_password(value)
 
 
 @router.post('/login')
@@ -230,7 +250,7 @@ class AccountIdentity(BaseModel):
 
 
 class RegisterBody(AccountIdentity):
-    password: str = Field(min_length=8, max_length=128, repr=False)
+    password: str = Field(min_length=9, max_length=128, repr=False)
     organization: str = Field(min_length=1, max_length=80)
     team_name: str = Field(min_length=1, max_length=80)
     role_name: str = Field(min_length=1, max_length=80)
@@ -279,9 +299,12 @@ def consume_public_attempt(request, action, employee=None):
 
 
 @router.post('/reset-password')
-def reset_password(body: AccountIdentity, request: Request):
+def reset_password(body: AccountIdentity, request: Request, response: Response):
     consume_public_attempt(request, 'reset', body.employee_id)
-    encoded = hash_password('wia1234!')
+    temporary_password = generate_temporary_password()
+    encoded = hash_password(temporary_password)
+    response.headers['Cache-Control'] = 'no-store'
+    response.headers['Pragma'] = 'no-cache'
     with database() as db:
         row = db.execute('''SELECT user_id,full_name FROM platform.users
             WHERE lower(employee_id)=%s AND is_active=TRUE FOR UPDATE''', (body.employee_id,)).fetchone()
@@ -292,7 +315,8 @@ def reset_password(body: AccountIdentity, request: Request):
             password_changed_at=%s,updated_at=%s WHERE user_id=%s''', (encoded, stamp, stamp, row['user_id']))
         db.execute('DELETE FROM platform.sessions WHERE user_id=%s', (row['user_id'],))
         db.execute('DELETE FROM platform.login_attempts WHERE attempt_key=%s', ('employee:' + body.employee_id,))
-    return {'ok': True, 'message': '패스워드가 wia1234!로 초기화되었습니다. 로그인 후 새 비밀번호로 변경해 주세요.'}
+    return {'ok': True, 'temporary_password': temporary_password,
+            'message': '임시 비밀번호가 발급되었습니다. 아래 비밀번호로 로그인한 후 새 비밀번호로 변경해 주세요.'}
 
 
 @router.post('/register', status_code=201)

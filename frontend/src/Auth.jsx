@@ -24,8 +24,8 @@ function PasswordChange({ user, onChanged, onLogout, notice }) {
     <span className="auth-icon"><LockKeyhole size={27}/></span><h1 id="change-title">비밀번호를 변경해 주세요</h1><p id="change-help">{user.full_name}님, 초기 비밀번호로 로그인하셨습니다.<br/>새 비밀번호를 설정하면 서비스를 이용할 수 있습니다.</p>
     <form onSubmit={submit}><fieldset disabled={busy}>
       <label>현재 비밀번호<input ref={first} type="password" autoComplete="current-password" required maxLength={128} value={values.current_password} onChange={e=>setValues({...values,current_password:e.target.value})}/></label>
-      <label>새 비밀번호<input type="password" autoComplete="new-password" required minLength={8} maxLength={128} value={values.new_password} onChange={e=>setValues({...values,new_password:e.target.value})}/><small>영문·숫자·특수문자를 포함해 8자 이상 입력하세요.</small></label>
-      <label>새 비밀번호 확인<input type="password" autoComplete="new-password" required minLength={8} maxLength={128} value={values.confirm} onChange={e=>setValues({...values,confirm:e.target.value})}/></label>
+      <label>새 비밀번호<input type="password" autoComplete="new-password" required minLength={9} maxLength={128} value={values.new_password} onChange={e=>setValues({...values,new_password:e.target.value})}/><small>영문 대문자·소문자·숫자·특수문자를 모두 포함해 9자 이상 입력하세요. 'wia'는 대소문자 구분 없이 사용할 수 없습니다.</small></label>
+      <label>새 비밀번호 확인<input type="password" autoComplete="new-password" required minLength={9} maxLength={128} value={values.confirm} onChange={e=>setValues({...values,confirm:e.target.value})}/></label>
       {(error||notice)&&<p className="auth-error" role="alert">{error||notice}</p>}
       <button className="button primary auth-submit" type="submit">{busy?<Loader2 size={17} className="spin"/>:<ShieldCheck size={17}/>}비밀번호 변경 후 시작</button>
       <button className="auth-text-button" type="button" onClick={onLogout}>로그아웃</button>

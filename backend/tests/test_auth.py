@@ -171,15 +171,17 @@ class AuthTests(unittest.TestCase):
         payload['full_name'] = '테스트 사용자'
         response = self.client.post('/api/auth/reset-password', json=payload, headers=self.headers)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('wia1234!', response.json()['message'])
+        temporary_password = response.json()['temporary_password']
+        self.assertNotEqual(temporary_password, 'wia1234!')
+        self.assertEqual(response.headers['Cache-Control'], 'no-store')
         self.assertEqual(self.client.get('/api/auth/me').status_code, 401)
         with database() as db:
             self.assertIsNone(db.execute('SELECT 1 FROM platform.sessions WHERE token_hash=%s', (token_hash(token),)).fetchone())
         self.assertEqual(self.login().status_code, 401)
-        response = self.login(password='wia1234!')
+        response = self.login(password=temporary_password)
         self.assertTrue(response.json()['must_change_password'])
         self.assertEqual(self.client.get('/api/agents').status_code, 403)
-        response = self.client.post('/api/auth/password', json={'current_password':'wia1234!', 'new_password':'Replacement123!'}, headers=self.headers)
+        response = self.client.post('/api/auth/password', json={'current_password':temporary_password, 'new_password':'Replacement123!'}, headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.json()['must_change_password'])
 
