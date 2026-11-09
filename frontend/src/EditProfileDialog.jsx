@@ -36,7 +36,7 @@ export default function EditProfileDialog({onClose,onDone}) {
   return <dialog ref={dialog} className="auth-card account-dialog edit-profile-dialog" aria-labelledby="edit-profile-title" onCancel={e=>{e.preventDefault();if(!busy)onClose();}}>
     <div className="account-dialog-heading"><h2 id="edit-profile-title">정보 변경</h2><button className="account-dialog-close" type="button" disabled={busy} onClick={onClose} aria-label="닫기"><X size={21}/></button></div>
     {success?<><div className="account-success" role="status"><ShieldCheck size={23}/><p>{success}</p></div><button type="button" className="button primary auth-submit" onClick={()=>onDone(credentials.employee_id)}>로그인으로 돌아가기</button></>:<>
-      <p>{original?'변경할 항목의 편집 버튼을 눌러 주세요.':'사번과 현재 비밀번호로 본인 확인 후 정보를 변경할 수 있습니다.'}</p>
+      <p>{original?'변경할 항목의 연필 아이콘을 눌러 주세요.':'사번과 현재 비밀번호로 본인 확인 후 정보를 변경할 수 있습니다.'}</p>
       <form onSubmit={submit}><fieldset disabled={busy}>
         {!original?<>
           <label>사번<input autoFocus required maxLength={40} autoComplete="username" value={credentials.employee_id} onChange={e=>setCredentials({...credentials,employee_id:e.target.value})}/></label>
@@ -45,7 +45,7 @@ export default function EditProfileDialog({onClose,onDone}) {
           <div className="edit-profile-identity"><span>사번 <strong>{credentials.employee_id}</strong></span><button type="button" onClick={reset}>다시 조회</button></div>
           <div className="edit-profile-fields">{fields.map(([key,label,option])=><div className="edit-profile-row" key={key}>
             <div>{editing[key]?<RegistrationAutocomplete name={key} label={label} value={values[key]} onChange={value=>setValues(v=>({...v,[key]:value}))} options={options[option]} loading={false}/>:<label>{label}<input readOnly value={values[key]||'미등록'} aria-label={label}/></label>}</div>
-            <button className="edit-profile-toggle" type="button" aria-label={`${label} ${editing[key]?'편집 취소':'편집'}`} aria-pressed={Boolean(editing[key])} onClick={()=>{if(editing[key])setValues(v=>({...v,[key]:original[key]}));setEditing(v=>({...v,[key]:!v[key]}));}}><Pencil size={14}/>{editing[key]?'취소':'편집'}</button>
+            <button className="edit-profile-toggle" type="button" aria-label={`${label} ${editing[key]?'편집 취소':'편집'}`} title={`${label} ${editing[key]?"변경 취소":"수정"}`} aria-pressed={Boolean(editing[key])} onClick={()=>{if(editing[key])setValues(v=>({...v,[key]:original[key]}));setEditing(v=>({...v,[key]:!v[key]}));}}>{editing[key]?<X size={18} aria-hidden="true"/>:<Pencil size={17} aria-hidden="true"/>}</button>
           </div>)}</div>
           <p className="account-reset-note">저장하면 기존 로그인이 종료됩니다. 다시 로그인하면 변경된 정보가 적용됩니다.</p>
         </>}
