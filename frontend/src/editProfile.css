@@ -1,0 +1,13 @@
+.login-account-actions{gap:14px}
+.login-account-actions button{white-space:nowrap}
+.account-dialog.edit-profile-dialog{width:520px;min-height:460px}
+.edit-profile-identity{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:#f0f5fb;border-radius:10px;margin-bottom:22px;font-size:14px;color:#52677f}
+.edit-profile-identity strong{color:#203d61;margin-left:8px}
+.edit-profile-identity button{border:0;background:transparent;color:#315f96;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.edit-profile-fields{display:grid;gap:16px;margin-bottom:20px}
+.edit-profile-row{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:12px;align-items:end}
+.edit-profile-row label{margin-bottom:0}
+.edit-profile-row input[readonly]{background:#f7f9fc;color:#40566f;border-color:#e1e7ef}
+.edit-profile-toggle{height:44px;display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid #cedbec;border-radius:8px;background:#fff;color:#315f96;font-size:13px}
+.edit-profile-toggle:hover,.edit-profile-toggle[aria-pressed=true]{background:#edf4fc;border-color:#8faed3}
+.edit-profile-dialog .registration-suggestions{z-index:5}

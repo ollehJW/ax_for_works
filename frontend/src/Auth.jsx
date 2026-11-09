@@ -1,3 +1,4 @@
+import EditProfileDialog from './EditProfileDialog';
 import ProfileDialog from './ProfileDialog';
 import {missingProfileFields} from './profileFields';
 import AccountDialog from './AccountDialogs.jsx';
@@ -42,7 +43,7 @@ function Login({onLogin,notice}) {
       <label>비밀번호<input type="password" autoComplete="current-password" required maxLength={128} placeholder="비밀번호를 입력하세요" value={password} onChange={e=>setPassword(e.target.value)}/></label>
       {(error||notice)&&<p className="auth-error" role="alert">{error||notice}</p>}
       <button className="button primary auth-submit" type="submit">{busy?<Loader2 size={17} className="spin"/>:<>로그인<ArrowRight size={17}/></>}</button>
-    </fieldset></form><div className="login-account-actions"><button type="button" disabled={busy} onClick={()=>setDialog('reset')}>패스워드 초기화</button><span aria-hidden="true"/><button type="button" disabled={busy} onClick={()=>setDialog('register')}>계정 생성</button></div>{dialog&&<AccountDialog mode={dialog} onClose={()=>setDialog(null)} onDone={employee=>{setEmployee(employee);setPassword('');setError('');setDialog(null);}}/>}</section></div></div>;
+    </fieldset></form><div className="login-account-actions"><button type="button" disabled={busy} onClick={()=>setDialog('reset')}>패스워드 초기화</button><span aria-hidden="true"/><button type="button" disabled={busy} onClick={()=>setDialog('register')}>계정 생성</button><span aria-hidden="true"/><button type="button" disabled={busy} onClick={()=>setDialog('edit')}>정보 변경</button></div>{dialog==='edit'&&<EditProfileDialog onClose={()=>setDialog(null)} onDone={employee=>{setEmployee(employee);setPassword('');setError('');setDialog(null);}}/>}{dialog&&dialog!=='edit'&&<AccountDialog mode={dialog} onClose={()=>setDialog(null)} onDone={employee=>{setEmployee(employee);setPassword('');setError('');setDialog(null);}}/>}</section></div></div>;
 }
 export default function AuthGate({children}) {
   const [user,setUser]=useState(null);const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');

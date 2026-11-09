@@ -421,3 +421,86 @@ def complete_profile(body: CompleteProfileBody, request: Request, user=Depends(r
         assignments = ', '.join(f'{field}=%s' for field in changes)
         db.execute(f'UPDATE platform.users SET {assignments} WHERE user_id=%s', (*changes.values(),row['user_id']))
         return public_user(db.execute(USER_QUERY + ' WHERE u.user_id=%s', (row['user_id'],)).fetchone())
+
+
+class ProfileCredentials(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    employee_id: str = Field(min_length=1, max_length=40, pattern=r'^[A-Za-z0-9._-]+$')
+    password: str = Field(min_length=1, max_length=128, repr=False)
+
+    @field_validator('employee_id', mode='before')
+    @classmethod
+    def normalize_employee(cls, value):
+        return value.strip().lower() if isinstance(value, str) else value
+
+
+class ProfileEditBody(ProfileCredentials):
+    revision: str = Field(max_length=64)
+    organization: str | None = Field(default=None, min_length=1, max_length=80)
+    team_name: str | None = Field(default=None, min_length=1, max_length=80)
+    role_name: str | None = Field(default=None, min_length=1, max_length=80)
+
+    @field_validator('organization', 'team_name', 'role_name')
+    @classmethod
+    def valid_label(cls, value):
+        return CompleteProfileBody.valid_label(value)
+
+
+def verified_profile(db, body):
+    row = db.execute(USER_QUERY + ' WHERE lower(u.employee_id)=%s FOR UPDATE OF u',
+                     (body.employee_id,)).fetchone()
+    valid = verify_password(body.password, row['password_hash'] if row else DUMMY_HASH)
+    if not valid or not row or not row['is_active']:
+        raise HTTPException(400, '사번 또는 비밀번호를 확인해 주세요.')
+    if row['must_change_password']:
+        raise HTTPException(403, '로그인하여 초기 비밀번호를 변경한 후 이용해 주세요.')
+    return row
+
+
+def profile_revision(row):
+    return row['updated_at'].isoformat() if row['updated_at'] else ''
+
+
+@router.post('/profile/verify')
+def verify_profile(body: ProfileCredentials, request: Request, response: Response):
+    consume_public_attempt(request, 'profile-verify', body.employee_id)
+    response.headers['Cache-Control'] = 'no-store'
+    with database() as db:
+        row = verified_profile(db, body)
+        return {**{key: row[key] or '' for key in ('organization', 'team_name', 'role_name')},
+                'revision': profile_revision(row)}
+
+
+@router.post('/profile/update')
+def update_profile(body: ProfileEditBody, request: Request, response: Response):
+    consume_public_attempt(request, 'profile-update', body.employee_id)
+    response.headers['Cache-Control'] = 'no-store'
+    supplied = body.model_dump(include={'organization', 'team_name', 'role_name'}, exclude_none=True)
+    if not supplied:
+        raise HTTPException(422, '변경할 정보를 입력해 주세요.')
+    with database() as db:
+        db.execute('SELECT pg_advisory_xact_lock(741902630)')
+        row = verified_profile(db, body)
+        if profile_revision(row) != body.revision:
+            raise HTTPException(409, '계정 정보가 변경되었습니다. 다시 조회해 주세요.')
+        changes = {}
+        stamp = now()
+        for field, table, column in [('organization','orgs','org_id'), ('team_name','teams','team_id'), ('role_name','roles','role_id')]:
+            if field not in supplied or supplied[field] == (row[field] or ''):
+                continue
+            name = supplied[field]
+            entries = db.execute(f'SELECT {column},name FROM platform.{table}').fetchall()
+            existing = next((entry for entry in entries if normalized_name(entry['name']).casefold() == name.casefold()), None)
+            item_id = existing[column] if existing else str(uuid.uuid4())
+            if not existing:
+                db.execute(f'INSERT INTO platform.{table} ({column},name,created_at) VALUES (%s,%s,%s)', (item_id,name,stamp))
+            changes[column] = item_id
+        if not changes:
+            return {'ok': True, 'message': '변경된 정보가 없습니다.'}
+        changes['updated_at'] = stamp
+        assignments = ', '.join(f'{field}=%s' for field in changes)
+        db.execute(f'UPDATE platform.users SET {assignments} WHERE user_id=%s', (*changes.values(),row['user_id']))
+        db.execute('DELETE FROM platform.sessions WHERE user_id=%s', (row['user_id'],))
+    response.delete_cookie(COOKIE, path='/', httponly=True, secure=True, samesite='strict')
+    response.delete_cookie(COOKIE, path='/api', httponly=True, secure=True, samesite='strict')
+    return {'ok': True, 'message': '정보를 변경했습니다. 다시 로그인해 주세요.'}
