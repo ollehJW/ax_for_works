@@ -37,3 +37,4 @@ def initialize_schema(connection):
     connection.execute((ROOT / 'backend/sql/feedbacks.sql').read_text())
     connection.execute((ROOT / 'backend/sql/agents.sql').read_text())
     connection.execute((ROOT / 'backend/sql/feedback_management.sql').read_text())
+    connection.execute((ROOT / 'backend/sql/access.sql').read_text())

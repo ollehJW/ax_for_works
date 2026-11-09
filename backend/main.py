@@ -20,6 +20,7 @@ from backend.database import database
 from backend.board import router as board_router
 from backend.feedbacks import router as feedbacks_router
 from backend.admin import router as admin_router
+from backend.access_admin import router as access_router
 from backend.agent_catalog import sync_agents, active_registry
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -79,6 +80,7 @@ def create_app(config_path: Path | None = None, dist_path: Path | None = None, g
     app.include_router(board_router)
     app.include_router(feedbacks_router)
     app.include_router(admin_router)
+    app.include_router(access_router)
     app.state.agent_registry = registry
 
     @app.exception_handler(psycopg.Error)

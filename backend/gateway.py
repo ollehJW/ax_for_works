@@ -114,6 +114,16 @@ async def proxy(request: Request, route):
     except httpx.RequestError:
         return JSONResponse({'detail': '서비스에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.'}, status_code=502)
 
+    # Count successful authenticated app entry, never previews, assets, polling or failed responses.
+    if request.method == 'GET' and relative.rstrip('/') == '/agent' and response.status_code == 200:
+        from backend.access_log import record_service_entry
+        try:
+            await run_in_threadpool(record_service_entry, request, prefix.lstrip('/'))
+        except Exception:
+            # Telemetry failure must not interrupt an otherwise working service.
+            import logging
+            logging.getLogger('uvicorn.error').error('Service access event could not be recorded')
+
     async def chunks():
         try:
             async for chunk in response.aiter_raw():

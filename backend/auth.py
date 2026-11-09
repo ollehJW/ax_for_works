@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from backend.database import database
+from backend.access_log import record_event
 
 COOKIE = 'ax_platform_session'
 SESSION_SECONDS = 8 * 3600
@@ -97,6 +98,7 @@ def set_session(db, response, user_id, old_token=None):
     response.set_cookie(COOKIE, token, httponly=True, secure=True, samesite='strict',
                         max_age=SESSION_SECONDS, path='/')
     response.headers['Cache-Control'] = 'no-store'
+    return token_hash(token)
 
 
 class RegistrationOptions(BaseModel):
@@ -186,7 +188,8 @@ def login(body: LoginBody, request: Request, response: Response):
             raise HTTPException(401, '사번 또는 비밀번호를 확인해 주세요.')
         db.execute('DELETE FROM platform.login_attempts WHERE attempt_key=%s', (keys[0][0],))
         db.execute('UPDATE platform.users SET last_login_at=%s WHERE user_id=%s', (now(), row['user_id']))
-        set_session(db, response, row['user_id'], request.cookies.get(COOKIE))
+        session_key = set_session(db, response, row['user_id'], request.cookies.get(COOKIE))
+        record_event(db, row, session_key, 'platform', 'login')
         return public_user(db.execute(USER_QUERY + ' WHERE u.user_id=%s', (row['user_id'],)).fetchone())
 
 
