@@ -3,8 +3,10 @@ Production port layout (2026-11-17)
 WiaCoding frontend: 127.0.0.1:1006 (shared gateway; no direct exposure)
 WiaCoding backend: 127.0.0.1:1016
 PostgreSQL: existing 5432 listener remains unchanged
-PostgreSQL relay: 0.0.0.0:1004 -> 127.0.0.1:5432
-External DB endpoint: 10.18.23.40:31004 -> internal 1004
+External DB endpoint: 10.18.23.40:5432 -> internal 5432
+The 1004 DB relay and its Supervisor program have been removed.
+External 31004 mapping may still exist; no service listens on internal 1004.
+The infrastructure owner can remove that external mapping.
 
 Private /data/wiacoding/runtime.env changes:
   FRONTEND_PORT=1006
@@ -15,17 +17,12 @@ Production /data/ax_for_works/config/config.yaml, /wiacoding route:
   redirect_hosts: 127.0.0.1:1016 and localhost:1016
 Keep require_login and other settings unchanged.
 
-Append postgres-port-relay.conf to the existing Supervisor configuration,
-then reread/update only postgres-port-relay. Restart only WiaCoding's two
-processes after updating their environment. Gateway YAML reloads on requests.
-Do not regenerate the entire Supervisor config with h200-runtime.py configure:
-the production file also contains separately managed services.
+Gateway YAML reloads on requests. Do not regenerate the entire Supervisor
+config: the production file also contains separately managed services.
 
-Use sslmode=require for DB clients. This relay passes TLS through unchanged;
-it does not authenticate clients or hold credentials. PostgreSQL sees the
-relay's 127.0.0.1 source, so original-source allowlists must be enforced by
-network controls. Existing loopback pg_hba rules still govern authentication.
-
-Rollback: stop/remove postgres-port-relay from Supervisor; restore private
-runtime and gateway configuration backups; restart WiaCoding on 1004/1014.
-Do not run WiaCoding frontend and the DB relay on port 1004 simultaneously.
+Use sslmode=require. Direct 5432 login from the development server was verified
+with TLS 1.3. PostgreSQL sees the NAT source 10.18.23.40.
+pg_hba.conf allows SSL/SCRAM for wia_platform_admin in wia_platform from:
+10.18.23.40/32, 10.217.183.72/32, 10.65.172.222/32, 10.65.172.229/32,
+10.65.172.26/32. Original-source restrictions also require network controls.
+Actual connections from the three IAM hosts have not been tested here.
