@@ -70,9 +70,12 @@ p{margin:0}
 .bucket.b-cp{border-top:4px solid var(--cp)} .bucket.b-cp.hit{border-color:var(--cp)}
 .bucket .name{font-weight:800;font-size:18px}
 .bucket .sub{font-size:13px;color:var(--muted);margin-top:2px}
-.bucket .count{font-size:40px;font-weight:800;margin-top:10px;font-variant-numeric:tabular-nums}
-.bucket .last{font-size:13px;min-height:42px;margin-top:6px;color:var(--muted)}
-.bucket .last b{color:var(--text)}
+.recent{display:grid;gap:6px;margin-top:14px;height:172px;overflow:hidden;align-content:start}
+.rc{border-radius:10px;padding:8px 11px;font-size:13.5px;line-height:1.45;background:var(--surface2);animation:feedin .5s cubic-bezier(.2,.8,.2,1);transition:opacity .4s}
+.rc b{display:block} .rc span{color:var(--muted)}
+.b-ax .rc b{color:var(--ax-ink)} .b-cp .rc b{color:var(--cp-ink)}
+.b-ax .rc:first-child{background:var(--ax-soft)} .b-cp .rc:first-child{background:var(--cp-soft)}
+.rc:nth-child(2){opacity:.6} .rc:nth-child(3){opacity:.32}
 .stage{position:relative;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--surface2);overflow:visible}
 .stage .cap{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em}
@@ -380,15 +383,13 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
       <div class="bucket b-ax" id="bAx">
         <div class="name ax">AX for Works</div>
         <div class="sub">업무별 전용 서비스</div>
-        <div class="count" id="cAx">0</div>
-        <div class="last" id="lAx">업무를 기다리는 중</div>
+        <div class="recent" id="lAx"></div>
       </div>
       <div class="stage" id="stage"><div class="cap">오늘 들어온 업무</div></div>
       <div class="bucket b-cp" id="bCp">
         <div class="name cp">Microsoft 365 Copilot</div>
         <div class="sub">M365 앱 속 범용 AI 도구</div>
-        <div class="count" id="cCp">0</div>
-        <div class="last" id="lCp">업무를 기다리는 중</div>
+        <div class="recent" id="lCp"></div>
       </div>
     </div>
   </div>
@@ -687,21 +688,27 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   function whenStep(){ wrs.forEach(function(r, i){ r.classList.toggle('now', i === wi); }); wi = (wi + 1) % wrs.length; }
   if (!reduce){ whenStep(); setInterval(whenStep, 2200); }
 
-  /* hero sorter */
+  /* hero sorter: each task flies to one side, with the reason it belongs there */
   var tasks = [
-    ['회의실에서 녹음한 회의, 회의록으로', 'ax', 'WiaMeet'],
-    ['이 메일에 영어로 답장 쓰기', 'cp', 'Outlook의 Copilot'],
-    ['이번 주 팀 주간보고 취합', 'ax', 'WiaReport'],
-    ['엑셀 매출 데이터에서 추세 찾기', 'cp', 'Excel의 Copilot'],
-    ['밤새 쌓인 메일·Teams에서 내 할 일만', 'ax', 'WiaAssist'],
-    ['놓친 Teams 회의 내용 파악', 'cp', 'Teams의 Copilot'],
-    ['매주 받아 보는 기술 뉴스레터', 'ax', 'WiaNews'],
-    ['보고서 초안을 발표 자료로', 'cp', 'PowerPoint의 Copilot'],
-    ['교육 영상 내레이션 음성', 'ax', 'WiaVoice'],
-    ['계약서 초안 문장 다듬기', 'cp', 'Word의 Copilot'],
-    ['자동화 아이디어를 개발 프롬프트로', 'ax', 'WiaCoding']
+    ['회의실에서 녹음한 회의, 회의록으로', 'ax', 'WiaMeet', '회의실 녹음은 Office 밖의 일'],
+    ['이 메일에 영어로 답장 쓰기', 'cp', 'Outlook의 Copilot', '메일 하나를 그 자리에서'],
+    ['이번 주 팀 주간보고 취합', 'ax', 'WiaReport', '팀이 같이 쓰는 정해진 양식'],
+    ['엑셀 매출 데이터에서 추세 찾기', 'cp', 'Excel의 Copilot', '열어 둔 파일 안에서 바로'],
+    ['밤새 쌓인 메일·Teams에서 내 할 일만', 'ax', 'WiaAssist', '매일 반복되는 정리'],
+    ['놓친 Teams 회의 내용 파악', 'cp', 'Teams의 Copilot', 'Teams 안에 있는 회의 기록'],
+    ['매주 받아 보는 기술 뉴스레터', 'ax', 'WiaNews', '정해진 주기로 팀에 발송'],
+    ['보고서 초안을 발표 자료로', 'cp', 'PowerPoint의 Copilot', '문서를 슬라이드로 직접 변환'],
+    ['교육 영상 내레이션 음성', 'ax', 'WiaVoice', '음성 제작은 Office 밖의 일'],
+    ['계약서 초안 문장 다듬기', 'cp', 'Word의 Copilot', '열어 둔 문서를 직접 수정'],
+    ['자동화 아이디어를 개발 프롬프트로', 'ax', 'WiaCoding', '질문을 따라가며 요구사항 정리']
   ];
-  var stage = $('stage'), ti = 0, counts = {ax:0, cp:0};
+  var stage = $('stage'), ti = 0;
+  function land(t){
+    var list = $(t[1] === 'ax' ? 'lAx' : 'lCp'), row = document.createElement('div'); row.className = 'rc';
+    var b = document.createElement('b'), sp = document.createElement('span'); b.textContent = t[2]; sp.textContent = t[3];
+    row.append(b, sp); list.prepend(row);
+    while (list.children.length > 3) list.lastChild.remove();
+  }
   function nextTask(){
     var t = tasks[ti++ % tasks.length];
     var el = document.createElement('div');
@@ -710,19 +717,15 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.add('in'); }); });
     setTimeout(function(){
       el.classList.add(t[1] === 'ax' ? 'to-ax' : 'to-cp');
-      var b = $(t[1] === 'ax' ? 'bAx' : 'bCp');
+      var bk = $(t[1] === 'ax' ? 'bAx' : 'bCp');
       setTimeout(function(){
-        counts[t[1]]++;
-        $(t[1] === 'ax' ? 'cAx' : 'cCp').textContent = counts[t[1]];
-        var last = $(t[1] === 'ax' ? 'lAx' : 'lCp');
-        last.textContent = ''; var s = document.createElement('b'); s.textContent = t[2];
-        last.appendChild(s); last.appendChild(document.createTextNode(' — ' + t[0]));
-        b.classList.add('hit'); setTimeout(function(){ b.classList.remove('hit'); }, 350);
+        land(t); bk.classList.add('hit'); setTimeout(function(){ bk.classList.remove('hit'); }, 350);
         el.remove();
       }, reduce ? 0 : 520);
-    }, 1500);
+    }, 1750);
   }
-  nextTask(); setInterval(nextTask, 2400);
+  land(tasks[ti++]); land(tasks[ti++]);   /* start with one example on each side */
+  nextTask(); setInterval(nextTask, 1900); /* the next card enters as the previous one leaves */
 
   /* scenario picker */
   var sc = [
