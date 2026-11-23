@@ -108,6 +108,42 @@ p{margin:0}
 @media (max-width:460px){.fc{flex-direction:column;align-items:flex-start;gap:2px}.fc h3{width:auto}}
 @media (prefers-reduced-motion:reduce){.fc{opacity:1;transform:none}}
 
+/* feature mock-ups (alternative to the side-by-side list) */
+.alt-label{margin:44px 0 0;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:800;color:var(--muted)}
+.alt-label::before,.alt-label::after{content:"";flex:1;height:1px;background:var(--line)}
+.mock{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:20px}
+.mock>div{display:flex} .mock .mk{flex:1}
+.m-cp .mk-body{grid-auto-rows:1fr;align-content:stretch}
+.mk{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.mk-bar{display:flex;align-items:center;gap:6px;padding:11px 14px;background:var(--surface2);border-bottom:1px solid var(--line);font-size:13.5px;font-weight:800}
+.mk-bar i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.mk-bar b{margin-left:8px} .m-ax .mk-bar b{color:var(--ax-ink)} .m-cp .mk-bar b{color:var(--cp-ink)}
+.mk-bar span{margin-left:auto;font-weight:700;color:var(--muted);font-size:12.5px}
+.mk-body{padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1;align-content:start}
+.tile{font:inherit;color:var(--text);border:2px solid var(--line);border-radius:14px;padding:14px 6px 12px;text-align:center;background:var(--surface);cursor:pointer;
+  transition:background .3s,border-color .3s,color .3s,transform .3s,box-shadow .3s}
+.tile .ic{width:46px;height:46px;border-radius:13px;margin:0 auto 8px;display:grid;place-items:center;background:var(--ax-soft);color:var(--ax-ink);font-weight:800;font-size:13px;transition:background .3s}
+.tile b{font-size:14px}
+.tile.on{background:var(--ax);border-color:var(--ax);color:var(--surface);transform:translateY(-5px);box-shadow:0 10px 22px color-mix(in srgb,var(--ax) 35%,transparent)}
+.tile.on .ic{background:var(--surface)}
+.tile-plus{grid-column:1/-1;border:2px dashed var(--ax);border-radius:14px;padding:9px;text-align:center;font-size:13.5px;font-weight:700;color:var(--ax-ink);animation:beckon 1.8s ease-in-out infinite}
+.app{font:inherit;color:var(--text);position:relative;border:2px solid var(--line);border-radius:12px;background:var(--surface);padding:0 0 32px;text-align:left;cursor:pointer;overflow:hidden;
+  transition:border-color .3s}
+.app{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch}
+.app .ab{display:block;font-size:12px;font-weight:800;padding:6px 10px;background:var(--surface2);color:var(--muted)}
+.app .ln{display:block;height:6px;border-radius:6px;background:var(--surface2);margin:9px 10px 0}
+.app .ln.s{width:52%}
+.app .cb{position:absolute;right:7px;bottom:7px;font-size:11px;font-weight:800;color:var(--cp-ink);background:var(--cp-soft);border:1.5px solid var(--cp);border-radius:999px;padding:1px 9px;
+  transform-origin:right bottom;transition:background .3s,color .3s,transform .3s,box-shadow .3s}
+.app.on{border-color:var(--cp)}
+.app.on .ab{color:var(--text)}
+.app.on .cb{background:var(--cp);color:var(--surface);transform:scale(1.25);box-shadow:0 0 0 5px color-mix(in srgb,var(--cp) 25%,transparent)}
+.mk-cap{padding:14px 18px;border-top:1px solid var(--line);font-size:15px;min-height:54px}
+.mk-cap.swap{animation:swap .4s ease}
+.mk-cap b{margin-right:8px} .m-ax .mk-cap b{color:var(--ax-ink)} .m-cp .mk-cap b{color:var(--cp-ink)}
+.mk-note{font-size:13.5px;color:var(--muted);margin-top:8px}
+@media (max-width:860px){.mock{grid-template-columns:1fr}}
+
 /* key points: tool vs service */
 .pipes{margin-top:32px;display:grid;gap:14px}
 .pipe{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
@@ -420,6 +456,23 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
         <div class="fc"><h3>Excel</h3><p>데이터에서 추세를 찾고 수식을 제안합니다</p></div>
       </div>
     </div>
+    <p class="alt-label">대안 · 실제 생김새를 본뜬 모형</p>
+    <div class="mock rv" id="mock">
+      <div>
+        <div class="mk m-ax">
+          <div class="mk-bar"><i></i><i></i><i></i><b>AX for Works 포털</b><span>서비스가 화면의 주인공</span></div>
+          <div class="mk-body" id="mkAx"></div>
+          <div class="mk-cap" id="mkAxCap"></div>
+        </div>
+      </div>
+      <div>
+        <div class="mk m-cp">
+          <div class="mk-bar"><i></i><i></i><i></i><b>Microsoft 365 앱</b><span>앱 구석에 붙은 Copilot 버튼</span></div>
+          <div class="mk-body" id="mkCp"></div>
+          <div class="mk-cap" id="mkCpCap"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -687,6 +740,44 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   io.observe(when);
   function whenStep(){ wrs.forEach(function(r, i){ r.classList.toggle('now', i === wi); }); wi = (wi + 1) % wrs.length; }
   if (!reduce){ whenStep(); setInterval(whenStep, 2200); }
+
+  /* feature mock-ups: portal tiles vs Copilot buttons inside apps */
+  var mkA = [['회의','WiaMeet','회의 녹음을 화자별 회의록으로 만듭니다'],['메일','WiaAssist','메일과 Teams에서 내 할 일을 업무 보드로 정리합니다'],
+    ['뉴스','WiaNews','관심 기술 뉴스를 정기 뉴스레터로 보냅니다'],['보고','WiaReport','팀원의 과제별 주간보고를 한곳에 모읍니다'],
+    ['음성','WiaVoice','문장을 원하는 목소리의 음성 파일로 만듭니다'],['개발','WiaCoding','업무 아이디어를 첫 개발 프롬프트로 정리합니다']];
+  var mkC = [['Teams','온라인 회의와 채팅 대화를 요약합니다'],['Outlook','긴 메일을 요약하고 답장 초안을 씁니다'],
+    ['Copilot Chat','업무 자료와 웹을 바탕으로 질문에 답합니다'],['Word','문서 초안을 쓰고 문장을 다듬습니다'],
+    ['PowerPoint','문서나 주제를 슬라이드로 만듭니다'],['Excel','데이터에서 추세를 찾고 수식을 제안합니다']];
+  var mkAx = $('mkAx'), mkCp = $('mkCp'), mkTimer, mkI = 0, mkTiles = [], mkApps = [];
+  function mkCap(el, name, text){
+    el.innerHTML = ''; var b = document.createElement('b'); b.textContent = name; el.append(b, document.createTextNode(text));
+    el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
+  }
+  function mkSet(i){
+    mkI = i;
+    mkTiles.forEach(function(t, j){ t.classList.toggle('on', j === i); });
+    mkApps.forEach(function(t, j){ t.classList.toggle('on', j === i); });
+    mkCap($('mkAxCap'), mkA[i][1], mkA[i][2]); mkCap($('mkCpCap'), mkC[i][0] + '의 Copilot', mkC[i][1]);
+  }
+  function mkPick(i){ return function(){ clearInterval(mkTimer); mkSet(i); }; }
+  mkA.forEach(function(d, i){
+    var t = document.createElement('button'); t.type = 'button'; t.className = 'tile';
+    var ic = document.createElement('div'); ic.className = 'ic'; ic.textContent = d[0];
+    var b = document.createElement('b'); b.textContent = d[1]; t.append(ic, b);
+    t.addEventListener('click', mkPick(i)); t.addEventListener('mouseenter', mkPick(i));
+    mkAx.appendChild(t); mkTiles.push(t);
+  });
+  var plus = document.createElement('div'); plus.className = 'tile-plus'; plus.textContent = '+ 새 서비스'; mkAx.appendChild(plus);
+  mkC.forEach(function(d, i){
+    var a = document.createElement('button'); a.type = 'button'; a.className = 'app';
+    var ab = document.createElement('span'); ab.className = 'ab'; ab.textContent = d[0]; a.appendChild(ab);
+    ['', '', 's'].forEach(function(c){ var l = document.createElement('span'); l.className = 'ln ' + c; a.appendChild(l); });
+    var cb = document.createElement('span'); cb.className = 'cb'; cb.textContent = 'Copilot'; a.appendChild(cb);
+    a.addEventListener('click', mkPick(i)); a.addEventListener('mouseenter', mkPick(i));
+    mkCp.appendChild(a); mkApps.push(a);
+  });
+  mkSet(0);
+  if (!reduce) mkTimer = setInterval(function(){ mkSet((mkI + 1) % mkA.length); }, 2000);
 
   /* hero sorter: each task flies to one side, with the reason it belongs there */
   var tasks = [
