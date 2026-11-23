@@ -104,16 +104,31 @@ p{margin:0}
 @media (max-width:460px){.fc{flex-direction:column;align-items:flex-start;gap:2px}.fc h3{width:auto}}
 @media (prefers-reduced-motion:reduce){.fc{opacity:1;transform:none}}
 
-/* key points */
-.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
-.key{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
-.key .n{font-size:13px;font-weight:800;color:var(--muted)}
-.key h3{margin:6px 0 12px}
-.key .pair{display:grid;gap:8px;font-size:14.5px}
-.key .pair div{padding:10px 12px;border-radius:10px}
-.key .pair .a{background:var(--ax-soft)} .key .pair .c{background:var(--cp-soft)}
-.key .pair b{display:block;font-size:12px;margin-bottom:2px}
-.key .pair .a b{color:var(--ax-ink)} .key .pair .c b{color:var(--cp-ink)}
+/* key points: tool vs service */
+.pipes{margin-top:32px;display:grid;gap:14px}
+.pipe{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.pipe.p-ax{--c:var(--ax);--cs:var(--ax-soft);--ci:var(--ax-ink);border-left:5px solid var(--ax)}
+.pipe.p-cp{--c:var(--cp);--cs:var(--cp-soft);--ci:var(--cp-ink);border-left:5px solid var(--cp)}
+.pipe .ph{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pipe .ph b{font-size:18px;color:var(--ci)} .pipe .ph span{font-size:14px;color:var(--muted)}
+.flow5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.st{border:2px dashed var(--line);border-radius:12px;padding:11px 8px;text-align:center;font-size:14px;color:var(--muted);
+  transition:background .4s,border-color .4s,color .4s,transform .4s}
+.st small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.04em;margin-bottom:2px}
+.st.lit{background:var(--cs);border:2px solid var(--c);color:var(--text);transform:translateY(-3px)}
+.st.lit small{color:var(--ci)}
+.st.me{border-color:var(--muted);color:var(--text)}
+.pipe-note{font-size:13.5px;color:var(--muted);text-align:center}
+.keys{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:28px}
+.key{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--ax);border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+.key .n{font-size:13px;font-weight:800;color:var(--ax-ink)}
+.key h3{font-size:21px;margin:6px 0 10px}
+.key p{font-size:15.5px}
+.key .vs-cp{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--cp-soft);font-size:14px}
+.key .vs-cp b{color:var(--cp-ink);margin-right:6px}
+.fair{margin-top:20px;padding:16px 20px;border-radius:var(--r);border:1px dashed var(--line);font-size:15px;color:var(--muted)}
+.fair b{color:var(--cp-ink)}
+@media (max-width:860px){.flow5{grid-template-columns:1fr}.st{text-align:left}.st.lit{transform:none}}
 
 /* table */
 .tbl-wrap{overflow-x:auto;margin-top:28px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow)}
@@ -228,19 +243,19 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   <div class="wrap">
     <p class="eyebrow">AX FOR WORKS × MICROSOFT 365 COPILOT</p>
     <h1><span class="ax">정해진 업무는 AX for Works</span>,<br><span class="cp">그때그때 필요한 일은 Copilot</span></h1>
-    <p class="lead">두 서비스는 경쟁 관계가 아니라 역할이 다릅니다. AX for Works는 우리 회사의 반복 업무를 처음부터 끝까지 처리하는 전용 도구 6종이고, Copilot은 Word·Excel·Outlook·Teams 안에서 무엇이든 물어보는 범용 비서입니다.</p>
+    <p class="lead">두 서비스는 경쟁 관계가 아니라 역할이 다릅니다. AX for Works는 우리 회사의 반복 업무를 처음부터 끝까지 처리하는 전용 서비스 6종이고, Copilot은 Word·Excel·Outlook·Teams 안에서 무엇이든 물어보는 범용 AI 도구입니다.</p>
 
     <div class="sorter" aria-label="업무가 두 서비스로 나뉘는 모습">
       <div class="bucket b-ax" id="bAx">
         <div class="name ax">AX for Works</div>
-        <div class="sub">전용 도구 6종</div>
+        <div class="sub">전용 서비스 6종</div>
         <div class="count" id="cAx">0</div>
         <div class="last" id="lAx">업무를 기다리는 중</div>
       </div>
       <div class="stage" id="stage"><div class="cap">오늘 들어온 업무</div></div>
       <div class="bucket b-cp" id="bCp">
         <div class="name cp">Microsoft 365 Copilot</div>
-        <div class="sub">M365 앱 속 범용 비서</div>
+        <div class="sub">M365 앱 속 범용 AI 도구</div>
         <div class="count" id="cCp">0</div>
         <div class="last" id="lCp">업무를 기다리는 중</div>
       </div>
@@ -279,33 +294,20 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
 <section>
   <div class="wrap">
     <p class="eyebrow rv">핵심 차이</p>
-    <h2 class="rv">세 가지만 기억하면 됩니다</h2>
-    <div class="keys">
-      <div class="key rv">
-        <div class="n">01 · 일하는 방식</div>
-        <h3>흐름이 정해져 있는가</h3>
-        <div class="pair">
-          <div class="a"><b>AX for Works</b>단계별 화면을 따라가면 회의록, 주간보고, 뉴스레터처럼 형식이 정해진 결과가 나옵니다.</div>
-          <div class="c"><b>Copilot</b>원하는 것을 말로 요청합니다. 결과의 형식과 품질은 요청하는 사람에 따라 달라집니다.</div>
-        </div>
-      </div>
-      <div class="key rv">
-        <div class="n">02 · 결과가 쌓이는 곳</div>
-        <h3>팀의 것인가, 나의 것인가</h3>
-        <div class="pair">
-          <div class="a"><b>AX for Works</b>팀 작업 공간에 쌓입니다. 팀원 누구나 라운지에서 지난 회의록과 보고서를 다시 찾습니다.</div>
-          <div class="c"><b>Copilot</b>내 권한으로 볼 수 있는 메일·채팅·파일을 바탕으로 나에게 답합니다. 공유는 내가 직접 합니다.</div>
-        </div>
-      </div>
-      <div class="key rv">
-        <div class="n">03 · 다루는 범위</div>
-        <h3>M365 안인가, 밖인가</h3>
-        <div class="pair">
-          <div class="a"><b>AX for Works</b>대면 회의 녹음, 팀 과제 일정, 외부 기술 뉴스, 음성 합성처럼 M365 밖의 업무를 다룹니다.</div>
-          <div class="c"><b>Copilot</b>Word, Excel, PowerPoint, Outlook, Teams 안에서 지금 열어 둔 문서와 대화를 다룹니다.</div>
-        </div>
-      </div>
+    <h2 class="rv"><span class="cp">Copilot은 도구</span>, <span class="ax">AX for Works는 서비스</span>입니다</h2>
+    <p class="lead rv">Copilot은 잘 쓰는 사람의 손에서 힘을 내는 범용 AI 도구입니다. AX for Works는 업무 하나를 입력부터 공유까지 맡아 처리하는 서비스입니다. 회의록 하나를 만드는 과정으로 비교하면 이렇습니다.</p>
+    <div class="pipes rv" id="pipes">
+      <div class="pipe p-ax"><div class="ph"><b>AX for Works</b><span>다섯 단계 모두 서비스가 화면과 절차를 제공합니다</span></div><div class="flow5" id="flowAx"><div class="st"><small>입력</small>녹음 올리기</div><div class="st"><small>AI 처리</small>화자·용어 인식</div><div class="st"><small>검토</small>화자 확인 화면</div><div class="st"><small>보관</small>팀 라운지</div><div class="st"><small>공유</small>Confluence 내보내기</div></div></div>
+      <div class="pipe p-cp"><div class="ph"><b>Microsoft 365 Copilot</b><span>AI가 답하는 한 단계를 맡고, 나머지는 사용자가 챙깁니다</span></div><div class="flow5" id="flowCp"><div class="st"><small>입력</small>프롬프트 직접 작성</div><div class="st"><small>AI 처리</small>요약·답변 생성</div><div class="st"><small>검토</small>직접 확인</div><div class="st"><small>보관</small>직접 저장</div><div class="st"><small>공유</small>직접 전달</div></div></div>
+      <p class="pipe-note">색이 채워진 칸은 서비스가 맡는 단계, 점선 칸은 사용자가 직접 하는 단계입니다.</p>
     </div>
+    <div class="keys">
+      <div class="key rv"><div class="n">01 · 전용 화면</div><h3>프롬프트를 몰라도 누구나 같은 결과</h3><p>업무마다 맞춤 화면이 있어 버튼과 입력란만 따라가면 됩니다. 누가 써도 같은 형식의 결과가 나옵니다.</p><div class="vs-cp"><b>Copilot은</b>무엇을 어떻게 요청할지 사용자가 정해야 해서 결과가 사람마다 달라집니다.</div></div>
+      <div class="key rv"><div class="n">02 · 업무의 끝까지</div><h3>답변이 아니라 완성된 결과물</h3><p>회의록, 주간보고, 뉴스레터, 음성 파일이 검토와 보관, 발송까지 한 흐름으로 이어집니다.</p><div class="vs-cp"><b>Copilot은</b>답변을 받은 뒤의 정리와 저장, 공유는 사용자의 몫입니다.</div></div>
+      <div class="key rv"><div class="n">03 · 팀의 자산</div><h3>결과가 팀에 쌓입니다</h3><p>결과가 팀 작업 공간에 누적됩니다. 지난 회의록과 보고서를 라운지에서 다시 찾고, 누가 작성했는지 한 화면에서 봅니다.</p><div class="vs-cp"><b>Copilot은</b>결과가 개인의 대화에 남고, 팀과 나누려면 직접 공유해야 합니다.</div></div>
+      <div class="key rv"><div class="n">04 · 우리 회사 맞춤</div><h3>사내 용어와 조직, 양식을 압니다</h3><p>사내 용어집, 조직·사번 연동, 우리 보고 양식이 들어 있습니다. 현업의 요청은 자체 개발로 반영합니다.</p><div class="vs-cp"><b>Copilot은</b>기능과 개선 일정을 Microsoft가 정합니다.</div></div>
+    </div>
+    <p class="fair rv"><b>Copilot이 더 나은 곳도 분명합니다.</b> Word, Excel, Outlook 안에서 그때그때 생기는 일처럼 형식이 정해지지 않은 요청은 범용 도구가 더 빠릅니다. 그래서 둘을 함께 씁니다.</p>
   </div>
 </section>
 
@@ -317,7 +319,7 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
       <table>
         <thead><tr><th></th><th>AX for Works</th><th>Microsoft 365 Copilot</th></tr></thead>
         <tbody>
-          <tr><th>성격</th><td>반복 업무를 끝까지 처리하는 전용 도구 6종</td><td>M365 앱 안에서 무엇이든 요청하는 범용 비서</td></tr>
+          <tr><th>성격</th><td>반복 업무를 끝까지 처리하는 전용 서비스 6종</td><td>M365 앱 안에서 무엇이든 요청하는 범용 AI 도구</td></tr>
           <tr><th>시작하는 곳</th><td>포털에서 서비스를 고르고 단계별 화면을 따라감</td><td>Word·Excel·Outlook·Teams의 Copilot 버튼과 채팅창</td></tr>
           <tr><th>결과물</th><td>회의록, 주간보고, 뉴스레터, 음성 파일, 개발 프롬프트, 업무 보드</td><td>초안, 요약, 답변, 수식, 슬라이드</td></tr>
           <tr><th>공유 단위</th><td>팀 작업 공간. 결과가 라운지에 누적됨</td><td>개인. 필요하면 직접 공유</td></tr>
@@ -464,6 +466,18 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   tbl.querySelectorAll('tbody tr').forEach(function(tr, i){ tr.style.transitionDelay = i * 70 + 'ms'; });
   io.observe(tbl);
   io.observe($('duo'));
+
+  /* tool vs service pipeline */
+  var fa = $('flowAx').children, fc = $('flowCp').children, pi = -1;
+  function pipeStep(){
+    pi = pi >= 6 ? -1 : pi + 1;
+    for (var i = 0; i < 5; i++){
+      fa[i].classList.toggle('lit', i <= pi);
+      fc[i].classList.toggle('lit', i === 1 && pi >= 1);
+      fc[i].classList.toggle('me', i !== 1 && i <= pi);
+    }
+  }
+  if (reduce){ pi = 4; pipeStep(); } else { setInterval(pipeStep, 850); }
 
   /* hero sorter */
   var tasks = [
