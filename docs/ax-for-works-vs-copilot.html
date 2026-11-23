@@ -130,6 +130,42 @@ p{margin:0}
 .fair b{color:var(--cp-ink)}
 @media (max-width:860px){.flow5{grid-template-columns:1fr}.st{text-align:left}.st.lit{transform:none}}
 
+/* key difference 2: extensibility */
+.grow{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:32px;align-items:stretch}
+.plat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.plat.g-ax{border-top:4px solid var(--ax)} .plat.g-cp{border-top:4px solid var(--cp)}
+.plat .ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.plat .ph b{font-size:18px} .g-ax .ph b{color:var(--ax-ink)} .g-cp .ph b{color:var(--cp-ink)}
+.plat .ph span{font-size:14px;color:var(--muted)}
+.plat .ph .cnt{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.g-cp .slots{grid-template-columns:repeat(3,1fr)}
+.slot{border-radius:12px;padding:14px 6px;text-align:center;font-weight:700;font-size:14px}
+.g-ax .slot{background:var(--ax-soft);color:var(--ax-ink);border:2px solid var(--ax);
+  opacity:0;transform:translateY(-34px) scale(.8);transition:opacity .45s,transform .55s cubic-bezier(.3,1.6,.4,1)}
+.grow.on .g-ax .slot{opacity:1;transform:none}
+.g-ax .slot:nth-child(1){transition-delay:.3s}.g-ax .slot:nth-child(2){transition-delay:.65s}.g-ax .slot:nth-child(3){transition-delay:1s}
+.g-ax .slot:nth-child(4){transition-delay:1.35s}.g-ax .slot:nth-child(5){transition-delay:1.7s}.g-ax .slot:nth-child(6){transition-delay:2.05s}
+.g-ax .slot.plus{background:transparent;border:2px dashed var(--ax);transition-delay:2.6s;animation:beckon 1.8s ease-in-out infinite}
+@keyframes beckon{50%{background:var(--ax-soft)}}
+.g-cp .slot{background:var(--surface2);color:var(--muted);border:2px solid var(--line)}
+.base{margin-top:10px;border-radius:12px;padding:12px 14px;background:var(--text);color:var(--bg);font-size:13.5px;
+  display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center}
+.base b{font-size:14px} .base span{opacity:.85}
+.g-cp .base{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.loop{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;margin-top:auto;padding-top:18px}
+.loop div{border-radius:999px;padding:9px 6px;text-align:center;font-size:14px;font-weight:700;border:2px solid var(--line);color:var(--muted);
+  transition:background .4s,color .4s,border-color .4s,transform .4s}
+.loop div.lit{background:var(--ax);border-color:var(--ax);color:#fff;transform:scale(1.06)}
+.loop i{font-style:normal;color:var(--muted);font-weight:800}
+.wait{margin-top:auto;padding-top:18px;font-size:14.5px;color:var(--muted)}
+.wait em{font-style:normal;display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cp);margin-left:4px;animation:blink 1.4s infinite}
+.wait em:nth-of-type(2){animation-delay:.2s}.wait em:nth-of-type(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.keys.k3{grid-template-columns:repeat(3,1fr)}
+@media (max-width:860px){.grow,.keys.k3{grid-template-columns:1fr}.slots{grid-template-columns:repeat(2,1fr)}.g-cp .slots{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){.g-ax .slot{opacity:1;transform:none}}
+
 /* matchups */
 .match{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:32px}
 .m{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);
@@ -282,7 +318,7 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
 
 <section>
   <div class="wrap">
-    <p class="eyebrow rv">핵심 차이</p>
+    <p class="eyebrow rv">핵심 차이 1 · 일하는 방식</p>
     <h2 class="rv"><span class="cp">Copilot은 도구</span>, <span class="ax">AX for Works는 서비스</span>입니다</h2>
     <p class="lead rv">Copilot은 잘 쓰는 사람의 손에서 힘을 내는 범용 AI 도구입니다. AX for Works는 업무 하나를 입력부터 공유까지 맡아 처리하는 서비스입니다. 회의록 하나를 만드는 과정으로 비교하면 이렇습니다.</p>
     <div class="pipes rv" id="pipes">
@@ -290,13 +326,45 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
       <div class="pipe p-cp"><div class="ph"><b>Microsoft 365 Copilot</b><span>AI가 답하는 한 단계를 맡고, 나머지는 사용자가 챙깁니다</span></div><div class="flow5" id="flowCp"><div class="st"><small>입력</small>프롬프트 직접 작성</div><div class="st"><small>AI 처리</small>요약·답변 생성</div><div class="st"><small>검토</small>직접 확인</div><div class="st"><small>보관</small>직접 저장</div><div class="st"><small>공유</small>직접 전달</div></div></div>
       <p class="pipe-note">색이 채워진 칸은 서비스가 맡는 단계, 점선 칸은 사용자가 직접 하는 단계입니다.</p>
     </div>
-    <div class="keys">
+    <div class="keys k3">
       <div class="key rv"><div class="n">01 · 전용 화면</div><h3>프롬프트를 몰라도 누구나 같은 결과</h3><p>업무마다 맞춤 화면이 있어 버튼과 입력란만 따라가면 됩니다. 누가 써도 같은 형식의 결과가 나옵니다.</p><div class="vs-cp"><b>Copilot은</b>무엇을 어떻게 요청할지 사용자가 정해야 해서 결과가 사람마다 달라집니다.</div></div>
       <div class="key rv"><div class="n">02 · 업무의 끝까지</div><h3>답변이 아니라 완성된 결과물</h3><p>회의록, 주간보고, 뉴스레터, 음성 파일이 검토와 보관, 발송까지 한 흐름으로 이어집니다.</p><div class="vs-cp"><b>Copilot은</b>답변을 받은 뒤의 정리와 저장, 공유는 사용자의 몫입니다.</div></div>
       <div class="key rv"><div class="n">03 · 팀의 자산</div><h3>결과가 팀에 쌓입니다</h3><p>결과가 팀 작업 공간에 누적됩니다. 지난 회의록과 보고서를 라운지에서 다시 찾고, 누가 작성했는지 한 화면에서 봅니다.</p><div class="vs-cp"><b>Copilot은</b>결과가 개인의 대화에 남고, 팀과 나누려면 직접 공유해야 합니다.</div></div>
-      <div class="key rv"><div class="n">04 · 우리 회사 맞춤</div><h3>사내 용어와 조직, 양식을 압니다</h3><p>사내 용어집, 조직·사번 연동, 우리 보고 양식이 들어 있습니다. 현업의 요청은 자체 개발로 반영합니다.</p><div class="vs-cp"><b>Copilot은</b>기능과 개선 일정을 Microsoft가 정합니다.</div></div>
     </div>
     <p class="fair rv"><b>Copilot이 더 나은 곳도 분명합니다.</b> Word, Excel, Outlook 안에서 그때그때 생기는 일처럼 형식이 정해지지 않은 요청은 범용 도구가 더 빠릅니다. 그래서 둘을 함께 씁니다.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow rv">핵심 차이 2 · 확장성</p>
+    <h2 class="rv"><span class="cp">Copilot은 주어진 기능을 쓰고</span>, <span class="ax">AX for Works는 필요한 서비스를 붙여 갑니다</span></h2>
+    <p class="lead rv">AX for Works는 서비스 6개의 묶음이 아니라, 서비스를 계속 올릴 수 있는 플랫폼입니다. 처음 4종으로 시작해 지금 6종이 되었고, 다음 자리가 열려 있습니다.</p>
+    <div class="grow" id="grow">
+      <div class="plat g-ax">
+        <div class="ph"><b>AX for Works</b><span>서비스 <span class="cnt" id="growCnt">0</span>종, 계속 추가</span></div>
+        <div class="slots">
+          <div class="slot">WiaMeet</div><div class="slot">WiaReport</div><div class="slot">WiaNews</div><div class="slot">WiaCoding</div>
+          <div class="slot">WiaVoice</div><div class="slot">WiaAssist</div><div class="slot plus">+ 새 서비스</div><div class="slot plus">+ 새 서비스</div>
+        </div>
+        <div class="base"><b>공통 기반</b><span>통합 로그인</span><span>공용 AI 연결</span><span>공용 데이터 저장소</span></div>
+        <div class="loop" id="growLoop"><div>현업 요청</div><i>→</i><div>자체 개발</div><i>→</i><div>포털에 추가</div></div>
+      </div>
+      <div class="plat g-cp">
+        <div class="ph"><b>Microsoft 365 Copilot</b><span>Microsoft가 정한 구성</span></div>
+        <div class="slots">
+          <div class="slot">Word</div><div class="slot">Excel</div><div class="slot">PowerPoint</div>
+          <div class="slot">Outlook</div><div class="slot">Teams</div><div class="slot">Chat</div>
+        </div>
+        <div class="base"><b>확장 방법</b><span>대화창 안에서 동작하는 에이전트 추가</span></div>
+        <p class="wait">새 기능은 Microsoft의 업데이트를 기다립니다<em></em><em></em><em></em></p>
+      </div>
+    </div>
+    <div class="keys k3">
+      <div class="key rv"><div class="n">공통 기반</div><h3>새 서비스는 업무 화면만 만들면 됩니다</h3><p>로그인, AI 연결, 데이터 저장소를 모든 서비스가 함께 씁니다. 새 서비스를 만들 때 이 부분을 다시 만들지 않습니다.</p></div>
+      <div class="key rv"><div class="n">빠른 연결</div><h3>설정 한 줄로 포털에 붙습니다</h3><p>포털 설정에 주소 하나를 추가하면 새 서비스가 같은 주소, 같은 로그인 아래로 들어옵니다. 사용자는 포털에서 카드 하나가 늘어난 것을 봅니다.</p></div>
+      <div class="key rv"><div class="n">우리 업무 맞춤</div><h3>현업의 요청이 다음 기능이 됩니다</h3><p>사내 용어, 조직·사번, 보고 양식처럼 우리 회사에만 있는 것을 넣을 수 있습니다. 고쳐 달라는 요청은 자체 개발로 반영합니다.</p></div>
+    </div>
   </div>
 </section>
 
@@ -440,6 +508,16 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
     }
   }
   if (reduce){ pi = 4; pipeStep(); } else { setInterval(pipeStep, 850); }
+
+  /* extensibility: services plugging into the platform */
+  var grow = $('grow'), gl = $('growLoop').querySelectorAll('div'), gi = 0;
+  new IntersectionObserver(function(es, o){
+    if (!es[0].isIntersecting) return;
+    o.disconnect(); grow.classList.add('on');
+    for (var n = 1; n <= 6; n++) (function(n){ setTimeout(function(){ $('growCnt').textContent = n; }, reduce ? 0 : 300 + (n - 1) * 350 + 300); })(n);
+  }, {threshold:.25}).observe(grow);
+  function loopStep(){ gl.forEach(function(d, i){ d.classList.toggle('lit', i === gi); }); gi = (gi + 1) % gl.length; }
+  loopStep(); if (!reduce) setInterval(loopStep, 1100);
 
   /* hero sorter */
   var tasks = [
