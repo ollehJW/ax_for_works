@@ -167,6 +167,38 @@ p{margin:0}
 @media (max-width:860px){.grow,.keys.k3{grid-template-columns:1fr}.slots{grid-template-columns:repeat(2,1fr)}.g-cp .slots{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.g-ax .slot{opacity:1;transform:none}}
 
+/* key difference 3: operations */
+.ops{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:32px;align-items:stretch}
+.console{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--ax);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+.console .ph,.report .ph{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.console .ph b{font-size:18px;color:var(--ax-ink)} .report .ph b{font-size:18px;color:var(--cp-ink)}
+.ph .eg{font-size:12px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.con-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.con-t{font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin-bottom:8px}
+.feed{display:grid;gap:6px;height:262px;overflow:hidden;align-content:start}
+.fr{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;background:var(--surface2);border-radius:10px;padding:8px 10px;
+  font-size:13.5px;animation:feedin .5s cubic-bezier(.2,.8,.2,1)}
+.fr:first-child{background:var(--ax-soft);box-shadow:inset 3px 0 0 var(--ax)}
+@keyframes feedin{from{opacity:0;transform:translateY(-16px)}}
+.fr time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12.5px}
+.fr .who b{font-weight:700} .fr .who span{color:var(--muted)}
+.fr .what{display:block;font-size:12.5px;color:var(--ax-ink);font-weight:700}
+.fr .tk{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tok{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.tok small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
+.bars{display:grid;gap:7px;margin-top:14px}
+.br{display:grid;grid-template-columns:74px 1fr 22px;gap:8px;align-items:center;font-size:12.5px}
+.br i{display:block;height:8px;border-radius:8px;background:var(--surface2);overflow:hidden}
+.br i u{display:block;height:100%;width:0;border-radius:8px;background:var(--ax);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.br span:last-child{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.br.bump span:first-child{color:var(--ax-ink);font-weight:800}
+.report{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--cp);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
+.report ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.report li{border-radius:10px;padding:11px 12px;font-size:14.5px;background:var(--surface2)}
+.report li b{display:block;font-size:12.5px;color:var(--muted);margin-bottom:1px}
+.report li.no{background:transparent;border:2px dashed var(--line);color:var(--muted)}
+@media (max-width:860px){.ops,.con-grid{grid-template-columns:1fr}}
+
 /* matchups */
 .match{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:32px}
 .m{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);
@@ -369,6 +401,42 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   </div>
 </section>
 
+<section class="tight">
+  <div class="wrap">
+    <p class="eyebrow rv">핵심 차이 3 · 운영 관리</p>
+    <h2 class="rv"><span class="cp">Copilot은 주어진 보고서를 보고</span>, <span class="ax">AX for Works는 사용 이력을 직접 추적합니다</span></h2>
+    <p class="lead rv">AX for Works는 우리가 운영하는 서비스라서, 누가 언제 어떤 서비스로 무엇을 했는지와 AI를 얼마나 썼는지가 우리 쪽에 남습니다.</p>
+    <div class="ops rv" id="ops">
+      <div class="console">
+        <div class="ph"><b>AX for Works 관리자 화면</b><span class="eg">예시 데이터</span></div>
+        <div class="con-grid">
+          <div><div class="con-t">사용 이력 (실시간)</div><div class="feed" id="feed"></div></div>
+          <div>
+            <div class="con-t">오늘 AI 사용량</div>
+            <div class="tok"><span id="tok">0</span><small>토큰</small></div>
+            <div class="con-t" style="margin-top:18px">서비스별 사용 건수</div>
+            <div class="bars" id="bars"><div class="br"><span>WiaMeet</span><i><u></u></i><span>0</span></div><div class="br"><span>WiaAssist</span><i><u></u></i><span>0</span></div><div class="br"><span>WiaNews</span><i><u></u></i><span>0</span></div><div class="br"><span>WiaReport</span><i><u></u></i><span>0</span></div><div class="br"><span>WiaVoice</span><i><u></u></i><span>0</span></div><div class="br"><span>WiaCoding</span><i><u></u></i><span>0</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="report">
+        <div class="ph"><b>Microsoft 365 Copilot</b><span class="eg">사용 현황 보고서</span></div>
+        <ul>
+          <li><b>볼 수 있는 것</b>활성 사용자 수, 앱별 사용 여부</li>
+          <li class="no"><b>업무별 AI 사용량</b>정액 구독이라 해당 개념 없음</li>
+          <li class="no"><b>프롬프트·AI 모델 조정</b>Microsoft가 관리</li>
+          <li class="no"><b>기록 항목과 화면 구성</b>Microsoft가 정한 형식</li>
+        </ul>
+      </div>
+    </div>
+    <div class="keys k3">
+      <div class="key rv"><div class="n">사용 이력</div><h3>누가, 언제, 무엇을 했는지 남습니다</h3><p>사용자가 어떤 서비스에 들어와 무엇을 만들었는지 이름·사번·팀과 함께 기록됩니다. 문제가 생기면 되짚어 볼 수 있고, 어느 팀이 잘 쓰는지도 보입니다.</p><div class="vs-cp"><b>Copilot은</b>Microsoft가 정한 보고서 범위 안에서 사용 현황을 봅니다.</div></div>
+      <div class="key rv"><div class="n">AI 사용량</div><h3>AI를 얼마나 썼는지 서비스별로 셉니다</h3><p>서비스별로 토큰 사용량을 기록합니다. 어느 업무에 AI 비용이 드는지 알 수 있습니다.</p><div class="vs-cp"><b>Copilot은</b>사용자당 정액 구독이라 업무별 AI 사용량이 드러나지 않습니다.</div></div>
+      <div class="key rv"><div class="n">직접 조정</div><h3>이력을 보고 바로 고칩니다</h3><p>서비스를 켜고 끄고, 프롬프트를 고치고, AI 모델을 교체합니다. 쓰이지 않는 기능과 비용이 큰 기능을 보고 판단합니다.</p><div class="vs-cp"><b>Copilot은</b>프롬프트와 AI 모델을 Microsoft가 관리합니다.</div></div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <p class="eyebrow rv">서비스별 대응</p>
@@ -519,6 +587,41 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   }, {threshold:.25}).observe(grow);
   function loopStep(){ gl.forEach(function(d, i){ d.classList.toggle('lit', i === gi); }); gi = (gi + 1) % gl.length; }
   loopStep(); if (!reduce) setInterval(loopStep, 1100);
+
+  /* operations: live usage history console (sample data) */
+  var hist = [
+    ['김○○','생산기술팀','WiaMeet','회의록 생성',12400],['이○○','품질팀','WiaNews','뉴스레터 발행',8300],
+    ['박○○','연구개발팀','WiaCoding','개발 프롬프트 생성',5100],['최○○','구매팀','WiaAssist','업무 브리핑 업데이트',9700],
+    ['정○○','인사팀','WiaVoice','음성 생성',0],['한○○','생산기술팀','WiaReport','주간보고 작성',0],
+    ['윤○○','품질팀','WiaMeet','회의록 수정',2100],['오○○','연구개발팀','WiaAssist','업무 브리핑 업데이트',10200],
+    ['서○○','영업팀','WiaNews','뉴스레터 구독 설정',0],['임○○','구매팀','WiaMeet','회의록 생성',13900]
+  ];
+  var feed = $('feed'), tokEl = $('tok'), barEls = $('bars').children, hi = 0, tok = 184200, mins = 9 * 60 + 2;
+  var cnt = {WiaMeet:14, WiaAssist:11, WiaNews:7, WiaReport:9, WiaVoice:4, WiaCoding:6};
+  function drawBars(hit){
+    var mx = 0, k; for (k in cnt) mx = Math.max(mx, cnt[k]);
+    for (var i = 0; i < barEls.length; i++){
+      var name = barEls[i].children[0].textContent;
+      barEls[i].querySelector('u').style.width = (cnt[name] / (mx * 1.15) * 100) + '%';
+      barEls[i].children[2].textContent = cnt[name];
+      barEls[i].classList.toggle('bump', name === hit);
+    }
+  }
+  function addHist(){
+    var h = hist[hi++ % hist.length]; mins += 2 + (hi % 4);
+    var row = document.createElement('div'); row.className = 'fr';
+    var t = document.createElement('time'); t.textContent = ('0' + Math.floor(mins / 60) % 24).slice(-2) + ':' + ('0' + mins % 60).slice(-2);
+    var who = document.createElement('div'); who.className = 'who';
+    var nb = document.createElement('b'); nb.textContent = h[0] + ' '; var tm = document.createElement('span'); tm.textContent = h[1];
+    var wt = document.createElement('span'); wt.className = 'what'; wt.textContent = h[2] + ' · ' + h[3];
+    who.append(nb, tm, wt);
+    var tk = document.createElement('span'); tk.className = 'tk'; tk.textContent = h[4] ? h[4].toLocaleString() + ' 토큰' : '';
+    row.append(t, who, tk); feed.prepend(row);
+    while (feed.children.length > 5) feed.lastChild.remove();
+    cnt[h[2]]++; tok += h[4]; tokEl.textContent = tok.toLocaleString(); drawBars(h[2]);
+  }
+  for (var q = 0; q < 4; q++) addHist();
+  if (!reduce) setInterval(addHist, 1700);
 
   /* hero sorter */
   var tasks = [
