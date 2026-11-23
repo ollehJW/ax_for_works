@@ -219,11 +219,18 @@ p{margin:0}
 .si{display:flex;justify-content:space-between;gap:8px;background:var(--surface);border-radius:9px;padding:8px 11px;font-size:13.5px;
   animation:feedin .5s cubic-bezier(.2,.8,.2,1)}
 .si b{color:var(--ci);margin-right:6px} .si span{color:var(--muted);white-space:nowrap}
-.solo{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1}
-.solo-col{display:flex;flex-direction:column;gap:8px}
-.solo-box{flex:1;min-height:150px;border:2px dashed var(--line);border-radius:12px;padding:6px;display:grid;gap:5px;align-content:start;overflow:hidden}
-.solo-box div{background:var(--cs);border-radius:8px;padding:6px 7px;font-size:12px;line-height:1.35;animation:feedin .5s cubic-bezier(.2,.8,.2,1)}
-.tm .wait{padding-top:14px}
+.solo{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.solo-col{display:flex;flex-direction:column;gap:6px;border:2px solid var(--line);border-radius:12px;padding:8px;background:var(--surface);
+  opacity:.45;transition:opacity .4s,border-color .3s,box-shadow .3s}
+.solo-col.act{opacity:1;border-color:var(--c);box-shadow:0 0 0 4px var(--cs)}
+.sw-h{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.sw-h b{font-size:13.5px}
+.sw-h span{font-size:11px;font-weight:800;color:var(--ci);background:var(--cs);border-radius:999px;padding:1px 8px}
+.solo-box{height:92px;display:grid;gap:5px;align-content:start;overflow:hidden}
+.solo-box div{background:var(--cs);border-radius:8px;padding:5px 7px;font-size:12px;line-height:1.35;animation:feedin .5s cubic-bezier(.2,.8,.2,1)}
+.sw-n{font-size:12px;color:var(--muted);text-align:right} .sw-n b{color:var(--ci);font-size:14px}
+.shelf-empty{margin-top:10px;border:2px dashed var(--line);border-radius:12px;padding:12px;text-align:center;font-size:13.5px;font-weight:700;color:var(--muted)}
+.shelf-empty b{font-size:15px;color:var(--text)} .shelf-empty span{display:block;font-weight:400;font-size:12.5px}
 @media (max-width:860px){.team{grid-template-columns:1fr}}
 
 /* matchups */
@@ -442,8 +449,10 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
       </div>
       <div class="tm t-cp">
         <div class="ph"><b>Microsoft 365 Copilot</b><span class="eg">예시 데이터</span></div>
-        <div class="solo" id="tmCp"><div class="solo-col"><div class="pp">김○○</div><div class="solo-box"></div></div><div class="solo-col"><div class="pp">이○○</div><div class="solo-box"></div></div><div class="solo-col"><div class="pp">박○○</div><div class="solo-box"></div></div><div class="solo-col"><div class="pp">최○○</div><div class="solo-box"></div></div></div>
-        <p class="wait">결과가 각자의 대화에 남습니다. 공유는 직접 합니다.</p>
+        <div class="people" id="tmCpP"><div class="pp">김○○</div><div class="pp">이○○</div><div class="pp">박○○</div><div class="pp">최○○</div></div>
+        <div class="funnel">▼ 각자 자기 대화창으로 ▼</div>
+        <div class="solo" id="tmCp"><div class="solo-col"><div class="sw-h"><b>김○○</b><span>나만 봄</span></div><div class="solo-box"></div><div class="sw-n"><b>6</b>건</div></div><div class="solo-col"><div class="sw-h"><b>이○○</b><span>나만 봄</span></div><div class="solo-box"></div><div class="sw-n"><b>4</b>건</div></div><div class="solo-col"><div class="sw-h"><b>박○○</b><span>나만 봄</span></div><div class="solo-box"></div><div class="sw-n"><b>5</b>건</div></div><div class="solo-col"><div class="sw-h"><b>최○○</b><span>나만 봄</span></div><div class="solo-box"></div><div class="sw-n"><b>3</b>건</div></div></div>
+        <div class="shelf-empty">팀 공간에 쌓인 결과 <b>0</b>건<span>직접 공유하기 전에는 비어 있습니다</span></div>
       </div>
     </div>
     <div class="keys k3">
@@ -681,16 +690,17 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   var tmItems = [[0,'WiaMeet','11월 3주 주간 회의록','메일 요약'],[1,'WiaReport','47주차 주간보고','답장 초안'],[2,'WiaCoding','검사 자동화 프롬프트','수식 제안'],
     [3,'WiaNews','전동화 기술 뉴스레터','문서 초안'],[0,'WiaVoice','안전 교육 내레이션','슬라이드 초안'],[1,'WiaMeet','협력사 미팅 회의록','회의 요약'],
     [2,'WiaReport','47주차 주간보고','표 정리'],[3,'WiaMeet','품질 회의 회의록','번역']];
-  var tmAx = $('tmAx').children, tmCols = $('tmCp').children, tmShelf = $('tmShelf'), tmN = 23, tmI = 0, tmNames = ['김○○','이○○','박○○','최○○'];
+  var tmAx = $('tmAx').children, tmCols = $('tmCp').children, tmShelf = $('tmShelf'), tmCpP = $('tmCpP').children, tmN = 23, tmI = 0, tmNames = ['김○○','이○○','박○○','최○○'];
   function tmStep(){
     var it = tmItems[tmI++ % tmItems.length], p = it[0];
-    for (var i = 0; i < 4; i++){ tmAx[i].classList.toggle('act', i === p); tmCols[i].firstChild.classList.toggle('act', i === p); }
+    for (var i = 0; i < 4; i++){ tmAx[i].classList.toggle('act', i === p); tmCols[i].classList.toggle('act', i === p); tmCpP[i].classList.toggle('act', i === p); }
     var row = document.createElement('div'); row.className = 'si';
     var l = document.createElement('div'), b = document.createElement('b'), r = document.createElement('span');
     b.textContent = it[1]; l.append(b, document.createTextNode(it[2])); r.textContent = tmNames[p]; row.append(l, r);
     tmShelf.prepend(row); while (tmShelf.children.length > 4) tmShelf.lastChild.remove();
     $('tmCnt').textContent = ++tmN;
-    var box = tmCols[p].lastChild, d = document.createElement('div'); d.textContent = it[3];
+    var box = tmCols[p].children[1], d = document.createElement('div'); d.textContent = it[3];
+    var pc = tmCols[p].children[2].firstChild; pc.textContent = +pc.textContent + 1;
     box.prepend(d); while (box.children.length > 3) box.lastChild.remove();
   }
   for (var w = 0; w < 4; w++) tmStep();
