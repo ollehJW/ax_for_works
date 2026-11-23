@@ -83,6 +83,39 @@ p{margin:0}
 .ticket.to-cp{opacity:0;transform:translateX(110%) scale(.7)}
 .ticket.to-ax{border-color:var(--ax)} .ticket.to-cp{border-color:var(--cp)}
 
+/* venn */
+.venn{position:relative;margin-top:28px;aspect-ratio:1000/600}
+.venn svg{position:absolute;inset:0;width:100%;height:100%}
+.venn ellipse{opacity:0;stroke-width:2;fill-opacity:.13;transition:transform 1.2s cubic-bezier(.2,.8,.2,1),opacity .9s}
+.venn .e-ax{fill:var(--ax);stroke:var(--ax);transform:translateX(-110px)}
+.venn .e-cp{fill:var(--cp);stroke:var(--cp);transform:translateX(110px)}
+.venn.on ellipse{opacity:1;transform:none}
+.vcol{position:absolute;top:50%;transform:translateY(-50%);width:24%}
+.vcol.vl{left:9%} .vcol.vr{left:67%}
+.vcol.vc{left:37%;width:26%;text-align:center}
+.vcol h3{font-size:16px;margin-bottom:6px}
+.vcol.vl h3{color:var(--ax-ink)} .vcol.vr h3{color:var(--cp-ink)} .vcol.vc h3{color:var(--both)}
+.vcol ul{list-style:none;margin:0;padding:0}
+.vcol li{font-size:13.5px;line-height:1.4;padding:6px 10px;margin-top:6px;border-radius:10px;background:var(--surface);
+  border:1px solid var(--line);box-shadow:0 1px 2px rgba(20,26,43,.06);
+  opacity:0;transform:scale(.85);transition:opacity .45s,transform .45s cubic-bezier(.3,1.5,.4,1)}
+.venn.on .vcol li{opacity:1;transform:none}
+.vcol li b{font-weight:800;margin-right:4px}
+.vcol.vl li b{color:var(--ax-ink)} .vcol.vr li b{color:var(--cp-ink)}
+.vcol.vl li:nth-child(1){transition-delay:.9s}.vcol.vl li:nth-child(2){transition-delay:1s}.vcol.vl li:nth-child(3){transition-delay:1.1s}
+.vcol.vl li:nth-child(4){transition-delay:1.2s}.vcol.vl li:nth-child(5){transition-delay:1.3s}.vcol.vl li:nth-child(6){transition-delay:1.4s}
+.vcol.vr li:nth-child(1){transition-delay:.9s}.vcol.vr li:nth-child(2){transition-delay:1s}.vcol.vr li:nth-child(3){transition-delay:1.1s}
+.vcol.vr li:nth-child(4){transition-delay:1.2s}.vcol.vr li:nth-child(5){transition-delay:1.3s}.vcol.vr li:nth-child(6){transition-delay:1.4s}
+.vcol.vc li:nth-child(1){transition-delay:1.6s}.vcol.vc li:nth-child(2){transition-delay:1.7s}.vcol.vc li:nth-child(3){transition-delay:1.8s}
+.vcol.vc li:nth-child(4){transition-delay:1.9s}.vcol.vc li:nth-child(5){transition-delay:2s}
+.venn-note{margin-top:14px;text-align:center;color:var(--muted);font-size:14.5px}
+@media (max-width:860px){
+  .venn{aspect-ratio:auto;display:grid;gap:12px}
+  .venn svg{display:none}
+  .vcol,.vcol.vl,.vcol.vr,.vcol.vc{position:static;transform:none;width:auto;text-align:left;padding:16px;border-radius:var(--r)}
+  .vcol.vl{background:var(--ax-soft)} .vcol.vr{background:var(--cp-soft)} .vcol.vc{background:var(--both-soft)}
+}
+
 /* key points */
 .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
 .key{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow)}
@@ -226,6 +259,53 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
     </div>
   </div>
 </header>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow rv">제공 기능</p>
+    <h2 class="rv">두 서비스가 하는 일을 한 장으로</h2>
+    <p class="lead rv">왼쪽은 AX for Works에만 있는 기능, 오른쪽은 Copilot에만 있는 기능, 가운데는 둘 다 할 수 있는 일입니다.</p>
+    <div class="venn rv" id="venn">
+      <svg viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse class="e-ax" cx="340" cy="300" rx="330" ry="290"/>
+        <ellipse class="e-cp" cx="660" cy="300" rx="330" ry="290"/>
+      </svg>
+      <div class="vcol vl">
+        <h3>AX for Works만</h3>
+        <ul>
+          <li><b>WiaMeet</b>대면 회의 녹음 회의록</li>
+          <li><b>WiaReport</b>팀 주간보고 취합</li>
+          <li><b>WiaNews</b>정기 뉴스레터 발송</li>
+          <li><b>WiaVoice</b>음성 생성·병합</li>
+          <li><b>WiaCoding</b>개발 프롬프트 작성</li>
+          <li><b>WiaAssist</b>통합 업무 보드</li>
+        </ul>
+      </div>
+      <div class="vcol vc">
+        <h3>둘 다</h3>
+        <ul>
+          <li>회의 내용 요약</li>
+          <li>메일 요약</li>
+          <li>Teams 대화 요약</li>
+          <li>할 일·일정 뽑기</li>
+          <li>웹 정보 조사</li>
+        </ul>
+      </div>
+      <div class="vcol vr">
+        <h3>Copilot만</h3>
+        <ul>
+          <li><b>Word</b>문서 초안·다듬기</li>
+          <li><b>Excel</b>데이터 분석·수식</li>
+          <li><b>PowerPoint</b>슬라이드 생성</li>
+          <li><b>Outlook</b>답장 초안 작성</li>
+          <li><b>Teams</b>회의 중 질문</li>
+          <li><b>Chat</b>자유 질문·답변</li>
+        </ul>
+      </div>
+    </div>
+    <p class="venn-note rv">가운데 겹치는 일도 쓰는 상황은 다릅니다. 그 기준은 아래에서 이어집니다.</p>
+  </div>
+</section>
 
 <section>
   <div class="wrap">
