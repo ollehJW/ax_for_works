@@ -233,6 +233,44 @@ p{margin:0}
 .shelf-empty b{font-size:15px;color:var(--text)} .shelf-empty span{display:block;font-weight:400;font-size:12.5px}
 @media (max-width:860px){.team{grid-template-columns:1fr}}
 
+/* when to use which */
+.when{display:grid;gap:12px;margin-top:32px}
+.wr{display:grid;grid-template-columns:1fr 132px 1fr;gap:12px;align-items:stretch}
+.wc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);
+  opacity:0;transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .4s}
+.wc.w-ax{--c:var(--ax);--cs:var(--ax-soft);--ci:var(--ax-ink);border-left:5px solid var(--ax);transform:translateX(-40px)}
+.wc.w-cp{--c:var(--cp);--cs:var(--cp-soft);--ci:var(--cp-ink);border-right:5px solid var(--cp);transform:translateX(40px)}
+.when.on .wc{opacity:1;transform:none}
+.wr:nth-child(2) .wc{transition-delay:.12s}.wr:nth-child(3) .wc{transition-delay:.24s}.wr:nth-child(4) .wc{transition-delay:.36s}
+.wr.now .wc{border-color:var(--c);box-shadow:0 0 0 4px var(--cs)}
+.wc .tool{font-size:12px;font-weight:800;color:var(--ci)}
+.wc h3{font-size:18px;margin:2px 0 8px}
+.wc .good{display:inline-block;font-size:13.5px;font-weight:700;color:var(--ci);background:var(--cs);border-radius:999px;padding:3px 11px}
+.wc .ex{font-size:13.5px;color:var(--muted);margin-top:8px}
+.wq{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:var(--r);
+  background:var(--surface2);font-weight:800;font-size:15px;padding:8px;transition:background .4s,color .4s,transform .4s}
+.wq small{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.05em;transition:color .4s}
+.wr.now .wq{background:var(--text);color:var(--bg);transform:scale(1.05)} .wr.now .wq small{color:var(--bg);opacity:.7}
+.wh{display:grid;grid-template-columns:1fr 132px 1fr;gap:12px;font-weight:800;font-size:17px}
+.wh .a{color:var(--ax-ink);background:var(--ax-soft);border-radius:14px;padding:12px 20px}
+.wh .c{color:var(--cp-ink);background:var(--cp-soft);border-radius:14px;padding:12px 20px;text-align:right}
+.wc.w-cp{text-align:right}
+.chains{margin-top:28px;border-radius:var(--r);background:var(--both-soft);padding:22px}
+.chains h3{color:var(--both);margin-bottom:12px}
+.chain{display:grid;grid-template-columns:1fr 70px 1fr;gap:8px;align-items:center;margin-top:8px}
+.chain div{background:var(--surface);border-radius:12px;padding:11px 14px;font-size:14.5px}
+.chain div b{display:block;font-size:12px} .chain .a b{color:var(--ax-ink)} .chain .c b{color:var(--cp-ink)}
+.chain i{position:relative;height:3px;border-radius:3px;background:var(--both);opacity:.35}
+.chain i::after{content:"";position:absolute;top:-4px;left:0;width:11px;height:11px;border-radius:50%;background:var(--both);animation:run 1.8s ease-in-out infinite}
+.chain:nth-child(3) i::after{animation-delay:.3s}.chain:nth-child(4) i::after{animation-delay:.6s}
+@keyframes run{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 11px);opacity:0}}
+@media (max-width:860px){
+  .wr,.wh{grid-template-columns:1fr}.wq{flex-direction:row;gap:8px;padding:10px}.wh .c,.wc.w-cp{text-align:left}
+  .wc.w-cp{border-right:1px solid var(--line);border-left:5px solid var(--cp)}
+  .chain{grid-template-columns:1fr}.chain i{display:none}
+}
+@media (prefers-reduced-motion:reduce){.wc{opacity:1;transform:none}}
+
 /* matchups */
 .match{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:32px}
 .m{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);
@@ -502,6 +540,27 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
 
 <section>
   <div class="wrap">
+    <p class="eyebrow rv">그래서, 언제 무엇을 쓰나</p>
+    <h2 class="rv"><span class="ax">맡길 일은 AX for Works</span>, <span class="cp">바로 할 일은 Copilot</span></h2>
+    <p class="lead rv">둘 다 잘하는 일이 다릅니다. 네 가지만 물어보면 어느 쪽의 강점이 필요한지 정해집니다.</p>
+    <div class="when" id="when">
+      <div class="wh"><div class="a">이럴 때는 AX for Works</div><div></div><div class="c">이럴 때는 Copilot</div></div>
+      <div class="wr"><div class="wc w-ax"><div class="tool">AX for Works</div><h3>매주 반복되는 정해진 업무</h3><span class="good">입력부터 공유까지 맡아 처리</span><p class="ex">예: 회의록, 주간보고, 정기 뉴스레터</p></div><div class="wq"><small>얼마나 자주</small>반복인가</div><div class="wc w-cp"><div class="tool">Copilot</div><h3>지금 한 번 필요한 일</h3><span class="good">준비 없이 그 자리에서 바로</span><p class="ex">예: 메일 답장, 문장 다듬기, 빠른 조사</p></div></div>
+      <div class="wr"><div class="wc w-ax"><div class="tool">AX for Works</div><h3>팀이 같이 보고 남겨야 하는 결과</h3><span class="good">팀 공간에 쌓이고 현황이 보임</span><p class="ex">예: 팀 회의록, 과제 현황, 공유 프롬프트</p></div><div class="wq"><small>누가 보나</small>팀인가 나인가</div><div class="wc w-cp"><div class="tool">Copilot</div><h3>나만 보면 되는 초안과 요약</h3><span class="good">내 메일과 파일을 알고 답함</span><p class="ex">예: 긴 메일 요약, 놓친 회의 파악</p></div></div>
+      <div class="wr"><div class="wc w-ax"><div class="tool">AX for Works</div><h3>Office 밖에서 생기는 일</h3><span class="good">음성 인식·음성 합성 같은 전용 AI</span><p class="ex">예: 회의실 녹음, 내레이션 음성, 외부 기술 뉴스</p></div><div class="wq"><small>어디의 일</small>Office 안인가</div><div class="wc w-cp"><div class="tool">Copilot</div><h3>Office 문서와 메일 안의 일</h3><span class="good">열어 둔 문서를 직접 고침</span><p class="ex">예: Word 초안, Excel 수식, PowerPoint 슬라이드</p></div></div>
+      <div class="wr"><div class="wc w-ax"><div class="tool">AX for Works</div><h3>양식이 정해진 결과물</h3><span class="good">누가 써도 같은 형식</span><p class="ex">예: 회의록 양식, 주간보고 양식</p></div><div class="wq"><small>결과의 모양</small>양식이 있나</div><div class="wc w-cp"><div class="tool">Copilot</div><h3>형식이 없는 자유로운 요청</h3><span class="good">무엇이든 말로 요청</span><p class="ex">예: 아이디어 정리, 번역, 질문</p></div></div>
+    </div>
+    <div class="chains rv">
+      <h3>이어서 쓰면 두 강점을 모두 얻습니다</h3>
+      <div class="chain"><div class="a"><b>WiaMeet</b>회의록을 만들고</div><i></i><div class="c"><b>Outlook의 Copilot</b>참석자에게 보낼 공유 메일로</div></div>
+      <div class="chain"><div class="a"><b>WiaReport</b>주간보고를 모으고</div><i></i><div class="c"><b>PowerPoint의 Copilot</b>임원 보고용 발표 자료로</div></div>
+      <div class="chain"><div class="c"><b>Word의 Copilot</b>내레이션 대본을 쓰고</div><i></i><div class="a"><b>WiaVoice</b>원하는 목소리의 음성 파일로</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <p class="eyebrow rv">서비스별 대응</p>
     <h2 class="rv">6개 서비스와 Copilot, 어디서 갈리나</h2>
     <p class="lead rv">겹쳐 보이는 기능도 쓰는 상황이 다릅니다. 서비스마다 기준을 한 줄로 정리했습니다.</p>
@@ -594,13 +653,6 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
 
 <section>
   <div class="wrap">
-    <p class="eyebrow rv">정리</p>
-    <h2 class="rv">헷갈릴 때의 판단 기준</h2>
-    <div class="rules">
-      <div class="r a rv"><span class="tag ax">AX for Works</span><h3>매주 반복되고 팀이 같이 보는 일</h3><p>회의록, 주간보고, 뉴스레터처럼 형식이 정해져 있고 결과를 팀에 남겨야 하면 AX for Works를 씁니다.</p></div>
-      <div class="r c rv"><span class="tag cp">Copilot</span><h3>지금 열어 둔 문서와 메일 안의 일</h3><p>초안 쓰기, 요약, 수식, 답장처럼 M365 앱 안에서 한 번에 끝나는 일은 Copilot을 씁니다.</p></div>
-      <div class="r b rv"><span class="tag both">함께</span><h3>만든 결과를 다른 형식으로 전달할 때</h3><p>AX for Works에서 회의록이나 보고서를 만들고, Copilot으로 공유 메일이나 발표 자료로 바꿉니다.</p></div>
-    </div>
     <div class="todo rv">
       <b>초안 확인 사항</b> — 아래는 확정 전에 사실 확인이 필요한 부분입니다.
       <ul>
@@ -705,6 +757,12 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   }
   for (var w = 0; w < 4; w++) tmStep();
   if (!reduce) setInterval(tmStep, 1600);
+
+  /* when to use which: cycle the four questions */
+  var when = $('when'), wrs = when.querySelectorAll('.wr'), wi = 0;
+  io.observe(when);
+  function whenStep(){ wrs.forEach(function(r, i){ r.classList.toggle('now', i === wi); }); wi = (wi + 1) % wrs.length; }
+  if (!reduce){ whenStep(); setInterval(whenStep, 2200); }
 
   /* hero sorter */
   var tasks = [
