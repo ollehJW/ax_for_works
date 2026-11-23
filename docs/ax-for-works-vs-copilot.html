@@ -130,17 +130,6 @@ p{margin:0}
 .fair b{color:var(--cp-ink)}
 @media (max-width:860px){.flow5{grid-template-columns:1fr}.st{text-align:left}.st.lit{transform:none}}
 
-/* table */
-.tbl-wrap{overflow-x:auto;margin-top:28px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow)}
-table{border-collapse:collapse;width:100%;min-width:680px;font-size:15px}
-th,td{padding:14px 18px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
-tr:last-child td{border-bottom:0}
-thead th{font-size:14px;background:var(--surface2)}
-thead th:nth-child(2){color:var(--ax-ink)} thead th:nth-child(3){color:var(--cp-ink)}
-tbody th{width:150px;font-weight:700;color:var(--muted);font-size:14px}
-tbody tr{opacity:0;transform:translateX(-14px);transition:opacity .5s,transform .5s}
-.tbl-wrap.on tbody tr{opacity:1;transform:none}
-
 /* matchups */
 .match{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:32px}
 .m{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);
@@ -313,30 +302,6 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
 
 <section>
   <div class="wrap">
-    <p class="eyebrow rv">항목별 비교</p>
-    <h2 class="rv">같은 AI지만 설계가 다릅니다</h2>
-    <div class="tbl-wrap" id="tbl">
-      <table>
-        <thead><tr><th></th><th>AX for Works</th><th>Microsoft 365 Copilot</th></tr></thead>
-        <tbody>
-          <tr><th>성격</th><td>반복 업무를 끝까지 처리하는 전용 서비스 6종</td><td>M365 앱 안에서 무엇이든 요청하는 범용 AI 도구</td></tr>
-          <tr><th>시작하는 곳</th><td>포털에서 서비스를 고르고 단계별 화면을 따라감</td><td>Word·Excel·Outlook·Teams의 Copilot 버튼과 채팅창</td></tr>
-          <tr><th>결과물</th><td>회의록, 주간보고, 뉴스레터, 음성 파일, 개발 프롬프트, 업무 보드</td><td>초안, 요약, 답변, 수식, 슬라이드</td></tr>
-          <tr><th>공유 단위</th><td>팀 작업 공간. 결과가 라운지에 누적됨</td><td>개인. 필요하면 직접 공유</td></tr>
-          <tr><th>다루는 데이터</th><td>녹음 파일, 팀 과제·일정, 외부 뉴스, 메일·Teams(WiaAssist)</td><td>M365의 메일, 채팅, 회의, 파일</td></tr>
-          <tr><th>AI가 도는 곳</th><td>음성 인식은 사내 GPU 서버, 문장 생성은 회사 계약 Azure OpenAI</td><td>Microsoft 클라우드</td></tr>
-          <tr><th>사내 맞춤</th><td>사내 용어집, 조직·사번 연동, 보고 양식을 직접 고칠 수 있음</td><td>제공되는 설정과 에이전트 기능의 범위 안에서 가능</td></tr>
-          <tr><th>로그인</th><td>AX 통합 로그인 한 번으로 6개 서비스 사용</td><td>Microsoft 365 계정</td></tr>
-          <tr><th>비용 구조</th><td>서버·GPU 운영비와 AI 사용량</td><td>사용자당 구독 라이선스</td></tr>
-          <tr><th>개선 방법</th><td>현업 요청을 받아 자체 개발로 반영</td><td>Microsoft의 업데이트 일정을 따름</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
     <p class="eyebrow rv">서비스별 대응</p>
     <h2 class="rv">6개 서비스와 Copilot, 어디서 갈리나</h2>
     <p class="lead rv">겹쳐 보이는 기능도 쓰는 상황이 다릅니다. 서비스마다 기준을 한 줄로 정리했습니다.</p>
@@ -462,9 +427,6 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   document.querySelectorAll('.rv').forEach(function(el, i){
     el.style.transitionDelay = (i % 3) * 90 + 'ms'; io.observe(el);
   });
-  var tbl = $('tbl');
-  tbl.querySelectorAll('tbody tr').forEach(function(tr, i){ tr.style.transitionDelay = i * 70 + 'ms'; });
-  io.observe(tbl);
   io.observe($('duo'));
 
   /* tool vs service pipeline */
