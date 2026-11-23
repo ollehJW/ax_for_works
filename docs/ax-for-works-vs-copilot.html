@@ -300,26 +300,46 @@ p{margin:0}
 .steps li::before{content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;background:var(--text);color:var(--bg);
   font-size:12px;font-weight:800;display:grid;place-items:center;margin-top:1px}
 
-/* day */
+/* day: two-lane timeline */
 .day{margin-top:32px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow)}
-.track{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.track::before{content:"";position:absolute;left:0;right:0;top:11px;height:4px;border-radius:4px;background:var(--surface2)}
-.prog{position:absolute;left:0;top:11px;height:4px;border-radius:4px;width:0;
-  background:var(--text);transition:width .8s ease}
-.stop{font:inherit;color:var(--muted);background:none;border:0;cursor:pointer;padding:0;position:relative;text-align:center}
-.stop i{display:block;width:26px;height:26px;border-radius:50%;margin:0 auto 8px;background:var(--surface);
-  border:4px solid var(--line);transition:border-color .3s,transform .3s}
-.stop.t-ax.done i,.stop.t-ax.now i{border-color:var(--ax)}
-.stop.t-cp.done i,.stop.t-cp.now i{border-color:var(--cp)}
-.stop.now i{transform:scale(1.3)}
-.stop.now{color:var(--text);font-weight:700}
-.stop span{display:block;font-size:13px}
-.stop small{display:block;font-size:11.5px}
-.stop:focus-visible{outline:3px solid var(--ax);outline-offset:4px;border-radius:8px}
-.day-detail{margin-top:24px;padding:18px;border-radius:12px;background:var(--surface2);min-height:104px}
+.lanes{position:relative;display:grid;grid-template-columns:118px repeat(9,1fr);grid-template-rows:26px 92px 92px;row-gap:8px}
+.band{grid-column:1/-1;border-radius:14px}
+.band.b1{grid-row:2;background:var(--ax-soft)} .band.b2{grid-row:3;background:var(--cp-soft)}
+.lane-l{grid-column:1;align-self:center;padding-left:14px;font-weight:800;font-size:14px;z-index:2}
+.lane-l.la{grid-row:2;color:var(--ax-ink)} .lane-l.lc{grid-row:3;color:var(--cp-ink)}
+.lt{grid-row:1;text-align:center;font-size:12.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;transition:color .3s}
+.lt.now{color:var(--text)}
+.lane-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
+.lane-svg polyline{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.lane-svg .base{stroke:var(--line);stroke-width:3}
+.lane-svg .done{stroke:var(--text);stroke-width:3}
+.lane-svg line{stroke:var(--both);stroke-width:5;stroke-linecap:round;stroke-dasharray:1 10;opacity:.35;transition:opacity .4s}
+.lane-svg line.on{opacity:1;animation:march 1s linear infinite}
+@keyframes march{to{stroke-dashoffset:-11}}
+.chain-l{position:absolute;z-index:2;transform:translate(-50%,-50%);font-size:11px;font-weight:800;color:var(--both);background:var(--surface);
+  border:1.5px solid var(--both);border-radius:999px;padding:1px 8px;white-space:nowrap;opacity:.4;transition:opacity .4s}
+.chain-l.on{opacity:1}
+.stop{font:inherit;color:var(--muted);background:none;border:0;cursor:pointer;padding:0;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.stop.t-ax{grid-row:2;--c:var(--ax);--ci:var(--ax-ink);flex-direction:column-reverse} .stop.t-cp{grid-row:3;--c:var(--cp);--ci:var(--cp-ink)}
+.stop i{display:block;width:24px;height:24px;border-radius:50%;background:var(--surface);border:4px solid var(--line);transition:border-color .3s,transform .3s,box-shadow .3s}
+.stop.done i,.stop.now i{border-color:var(--c)}
+.stop.now i{transform:scale(1.35);box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 22%,transparent)}
+.stop span{font-size:13px;font-weight:700} .stop.done span,.stop.now span{color:var(--ci)}
+.stop small{display:none}
+.stop:focus-visible{outline:3px solid var(--ax);outline-offset:2px;border-radius:10px}
+.day-detail{margin-top:22px;padding:18px;border-radius:12px;background:var(--surface2);min-height:112px}
 .day-detail.swap{animation:swap .45s ease}
 .day-detail h3{margin:8px 0 4px}
 .day-detail p{color:var(--muted);font-size:15px}
+.day-detail .tag+.tag{margin-left:6px}
+@media (max-width:860px){
+  .lanes{display:grid;grid-template-columns:1fr;grid-template-rows:none;row-gap:6px}
+  .band,.lane-l,.lt,.lane-svg,.chain-l{display:none}
+  .stop,.stop.t-ax,.stop.t-cp{grid-row:auto;grid-column:auto!important;flex-direction:row;justify-content:flex-start;gap:10px;padding:8px 10px;border-radius:10px}
+  .stop.t-ax{background:var(--ax-soft)} .stop.t-cp{background:var(--cp-soft)}
+  .stop small{display:block;font-size:12.5px;font-variant-numeric:tabular-nums;width:40px;text-align:left}
+}
 
 /* principles */
 .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
@@ -338,10 +358,6 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   .stage{grid-column:1/-1;order:-1;min-height:150px}
   .ticket.to-ax{transform:translate(-60%,120%) scale(.7)}
   .ticket.to-cp{transform:translate(60%,120%) scale(.7)}
-  .track{grid-template-columns:1fr;gap:10px}
-  .track::before,.prog{display:none}
-  .stop{display:flex;align-items:center;gap:10px;text-align:left}
-  .stop i{margin:0;flex:none}
   .vs{grid-template-columns:1fr}
   .vs .mid{justify-content:center}
 }
@@ -564,9 +580,9 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   <div class="wrap">
     <p class="eyebrow rv">하루의 흐름</p>
     <h2 class="rv">둘 다 쓰는 김 책임의 하루</h2>
-    <p class="lead rv">두 서비스를 모두 운영하면 하루가 이렇게 나뉩니다. 시간을 눌러 보세요.</p>
+    <p class="lead rv">파란색은 AX for Works, 주황색은 Copilot입니다. 하루 동안 둘을 번갈아 씁니다. 시간을 눌러 보세요.</p>
     <div class="day rv">
-      <div class="track" id="track"><div class="prog" id="prog"></div></div>
+      <div class="lanes" id="lanes"><div class="band b1"></div><div class="band b2"></div><svg class="lane-svg" id="laneSvg" aria-hidden="true"><polyline class="base"/><polyline class="done"/></svg><div class="lane-l la">AX for Works</div><div class="lane-l lc">Copilot</div></div>
       <div class="day-detail" id="dayDetail"></div>
     </div>
   </div>
@@ -770,40 +786,63 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:13px}
   });
   show(0);
 
-  /* day timeline */
+  /* day: two-lane timeline */
   var day = [
-    ['08:50','브리핑','ax','WiaAssist','밤새 온 메일과 Teams 대화에서 오늘 챙길 일을 업무 보드로 확인합니다. 답장이 필요한 메일 세 건과 오후 회의 일정이 올라와 있습니다.'],
-    ['09:20','답장','cp','Outlook의 Copilot','답장이 필요한 메일을 열고 Copilot에게 초안을 요청합니다. 긴 스레드는 요약부터 봅니다.'],
-    ['10:00','대면 회의','ax','WiaMeet','회의실에서 협력사와 회의합니다. 녹음을 올리면 화자별 발언과 결정 사항이 담긴 회의록이 팀 라운지에 남습니다.'],
-    ['13:00','Teams 회의','cp','Teams의 Copilot','해외 법인과 Teams로 회의합니다. 회의가 끝나면 Copilot 요약에서 내 할 일을 확인합니다.'],
-    ['14:30','분석','cp','Excel의 Copilot','품질 데이터 파일에서 이상값과 추세를 묻고, 제안된 차트를 보고서에 넣습니다.'],
-    ['16:00','주간보고','ax','WiaReport','이번 주 과제별 실적과 이슈, 다음 주 계획을 입력합니다. 팀장은 작성 현황을 한 화면에서 봅니다.'],
-    ['17:30','뉴스레터','ax','WiaNews','매주 금요일에 도착하는 기술 뉴스레터를 읽습니다. 팀원들도 같은 뉴스레터를 받습니다.']
+    ['08:50','ax','WiaAssist','WiaAssist','밤새 온 메일과 Teams 대화에서 오늘 챙길 일을 업무 보드로 확인합니다. 답장이 필요한 메일 세 건과 오전 회의 일정이 올라와 있습니다.',0],
+    ['09:20','cp','Outlook','Outlook의 Copilot','답장이 필요한 메일을 열고 Copilot에게 초안을 요청합니다. 긴 스레드는 요약부터 봅니다.',0],
+    ['10:00','ax','WiaMeet','WiaMeet','회의실에서 협력사와 회의합니다. 녹음을 올리면 화자별 발언과 결정 사항이 담긴 회의록이 팀 라운지에 남습니다.',0],
+    ['11:00','cp','Outlook','Outlook의 Copilot','방금 만든 회의록을 붙여 넣고 Copilot에게 참석자 공유 메일을 요청합니다. 결정 사항과 담당자가 정리된 메일이 나옵니다.',1],
+    ['13:00','cp','Teams','Teams의 Copilot','해외 법인과 Teams로 회의합니다. 회의가 끝나면 Copilot 요약에서 내 할 일을 확인합니다.',0],
+    ['14:30','cp','Excel','Excel의 Copilot','품질 데이터 파일에서 추세와 이상값을 묻고, 제안된 차트를 확인합니다.',0],
+    ['15:30','ax','WiaCoding','WiaCoding','방금 한 분석을 매주 자동으로 돌리고 싶습니다. WiaCoding에서 질문에 답하며 개발 프롬프트로 정리합니다.',1],
+    ['16:30','ax','WiaReport','WiaReport','이번 주 과제별 실적과 이슈, 다음 주 계획을 입력합니다. 팀장은 작성 현황을 한 화면에서 봅니다.',0],
+    ['17:30','ax','WiaNews','WiaNews','금요일마다 도착하는 기술 뉴스레터를 읽습니다. 팀원들도 같은 뉴스레터를 받습니다.',0]
   ];
-  var track = $('track'), prog = $('prog'), dd = $('dayDetail'), di = 0, timer;
+  var lanes = $('lanes'), lsvg = $('laneSvg'), dd = $('dayDetail'), di = 0, timer, stops = [], lts = [], chains = [];
+  var NS = 'http://www.w3.org/2000/svg', pBase = lsvg.querySelector('.base'), pDone = lsvg.querySelector('.done');
+  function drawLanes(){
+    if (!lsvg.getBoundingClientRect().width) return;
+    var r = lanes.getBoundingClientRect(), c = stops.map(function(b){
+      var d = b.firstChild.getBoundingClientRect(); return [d.left + d.width / 2 - r.left, d.top + d.height / 2 - r.top];
+    });
+    lsvg.setAttribute('viewBox', '0 0 ' + r.width + ' ' + r.height);
+    pBase.setAttribute('points', c.map(function(p){ return p.join(','); }).join(' '));
+    pDone.setAttribute('points', c.slice(0, di + 1).map(function(p){ return p.join(','); }).join(' '));
+    chains.forEach(function(ch){
+      var a = c[ch.k - 1], b = c[ch.k];
+      ch.line.setAttribute('x1', a[0]); ch.line.setAttribute('y1', a[1]); ch.line.setAttribute('x2', b[0]); ch.line.setAttribute('y2', b[1]);
+      ch.label.style.left = (a[0] + b[0]) / 2 + 'px'; ch.label.style.top = (a[1] + b[1]) / 2 + 'px';
+      ch.line.classList.toggle('on', di >= ch.k); ch.label.classList.toggle('on', di >= ch.k);
+    });
+  }
   function setDay(i){
     di = i;
-    track.querySelectorAll('.stop').forEach(function(b, j){
-      b.classList.toggle('done', j < i); b.classList.toggle('now', j === i);
-    });
-    prog.style.width = ((i + .5) / day.length * 100) + '%';
-    var d = day[i];
-    dd.innerHTML = '';
-    var tag = document.createElement('span'); tag.className = 'tag ' + d[2];
-    tag.textContent = d[2] === 'ax' ? 'AX for Works' : 'Copilot';
+    stops.forEach(function(b, j){ b.classList.toggle('done', j < i); b.classList.toggle('now', j === i); lts[j].classList.toggle('now', j === i); });
+    var d = day[i]; dd.innerHTML = '';
+    var tag = document.createElement('span'); tag.className = 'tag ' + d[1]; tag.textContent = d[1] === 'ax' ? 'AX for Works' : 'Copilot';
+    dd.appendChild(tag);
+    if (d[5]){ var t2 = document.createElement('span'); t2.className = 'tag both'; t2.textContent = '앞 단계에서 이어 쓰기'; dd.appendChild(t2); }
     var h = document.createElement('h3'); h.textContent = d[0] + ' · ' + d[3];
     var p = document.createElement('p'); p.textContent = d[4];
-    dd.append(tag, h, p);
+    dd.append(h, p);
     dd.classList.remove('swap'); void dd.offsetWidth; dd.classList.add('swap');
+    drawLanes();
   }
   day.forEach(function(d, i){
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'stop t-' + d[2];
-    var dot = document.createElement('i'), t = document.createElement('span'), s = document.createElement('small');
-    t.textContent = d[0]; s.textContent = d[1]; b.append(dot, t, s);
+    var lt = document.createElement('div'); lt.className = 'lt'; lt.style.gridColumn = i + 2; lt.textContent = d[0]; lanes.appendChild(lt); lts.push(lt);
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'stop t-' + d[1]; b.style.gridColumn = i + 2;
+    var dot = document.createElement('i'), sm = document.createElement('small'), nm = document.createElement('span');
+    sm.textContent = d[0]; nm.textContent = d[2]; b.append(dot, sm, nm);
     b.addEventListener('click', function(){ clearInterval(timer); setDay(i); });
-    track.appendChild(b);
+    lanes.appendChild(b); stops.push(b);
+    if (d[5]){
+      var line = document.createElementNS(NS, 'line'); lsvg.appendChild(line);
+      var lab = document.createElement('div'); lab.className = 'chain-l'; lab.textContent = '이어 쓰기'; lanes.appendChild(lab);
+      chains.push({k:i, line:line, label:lab});
+    }
   });
   setDay(0);
+  window.addEventListener('resize', drawLanes); window.addEventListener('load', drawLanes);
   if(!reduce){ timer = setInterval(function(){ setDay((di + 1) % day.length); }, 3200); }
 })();
 </script>
