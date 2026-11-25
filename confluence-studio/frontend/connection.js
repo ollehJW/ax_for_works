@@ -183,7 +183,7 @@ function pageNode(page, spaceKey) {
   radio.type = 'radio';
   radio.name = 'parent-page';
   radio.value = page.id;
-  label.append(radio, document.createTextNode(page.title));
+  label.append(document.createTextNode(page.title), radio);
   row.append(label);
   node.append(row);
   radio.addEventListener('change', () => {

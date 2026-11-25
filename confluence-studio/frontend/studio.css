@@ -213,8 +213,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .page-row { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; border-radius: 6px; }
 .page-row:hover { background: #f3f7fc; }
 .page-row:has(input:checked) { background: #e9f1ff; color: #234e89; }
-.page-row label { display: flex; align-items: baseline; gap: 7px; margin: 0; padding: 6px 4px; font: inherit; line-height: 1.5; cursor: pointer; overflow-wrap: anywhere; }
-.page-row input { appearance: auto; flex: none; width: 13px; height: 13px; margin: 0; padding: 0; accent-color: #315d9f; }
+.page-row label { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 7px; margin: 0; padding: 6px 4px; font: inherit; line-height: 1.5; cursor: pointer; overflow-wrap: anywhere; }
+.page-row input { appearance: auto; grid-column: 2; font: inherit; width: 1.05em; height: 1.05em; margin: .225em 0 0; padding: 0; accent-color: #315d9f; }
 .page-row label:has(:focus-visible) { outline: 2px solid #527cb2; border-radius: 4px; }
 #page-tree button { padding: 6px 10px; background: #edf3fb; color: #345781; }
 #page-tree .tree-toggle { display: grid; place-items: center; height: 33px; padding: 0; background: transparent; }
