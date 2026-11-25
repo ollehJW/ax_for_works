@@ -300,12 +300,12 @@ el('logout').addEventListener('click', async () => {
 });
 
 const sourceFormats = [
-  { label: 'DOCX', extensions: ['docx'], recommended: true, note: '문서에 삽입한 그림과 스크린샷은 텍스트 추출에서 제외됩니다.' },
-  { label: 'MD', extensions: ['md'], recommended: true, note: '이미지 링크에 연결된 파일의 내용은 읽지 않습니다.' },
-  { label: 'HTML', extensions: ['html', 'htm'], note: '본문에 포함되거나 링크된 이미지는 읽지 않습니다.' },
-  { label: 'Excel', extensions: ['xlsx'], note: '셀에 넣은 이미지와 차트의 시각적 내용은 읽지 않습니다.' },
-  { label: 'PDF', extensions: ['pdf'], note: '이미지 속 글자는 읽지 않습니다. 스캔 PDF는 텍스트 추출이 필요합니다.' },
-  { label: 'PPTX', extensions: ['pptx'], note: '슬라이드의 그림과 스크린샷 속 글자는 읽지 않습니다.' },
+  { label: 'DOCX', extensions: ['docx'], recommended: true, note: '문서 안에 그림을 삽입하면 DOCX 파일에 이미지 원본도 포함됩니다.' },
+  { label: 'MD', extensions: ['md'], recommended: true, note: '이미지 주소만 적은 경우 MD 파일에는 그림이 포함되지 않습니다. 상대 경로 이미지는 원본 파일이 필요합니다.' },
+  { label: 'HTML', extensions: ['html', 'htm'], note: '이미지를 data: URL로 넣으면 HTML 한 파일에 담을 수 있습니다. 파일 경로나 웹 주소로 연결했다면 해당 원본이 필요합니다.' },
+  { label: 'Excel', extensions: ['xlsx'], note: '통합 문서에 삽입한 그림은 XLSX 파일에 포함됩니다. 차트는 셀 데이터로 그리는 별도 개체일 수 있습니다.' },
+  { label: 'PDF', extensions: ['pdf'], note: 'PDF에 포함된 이미지는 추출할 수 있습니다. 텍스트 층이 없는 스캔본에서 글자를 얻으려면 문자 인식(OCR)이 필요합니다.' },
+  { label: 'PPTX', extensions: ['pptx'], note: '슬라이드에 삽입한 그림은 PPTX 파일에 포함됩니다. 외부 파일로 연결한 그림은 원본이 필요합니다.' },
 ];
 let sourceFile = null;
 const sourceInput = el('source-input');
