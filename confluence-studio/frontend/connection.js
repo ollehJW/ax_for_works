@@ -307,86 +307,75 @@ const sourceFormats = [
   { label: 'PDF', extensions: ['pdf'], note: '이미지 속 글자는 읽지 않습니다. 스캔 PDF는 텍스트 추출이 필요합니다.' },
   { label: 'PPTX', extensions: ['pptx'], note: '슬라이드의 그림과 스크린샷 속 글자는 읽지 않습니다.' },
 ];
-const sources = [];
-let pickedFormat = null;
+let sourceFile = null;
 const sourceInput = el('source-input');
-function renderSources() {
-  el('source-files').replaceChildren(...sources.map(entry => {
-    const item = document.createElement('li');
-    const name = document.createElement('span');
-    name.textContent = entry.file.name;
-    name.title = entry.file.name;
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.textContent = '삭제';
-    remove.setAttribute('aria-label', entry.file.name + ' 삭제');
-    remove.addEventListener('click', () => {
-      sources.splice(sources.indexOf(entry), 1);
-      pickedFormat = null;
-      renderSources();
-    });
-    item.append(name, remove);
-    return item;
-  }));
-  const formats = new Set(sources.map(entry => entry.format));
-  if (pickedFormat) formats.add(pickedFormat);
-  el('source-warning').hidden = !formats.size;
-  el('source-warning').querySelector('ul').replaceChildren(...Array.from(formats, format => {
-    const li = document.createElement('li');
-    li.textContent = format.label + ' · ' + format.note;
-    return li;
-  }));
+sourceInput.accept = sourceFormats.flatMap(format => format.extensions.map(ext => '.' + ext)).join(',');
+
+function showFormat(format) {
+  for (const button of el('source-formats').children) {
+    button.setAttribute('aria-pressed', String(button.dataset.format === format?.label));
+  }
+  el('source-warning').hidden = !format;
+  el('source-warning').querySelector('p').textContent = format ? format.label + ' · ' + format.note : '';
 }
+
 function clearSources() {
-  sources.length = 0;
-  pickedFormat = null;
+  sourceFile = null;
   sourceInput.value = '';
   el('source-error').textContent = '';
-  renderSources();
+  el('source-name').textContent = '';
+  el('source-files').hidden = true;
+  el('source-drop').querySelector('strong').textContent = '파일 추가';
+  showFormat(null);
 }
-function chooseFiles(format) {
-  pickedFormat = format;
-  sourceInput.accept = (format ? [format] : sourceFormats).flatMap(f => f.extensions.map(ext => '.' + ext)).join(',');
-  renderSources();
-  sourceInput.click();
-}
+
+el('source-remove').addEventListener('click', clearSources);
 for (const format of sourceFormats) {
   const button = document.createElement('button');
   button.type = 'button';
   button.textContent = format.label;
-  button.title = format.extensions.map(ext => '.' + ext).join(', ') + ' 파일 추가';
+  button.title = format.extensions.map(ext => '.' + ext).join(', ') + ' 이미지 처리 안내';
+  button.dataset.format = format.label;
+  button.setAttribute('aria-pressed', 'false');
   if (format.recommended) {
     const badge = document.createElement('small');
     badge.textContent = '추천';
     button.append(badge);
   }
-  button.addEventListener('click', () => chooseFiles(format));
+  button.addEventListener('click', () => showFormat(format));
   el('source-formats').append(button);
 }
-function addSources(files) {
-  const rejected = [];
-  for (const file of files) {
-    const ext = /\.([^.]+)$/.exec(file.name)?.[1].toLowerCase();
-    const format = sourceFormats.find(f => f.extensions.includes(ext));
-    if (!format) rejected.push(file.name);
-    else if (!sources.some(s => s.file.name === file.name && s.file.size === file.size && s.file.lastModified === file.lastModified)) {
-      sources.push({ file, format });
-    }
+function attachSource(files) {
+  if (!files.length) return;
+  if (files.length > 1) {
+    el('source-error').textContent = '문서 한 개만 첨부할 수 있습니다.';
+    return;
   }
-  pickedFormat = null;
-  el('source-error').textContent = rejected.length ? '지원하지 않는 형식 · ' + rejected.join(', ') : '';
-  renderSources();
+  const file = files[0];
+  const ext = /\.([^.]+)$/.exec(file.name)?.[1].toLowerCase();
+  const format = sourceFormats.find(item => item.extensions.includes(ext));
+  if (!format) {
+    el('source-error').textContent = '지원하지 않는 형식 · ' + file.name;
+    return;
+  }
+  sourceFile = file;
+  el('source-name').textContent = sourceFile.name;
+  el('source-remove').setAttribute('aria-label', sourceFile.name + ' 삭제');
+  el('source-files').hidden = false;
+  el('source-drop').querySelector('strong').textContent = '파일 교체';
+  el('source-error').textContent = '';
+  showFormat(format);
 }
 sourceInput.addEventListener('change', () => {
-  addSources(sourceInput.files);
+  attachSource(sourceInput.files);
   sourceInput.value = '';
 });
 const drop = el('source-drop');
-drop.addEventListener('click', () => chooseFiles(null));
+drop.addEventListener('click', () => sourceInput.click());
 drop.addEventListener('dragover', event => { event.preventDefault(); drop.classList.add('dragging'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
 drop.addEventListener('drop', event => {
   event.preventDefault();
   drop.classList.remove('dragging');
-  addSources(event.dataTransfer.files);
+  attachSource(event.dataTransfer.files);
 });

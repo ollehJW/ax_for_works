@@ -237,7 +237,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .ax-account button:focus-visible{outline:2px solid #83b4ff;outline-offset:3px}
 #logout-status { font-size: 12px; }
 
-#compose-columns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; gap: 14px; }
+#compose-columns { display: grid; grid-template-columns: minmax(0, 25%); align-items: start; gap: 14px; }
 .source-panel { min-width: 0; padding: 18px; border: 1px solid #d9e3f0; border-radius: 14px; background: white; box-shadow: 0 4px 14px #244a8110; font: 500 14px/1.55 "Studio Pretendard", "Malgun Gothic", sans-serif; }
 .source-panel h2 { font-size: 16px; margin: 0; }
 .source-panel > p { color: #526983; font-size: 13px; margin: 4px 0 12px; overflow-wrap: anywhere; }
@@ -252,6 +252,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #source-files span { min-width: 0; overflow-wrap: anywhere; }
 #source-files button { flex: none; padding: 2px 6px; }
 #source-warning { margin-top: 12px; padding: 10px; border-radius: 7px; background: #fff7e8; color: #704f1c; font-size: 12px; }
-#source-warning ul { margin: 4px 0 0; padding-left: 15px; }
+#source-warning p { margin: 4px 0 0; }
+#source-formats button[aria-pressed="true"] { background: #e7f0fc; border-color: #7296cb; }
 .source-panel #source-error:empty { margin: 0; }
 @media (max-width: 700px) { #compose-columns { grid-template-columns: minmax(0, 1fr); } }
