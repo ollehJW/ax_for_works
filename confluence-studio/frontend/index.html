@@ -114,21 +114,36 @@
           <p id="verified"></p>
           <button id="replace" type="button">토큰 변경</button>
         </section>
-        <section id="compose-panel" hidden aria-label="페이지 작성 위치">
-          <label for="compose-space">스페이스 선택</label>
-          <div class="space-picker">
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            <select id="compose-space"></select>
-          </div>
-          <section id="tree-panel" hidden aria-labelledby="tree-heading">
-            <h2 id="tree-heading">페이지 트리</h2>
-            <div class="parent-guide">
-              <strong>상위 페이지를 선택하세요</strong>
-              <p>선택한 페이지 바로 아래에 새 페이지가 작성됩니다.</p>
+        <div id="compose-columns" hidden>
+          <section id="compose-panel" aria-label="페이지 작성 위치">
+            <label for="compose-space">스페이스 선택</label>
+            <div class="space-picker">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              <select id="compose-space"></select>
             </div>
-            <div id="page-tree" role="group" aria-label="상위 페이지 선택"></div>
+            <section id="tree-panel" hidden aria-labelledby="tree-heading">
+              <h2 id="tree-heading">페이지 트리</h2>
+              <div class="parent-guide">
+                <strong>상위 페이지를 선택하세요</strong>
+                <p>선택한 페이지 바로 아래에 새 페이지가 작성됩니다.</p>
+              </div>
+              <div id="page-tree" role="group" aria-label="상위 페이지 선택"></div>
+            </section>
           </section>
-        </section>
+          <section class="source-panel" aria-labelledby="source-title">
+            <h2 id="source-title">작성 자료</h2>
+            <p>초안에 사용할 문서 형식을 선택하세요.</p>
+            <div id="source-formats" aria-label="파일 형식"></div>
+            <button type="button" id="source-drop"><strong>파일 추가</strong><span>여기에 문서를 끌어다 놓으세요</span></button>
+            <input type="file" id="source-input" multiple hidden>
+            <p id="source-error" role="status"></p>
+            <ul id="source-files" aria-label="첨부한 파일"></ul>
+            <aside id="source-warning" hidden aria-live="polite">
+              <strong>이미지 처리 주의</strong>
+              <ul></ul>
+            </aside>
+          </section>
+        </div>
       </main>
     </div>
   </div>

@@ -23,6 +23,7 @@ function screen(state, result = {}) {
   reveal(false);
   if (connected) {
     loadPlatformAccount();
+    clearSources();
     showCompose(false);
     spaces = result.spaces || [];
     renderSpaces();
@@ -154,7 +155,7 @@ function showCompose(active) {
   document.title = menu + ' · Confluence Studio';
   el('registration-card').hidden = active;
   el('account-card').hidden = active;
-  el('compose-panel').hidden = !active;
+  el('compose-columns').hidden = !active;
   el('tree-panel').hidden = true;
   el('page-tree').replaceChildren();
   if (active) {
@@ -296,4 +297,96 @@ el('logout').addEventListener('click', async () => {
     el('logout-status').textContent = '로그아웃하지 못했습니다. 다시 시도해 주세요.';
     el('logout').disabled = false;
   }
+});
+
+const sourceFormats = [
+  { label: 'DOCX', extensions: ['docx'], recommended: true, note: '문서에 삽입한 그림과 스크린샷은 텍스트 추출에서 제외됩니다.' },
+  { label: 'MD', extensions: ['md'], recommended: true, note: '이미지 링크에 연결된 파일의 내용은 읽지 않습니다.' },
+  { label: 'HTML', extensions: ['html', 'htm'], note: '본문에 포함되거나 링크된 이미지는 읽지 않습니다.' },
+  { label: 'Excel', extensions: ['xlsx'], note: '셀에 넣은 이미지와 차트의 시각적 내용은 읽지 않습니다.' },
+  { label: 'PDF', extensions: ['pdf'], note: '이미지 속 글자는 읽지 않습니다. 스캔 PDF는 텍스트 추출이 필요합니다.' },
+  { label: 'PPTX', extensions: ['pptx'], note: '슬라이드의 그림과 스크린샷 속 글자는 읽지 않습니다.' },
+];
+const sources = [];
+let pickedFormat = null;
+const sourceInput = el('source-input');
+function renderSources() {
+  el('source-files').replaceChildren(...sources.map(entry => {
+    const item = document.createElement('li');
+    const name = document.createElement('span');
+    name.textContent = entry.file.name;
+    name.title = entry.file.name;
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.textContent = '삭제';
+    remove.setAttribute('aria-label', entry.file.name + ' 삭제');
+    remove.addEventListener('click', () => {
+      sources.splice(sources.indexOf(entry), 1);
+      pickedFormat = null;
+      renderSources();
+    });
+    item.append(name, remove);
+    return item;
+  }));
+  const formats = new Set(sources.map(entry => entry.format));
+  if (pickedFormat) formats.add(pickedFormat);
+  el('source-warning').hidden = !formats.size;
+  el('source-warning').querySelector('ul').replaceChildren(...Array.from(formats, format => {
+    const li = document.createElement('li');
+    li.textContent = format.label + ' · ' + format.note;
+    return li;
+  }));
+}
+function clearSources() {
+  sources.length = 0;
+  pickedFormat = null;
+  sourceInput.value = '';
+  el('source-error').textContent = '';
+  renderSources();
+}
+function chooseFiles(format) {
+  pickedFormat = format;
+  sourceInput.accept = (format ? [format] : sourceFormats).flatMap(f => f.extensions.map(ext => '.' + ext)).join(',');
+  renderSources();
+  sourceInput.click();
+}
+for (const format of sourceFormats) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = format.label;
+  button.title = format.extensions.map(ext => '.' + ext).join(', ') + ' 파일 추가';
+  if (format.recommended) {
+    const badge = document.createElement('small');
+    badge.textContent = '추천';
+    button.append(badge);
+  }
+  button.addEventListener('click', () => chooseFiles(format));
+  el('source-formats').append(button);
+}
+function addSources(files) {
+  const rejected = [];
+  for (const file of files) {
+    const ext = /\.([^.]+)$/.exec(file.name)?.[1].toLowerCase();
+    const format = sourceFormats.find(f => f.extensions.includes(ext));
+    if (!format) rejected.push(file.name);
+    else if (!sources.some(s => s.file.name === file.name && s.file.size === file.size && s.file.lastModified === file.lastModified)) {
+      sources.push({ file, format });
+    }
+  }
+  pickedFormat = null;
+  el('source-error').textContent = rejected.length ? '지원하지 않는 형식 · ' + rejected.join(', ') : '';
+  renderSources();
+}
+sourceInput.addEventListener('change', () => {
+  addSources(sourceInput.files);
+  sourceInput.value = '';
+});
+const drop = el('source-drop');
+drop.addEventListener('click', () => chooseFiles(null));
+drop.addEventListener('dragover', event => { event.preventDefault(); drop.classList.add('dragging'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
+drop.addEventListener('drop', event => {
+  event.preventDefault();
+  drop.classList.remove('dragging');
+  addSources(event.dataTransfer.files);
 });
