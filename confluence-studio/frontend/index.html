@@ -33,16 +33,19 @@
       <div class="connect">
         <h2 id="form-title">Confluence 계정 연결</h2>
         <p id="description">개인 Access Token을 입력해 계정을 연결하세요.</p>
-        <form id="token-form" novalidate>
+        <form id="token-form" hidden novalidate>
           <label for="token">Confluence Access Token</label>
           <div class="field">
-            <input id="token" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" required placeholder="Access Token 입력" aria-describedby="preview-note message">
+            <input id="token" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" required placeholder="Access Token 입력" aria-describedby="token-note message">
             <button class="visibility" id="visibility" type="button" aria-controls="token" aria-label="토큰 표시" aria-pressed="false">표시</button>
           </div>
-          <p id="message" role="status" aria-live="polite"></p>
           <button class="primary" id="submit" type="submit">연결 확인</button>
-          <p id="preview-note">화면 미리보기입니다. 실제 토큰 대신 예시 값을 입력하세요.</p>
+          <p id="token-note">확인된 토큰은 로그인한 계정에 암호화해 저장합니다.</p>
         </form>
+        <p id="message" role="status" aria-live="polite">연결 정보를 확인하고 있습니다.</p>
+        <a id="login" href="/login" target="_blank" rel="noopener" hidden>AX for Works 로그인</a>
+        <button class="primary" id="retry" type="button" hidden>다시 확인</button>
+        <button class="primary" id="replace" type="button" hidden>토큰 변경</button>
       </div>
     </section>
   </main>
