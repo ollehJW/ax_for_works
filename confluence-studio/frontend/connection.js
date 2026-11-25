@@ -15,22 +15,30 @@ function reveal(visible) {
   visibility.setAttribute('aria-pressed', String(visible));
 }
 function screen(state, result = {}) {
-  form.hidden = !['missing', 'invalid', 'replace'].includes(state);
-  el('retry').hidden = state !== 'error';
-  el('replace').hidden = state !== 'connected';
+  const connected = state === 'connected';
+  el('setup').hidden = connected;
+  el('workspace').hidden = !connected;
+  document.title = connected ? 'Confluence Studio' : '계정 연결 · Confluence Studio';
   field.value = '';
   reveal(false);
+  if (connected) {
+    el('profile-name').textContent = result.display_name;
+    el('verified').textContent = '최근 확인 ' + new Date(result.last_verified_at).toLocaleString('ko-KR');
+    el('workspace-title').focus();
+    return;
+  }
+  form.hidden = !['missing', 'invalid', 'replace'].includes(state);
+  el('retry').hidden = state !== 'error';
   field.setAttribute('aria-invalid', String(state === 'invalid'));
   el('form-title').textContent = ({
-    connected: 'Confluence 연결 완료', invalid: 'Confluence 계정 다시 연결', replace: 'Access Token 변경',
+    invalid: 'Confluence 계정 다시 연결', replace: 'Access Token 변경',
   })[state] || 'Confluence 계정 연결';
   el('description').textContent = ({
-    connected: result.display_name + ' 계정으로 연결되었습니다.',
     error: '연결 상태를 확인하지 못했습니다.',
     loading: '저장된 연결 정보를 확인하고 있습니다.',
   })[state] || '개인 Access Token을 입력해 계정을 연결하세요.';
   notice(state === 'invalid' ? '기존 토큰이 만료되었거나 유효하지 않습니다.'
-    : state === 'connected' ? '최근 확인 ' + new Date(result.last_verified_at).toLocaleString('ko-KR')
+
     : result.detail || '', state === 'invalid' || state === 'error');
 }
 let busy = false;
