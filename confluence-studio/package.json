@@ -1,0 +1,11 @@
+{
+  "name": "confluence-studio",
+  "private": true,
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "config": {
+    "frontend_port": 1008,
+    "backend_port": 1018
+  }
+}
