@@ -22,6 +22,7 @@ function screen(state, result = {}) {
   field.value = '';
   reveal(false);
   if (connected) {
+    loadPlatformAccount();
     showCompose(false);
     spaces = result.spaces || [];
     renderSpaces();
@@ -74,9 +75,7 @@ async function check(save = false) {
     const result = await response.json().catch(() => ({}));
     if (response.ok) screen(result.state, result);
     else if (response.status === 401 || (!save && response.status === 403)) {
-      const login = window.location.pathname.startsWith('/confluencestudio/')
-        ? '/login?next=%2Fconfluencestudio%2F' : '/login';
-      window.location.replace(login);
+      goToLogin();
     } else if (save && response.status === 422) {
       screen('invalid');
       notice(result.detail || '새 토큰을 입력해 주세요.', true);
@@ -149,7 +148,10 @@ function showCompose(active) {
     if (current) el(id).setAttribute('aria-current', 'page');
     else el(id).removeAttribute('aria-current');
   }
-  el('workspace-title').textContent = active ? '페이지 작성' : '스페이스 등록';
+  const menu = el(active ? 'compose-menu' : 'spaces-menu').textContent;
+  el('workspace-title').textContent = menu;
+  el('breadcrumb-menu').textContent = menu;
+  document.title = menu + ' · Confluence Studio';
   el('registration-card').hidden = active;
   el('account-card').hidden = active;
   el('compose-panel').hidden = !active;
@@ -236,4 +238,41 @@ el('compose-space').addEventListener('change', event => {
   el('page-tree').replaceChildren(root);
   el('tree-panel').hidden = !key;
   if (key) loadBranch(root, key);
+});
+
+function goToLogin() {
+  window.location.replace(window.location.pathname.startsWith('/confluencestudio/')
+    ? '/login?next=%2Fconfluencestudio%2F' : '/login');
+}
+
+async function loadPlatformAccount() {
+  const name = el('account-name');
+  const team = el('account-team');
+  name.textContent = '계정 확인 중';
+  team.textContent = '';
+  try {
+    const response = await fetch('/api/auth/me', { cache: 'no-store' });
+    if (response.status === 401) return goToLogin();
+    if (!response.ok) throw new Error();
+    const user = await response.json();
+    name.textContent = name.title = user.full_name || '사용자';
+    team.textContent = team.title = user.team_name && user.team_name !== '미지정' ? user.team_name : '소속 팀 미지정';
+  } catch {
+    name.textContent = '계정 정보를 불러오지 못했습니다.';
+  }
+}
+
+el('logout').addEventListener('click', async () => {
+  el('logout').disabled = true;
+  el('logout-status').textContent = '';
+  try {
+    const response = await fetch('/api/auth/logout', {
+      method: 'POST', headers: { 'X-AX-Request': '1', 'Content-Type': 'application/json' }, body: '{}',
+    });
+    if (!response.ok && response.status !== 401) throw new Error();
+    goToLogin();
+  } catch {
+    el('logout-status').textContent = '로그아웃하지 못했습니다. 다시 시도해 주세요.';
+    el('logout').disabled = false;
+  }
 });

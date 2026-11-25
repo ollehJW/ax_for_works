@@ -73,10 +73,19 @@
         <button type="button" disabled>문서 템플릿</button>
         <button type="button" disabled>작업 기록</button>
       </nav>
+      <div class="ax-account">
+        <div class="ax-account__identity">
+          <span class="ax-account__avatar" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></span>
+          <span class="ax-account__text"><strong id="account-name"></strong><small id="account-team"></small></span>
+          <span class="ax-account__online" aria-hidden="true"></span>
+        </div>
+        <button class="ax-account__logout" id="logout" type="button"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></svg>로그아웃</button>
+        <span id="logout-status" role="status"></span>
+      </div>
     </aside>
     <div class="workspace-body">
       <header class="workspace-header">
-        <nav aria-label="현재 위치"><a href="/">AX for Works</a><span aria-hidden="true">›</span><strong aria-current="page">Confluence Studio</strong></nav>
+        <nav aria-label="현재 위치"><a href="/">AX for Works</a><span aria-hidden="true">›</span><span>Confluence Studio</span><span aria-hidden="true">›</span><strong id="breadcrumb-menu" aria-current="page">스페이스 등록</strong></nav>
         <a class="return-link" href="/">← AX for Works로 돌아가기</a>
       </header>
       <main class="workspace-content">
