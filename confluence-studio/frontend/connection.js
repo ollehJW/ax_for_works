@@ -22,6 +22,7 @@ function screen(state, result = {}) {
   field.value = '';
   reveal(false);
   if (connected) {
+    showCompose(false);
     spaces = result.spaces || [];
     renderSpaces();
     el('space-form').reset();
@@ -108,7 +109,8 @@ function renderSpaces() {
     return item;
   }));
 }
-el('spaces-menu').addEventListener('click', () => el('space-key').focus());
+el('spaces-menu').addEventListener('click', () => showCompose(false));
+el('compose-menu').addEventListener('click', () => showCompose(true));
 el('space-form').addEventListener('submit', async event => {
   event.preventDefault();
   const button = event.submitter || el('space-form').querySelector('button');
@@ -140,4 +142,80 @@ el('space-form').addEventListener('submit', async event => {
   } finally {
     button.disabled = false;
   }
+});
+
+function showCompose(active) {
+  for (const [id, current] of [['compose-menu', active], ['spaces-menu', !active]]) {
+    if (current) el(id).setAttribute('aria-current', 'page');
+    else el(id).removeAttribute('aria-current');
+  }
+  el('workspace-title').textContent = active ? '페이지 작성' : '스페이스 등록';
+  el('registration-card').hidden = active;
+  el('account-card').hidden = active;
+  el('compose-panel').hidden = !active;
+  el('tree-panel').hidden = true;
+  el('page-tree').replaceChildren();
+  if (active) {
+    el('compose-space').replaceChildren(
+      new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
+      ...spaces.map(space => new Option(space.name + ' (' + space.space_key + ')', space.space_key)),
+    );
+    el('compose-space').disabled = !spaces.length;
+  }
+}
+
+async function loadBranch(container, spaceKey, parentId = null, start = 0) {
+  const status = document.createElement('p');
+  status.setAttribute('role', 'status');
+  status.textContent = '페이지를 불러오는 중입니다.';
+  container.append(status);
+  function action(label, offset) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = label;
+    button.addEventListener('click', () => {
+      button.remove();
+      status.remove();
+      loadBranch(container, spaceKey, parentId, offset);
+    });
+    container.append(button);
+  }
+  try {
+    const response = await fetch('./api/pages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Studio-Request': '1' },
+      body: JSON.stringify({ space_key: spaceKey, parent_id: parentId, start }),
+    });
+    if (!container.isConnected) return;
+    if (response.status === 401 || response.status === 409) {
+      await check();
+      return;
+    }
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || '페이지 조회에 실패했습니다.');
+    if (data.pages.length || start) status.remove();
+    else status.textContent = parentId ? '하위 페이지가 없습니다.' : '표시할 페이지가 없습니다.';
+    for (const page of data.pages) {
+      const branch = document.createElement('details');
+      const title = document.createElement('summary');
+      title.textContent = page.title;
+      branch.append(title);
+      const children = document.createElement('div');
+      branch.append(children);
+      branch.addEventListener('toggle', () => {
+        if (branch.open && !children.childElementCount) loadBranch(children, spaceKey, page.id);
+      });
+      container.append(branch);
+    }
+    if (data.next_start != null) action('더 보기', data.next_start);
+  } catch (error) {
+    status.textContent = error instanceof TypeError ? '서비스에 연결할 수 없습니다.' : error.message;
+    action('다시 시도', start);
+  }
+}
+el('compose-space').addEventListener('change', event => {
+  const key = event.target.value;
+  const root = document.createElement('div');
+  el('page-tree').replaceChildren(root);
+  el('tree-panel').hidden = !key;
+  if (key) loadBranch(root, key);
 });

@@ -68,7 +68,7 @@
       <div class="studio-brand"><span class="brand-mark" aria-hidden="true"></span>Confluence Studio</div>
       <nav class="studio-menu" aria-label="주요 메뉴">
         <button type="button" id="spaces-menu" aria-current="page">스페이스 등록</button>
-        <button type="button" disabled>페이지 작성</button>
+        <button type="button" id="compose-menu">페이지 작성</button>
         <button type="button" disabled>페이지 편집</button>
         <button type="button" disabled>문서 템플릿</button>
         <button type="button" disabled>작업 기록</button>
@@ -81,7 +81,7 @@
       </header>
       <main class="workspace-content">
         <h1 id="workspace-title" tabindex="-1">스페이스 등록</h1>
-        <section class="profile-card spaces-card" aria-label="스페이스 등록">
+        <section id="registration-card" class="profile-card spaces-card" aria-label="스페이스 등록">
           <form id="space-form">
             <label for="space-key">스페이스 키</label>
             <p id="space-help">Confluence 주소의 /display/ 다음에 나오는 키를 입력하세요.</p>
@@ -95,11 +95,19 @@
           <ul id="space-list"></ul>
           <p id="spaces-empty">등록한 스페이스가 없습니다.</p>
         </section>
-        <section class="profile-card" aria-labelledby="profile-title">
+        <section id="account-card" class="profile-card" aria-labelledby="profile-title">
           <h2 id="profile-title">연결된 Confluence 계정</h2>
           <strong id="profile-name"></strong>
           <p id="verified"></p>
           <button id="replace" type="button">토큰 변경</button>
+        </section>
+        <section id="compose-panel" hidden aria-label="페이지 작성 위치">
+          <label for="compose-space">스페이스 선택</label>
+          <select id="compose-space"></select>
+          <section id="tree-panel" hidden aria-labelledby="tree-heading">
+            <h2 id="tree-heading">페이지 트리</h2>
+            <div id="page-tree"></div>
+          </section>
         </section>
       </main>
     </div>
