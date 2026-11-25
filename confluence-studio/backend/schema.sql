@@ -8,3 +8,11 @@ CREATE TABLE IF NOT EXISTS confluence_studio.connections (
     last_verified_at timestamptz NOT NULL DEFAULT now()
 );
 COMMENT ON COLUMN confluence_studio.connections.token IS 'Fernet-encrypted Confluence personal access token';
+
+CREATE TABLE IF NOT EXISTS confluence_studio.registered_spaces (
+    user_id text NOT NULL REFERENCES confluence_studio.connections(user_id) ON DELETE CASCADE,
+    confluence_user_key text NOT NULL,
+    space_key text NOT NULL,
+    name text NOT NULL,
+    PRIMARY KEY (user_id, confluence_user_key, space_key)
+);

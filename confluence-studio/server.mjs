@@ -29,7 +29,7 @@ createServer(async (request, response) => {
     response.writeHead(302, { Location: destination.href }).end();
     return;
   }
-  if (path === '/api/connection' && ['GET', 'POST'].includes(request.method)) {
+  if ((path === '/api/connection' || (path === '/api/spaces' && request.method === 'POST')) && ['GET', 'POST'].includes(request.method)) {
     let body;
     if (request.method === 'POST') {
       const origin = request.headers.origin;

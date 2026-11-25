@@ -136,3 +136,13 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
   .workspace-header nav { gap: 7px; }
   .workspace-content { padding: 24px 16px; }
 }
+
+.studio-menu [aria-current="page"] { background: #ffffff2b; color: white; font-weight: 600; }
+.spaces-card { margin-bottom: 20px; }
+.spaces-card p, #space-list { color: #526983; font-size: 14px; line-height: 1.6; }
+.space-entry { display: flex; gap: 8px; }
+.space-entry input { border: 1px solid #d4dfed; border-radius: 8px; }
+.space-entry input:focus { outline: 2px solid #5689ca; }
+.space-entry .primary { width: auto; min-width: 74px; margin: 0; }
+.spaces-card h2 { margin-top: 24px; }
+#space-list { padding-inline-start: 20px; }

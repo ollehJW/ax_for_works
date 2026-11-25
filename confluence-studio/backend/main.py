@@ -1,5 +1,6 @@
 import hashlib
 import os
+import re
 import ssl
 import time
 from contextlib import contextmanager
@@ -49,16 +50,27 @@ def account(request: Request):
     return row["user_id"]
 
 
-def current_profile(token):
+def decrypt_token(encrypted):
+    try:
+        return cipher().decrypt(bytes(encrypted)).decode("ascii")
+    except InvalidToken:
+        raise HTTPException(503, "저장된 토큰을 읽을 수 없습니다. 서비스 관리자에게 문의해 주세요.") from None
+
+
+def confluence_get(token, path):
     base = os.environ["CONFLUENCE_BASE_URL"].rstrip("/")
     if urlsplit(base).scheme != "https":
         raise RuntimeError("Confluence requires an HTTPS endpoint")
     try:
         with httpx.Client(verify=ssl.create_default_context(), timeout=6, follow_redirects=False) as client:
-            response = client.get(base + "/rest/api/user/current",
+            return client.get(base + path,
                                   headers={"Authorization": "Bearer " + token, "Accept": "application/json"})
     except httpx.RequestError:
         raise HTTPException(503, "Confluence에 접속할 수 없습니다. 잠시 후 다시 확인해 주세요.") from None
+
+
+def current_profile(token):
+    response = confluence_get(token, "/rest/api/user/current")
     if response.status_code in (401, 403):
         return None
     if response.status_code != 200:
@@ -86,19 +98,23 @@ async def request_checks(request, call_next):
 
 @app.exception_handler(RequestValidationError)
 async def invalid_body(request, exc):
-    return JSONResponse({"detail": "토큰 입력값을 확인해 주세요."}, status_code=422)
+    return JSONResponse({"detail": "입력값을 확인해 주세요."}, status_code=422)
 
 
 @app.get("/api/health")
 def health():
     with database() as db:
         db.execute("SELECT user_id FROM confluence_studio.connections LIMIT 0")
+        db.execute("SELECT space_key FROM confluence_studio.registered_spaces LIMIT 0")
     cipher()
     return {"ok": True}
 
 
-def connected(row):
-    return {"state": "connected", "display_name": row["display_name"],
+def connected(row, db, user_id, key):
+    spaces = db.execute("""SELECT space_key, name FROM confluence_studio.registered_spaces
+            WHERE user_id=%s AND confluence_user_key=%s ORDER BY name,space_key""",
+            (user_id, key)).fetchall()
+    return {"state": "connected", "spaces": spaces, "display_name": row["display_name"],
             "connected_date": row["connected_date"], "last_verified_at": row["last_verified_at"]}
 
 
@@ -109,10 +125,7 @@ def connection(user_id: str = Depends(account)):
                          (user_id,)).fetchone()
     if not row:
         return {"state": "missing"}
-    try:
-        token = cipher().decrypt(bytes(row["token"])).decode("ascii")
-    except InvalidToken:
-        raise HTTPException(503, "저장된 토큰을 읽을 수 없습니다. 서비스 관리자에게 문의해 주세요.") from None
+    token = decrypt_token(row["token"])
     profile = current_profile(token)
     if profile is None:
         return {"state": "invalid"}
@@ -122,9 +135,9 @@ def connection(user_id: str = Depends(account)):
                 confluence_user_key=%s,display_name=%s WHERE user_id=%s AND token=%s
                 RETURNING display_name,connected_date,last_verified_at""",
                 (key,name,user_id,row["token"])).fetchone()
-    if not latest:
-        raise HTTPException(409, "연결 정보가 변경되었습니다. 다시 확인해 주세요.")
-    return connected(latest)
+        if not latest:
+            raise HTTPException(409, "연결 정보가 변경되었습니다. 다시 확인해 주세요.")
+        return connected(latest, db, user_id, key)
 
 
 class TokenInput(BaseModel):
@@ -149,4 +162,46 @@ def connect(body: TokenInput, user_id: str = Depends(account)):
                 connected_date=excluded.connected_date,last_verified_at=excluded.last_verified_at
                 RETURNING display_name,connected_date,last_verified_at""",
                 (user_id,cipher().encrypt(token.encode("ascii")),key,name)).fetchone()
-    return connected(row)
+        return connected(row, db, user_id, key)
+
+
+class SpaceInput(BaseModel):
+    space_key: str
+
+
+@app.post("/api/spaces")
+def register_space(body: SpaceInput, user_id: str = Depends(account)):
+    key = body.space_key.strip()
+    if not key or len(key) > 255 or not re.fullmatch(r"~?[\w.-]+", key) or key in {".", ".."}:
+        raise HTTPException(422, "Confluence 스페이스 키를 입력해 주세요.")
+    with database() as db:
+        connection = db.execute("""SELECT token, confluence_user_key FROM confluence_studio.connections
+                WHERE user_id=%s""", (user_id,)).fetchone()
+    if not connection:
+        raise HTTPException(409, "Confluence 계정을 먼저 연결해 주세요.")
+    response = confluence_get(decrypt_token(connection["token"]), "/rest/api/space/" + key)
+    if response.status_code == 401:
+        raise HTTPException(409, "Confluence 토큰을 다시 확인해 주세요.")
+    if response.status_code in (403, 404):
+        raise HTTPException(422, "스페이스를 찾을 수 없거나 조회 권한이 없습니다.")
+    if response.status_code != 200:
+        raise HTTPException(503, "Confluence에서 스페이스를 확인하지 못했습니다.")
+    try:
+        space = response.json()
+    except ValueError:
+        space = None
+    if (not isinstance(space, dict) or not isinstance(space.get("key"), str)
+            or space["key"].casefold() != key.casefold() or not isinstance(space.get("name"), str)
+            or not space["name"]):
+        raise HTTPException(503, "Confluence 스페이스 정보를 확인하지 못했습니다.")
+    with database() as db:
+        current = db.execute("""SELECT user_id FROM confluence_studio.connections
+                WHERE user_id=%s AND token=%s AND confluence_user_key=%s FOR UPDATE""",
+                (user_id, connection["token"], connection["confluence_user_key"])).fetchone()
+        if not current:
+            raise HTTPException(409, "연결 정보가 변경되었습니다. 다시 확인해 주세요.")
+        return db.execute("""INSERT INTO confluence_studio.registered_spaces
+                (user_id,confluence_user_key,space_key,name) VALUES (%s,%s,%s,%s)
+                ON CONFLICT (user_id,confluence_user_key,space_key) DO UPDATE SET name=excluded.name
+                RETURNING space_key,name""", (user_id, connection["confluence_user_key"],
+                                              space["key"], space["name"])).fetchone()

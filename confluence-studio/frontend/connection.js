@@ -22,6 +22,10 @@ function screen(state, result = {}) {
   field.value = '';
   reveal(false);
   if (connected) {
+    spaces = result.spaces || [];
+    renderSpaces();
+    el('space-form').reset();
+    el('space-status').textContent = '';
     el('profile-name').textContent = result.display_name;
     el('verified').textContent = '최근 확인 ' + new Date(result.last_verified_at).toLocaleString('ko-KR');
     el('workspace-title').focus();
@@ -94,3 +98,46 @@ el('retry').addEventListener('click', () => check());
 el('replace').addEventListener('click', () => { screen('replace'); field.focus(); });
 window.addEventListener('pagehide', () => { field.value = ''; reveal(false); });
 window.addEventListener('pageshow', () => check());
+
+let spaces = [];
+function renderSpaces() {
+  el('spaces-empty').hidden = spaces.length > 0;
+  el('space-list').replaceChildren(...spaces.map(space => {
+    const item = document.createElement('li');
+    item.textContent = space.name + ' (' + space.space_key + ')';
+    return item;
+  }));
+}
+el('spaces-menu').addEventListener('click', () => el('space-key').focus());
+el('space-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = event.submitter || el('space-form').querySelector('button');
+  if (button.disabled) return;
+  button.disabled = true;
+  el('space-status').textContent = '접근 권한을 확인하고 있습니다.';
+  try {
+    const response = await fetch('./api/spaces', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Studio-Request': '1' },
+      body: JSON.stringify({ space_key: el('space-key').value.trim() }),
+    });
+    if (response.status === 401 || response.status === 409) {
+      await check();
+      return;
+    }
+    const result = await response.json();
+    if (!response.ok) {
+      el('space-status').textContent = result.detail || '스페이스 등록에 실패했습니다.';
+      return;
+    }
+    spaces = spaces.filter(space => space.space_key !== result.space_key);
+    spaces.push(result);
+    spaces.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    renderSpaces();
+    el('space-form').reset();
+    el('space-status').textContent = result.name + ' 스페이스를 등록했습니다.';
+  } catch {
+    el('space-status').textContent = '서비스에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.';
+  } finally {
+    button.disabled = false;
+  }
+});

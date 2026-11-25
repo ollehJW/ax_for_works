@@ -67,6 +67,7 @@
     <aside class="sidebar" aria-label="서비스 사이드바">
       <div class="studio-brand"><span class="brand-mark" aria-hidden="true"></span>Confluence Studio</div>
       <nav class="studio-menu" aria-label="주요 메뉴">
+        <button type="button" id="spaces-menu" aria-current="page">스페이스 등록</button>
         <button type="button" disabled>페이지 작성</button>
         <button type="button" disabled>페이지 편집</button>
         <button type="button" disabled>문서 템플릿</button>
@@ -79,7 +80,21 @@
         <a class="return-link" href="/">← AX for Works로 돌아가기</a>
       </header>
       <main class="workspace-content">
-        <h1 id="workspace-title" tabindex="-1">Confluence Studio</h1>
+        <h1 id="workspace-title" tabindex="-1">스페이스 등록</h1>
+        <section class="profile-card spaces-card" aria-label="스페이스 등록">
+          <form id="space-form">
+            <label for="space-key">스페이스 키</label>
+            <p id="space-help">Confluence 주소의 /display/ 다음에 나오는 키를 입력하세요.</p>
+            <div class="space-entry">
+              <input id="space-key" required maxlength="255" placeholder="예: TEAM" aria-describedby="space-help" autocomplete="off">
+              <button class="primary" type="submit">등록</button>
+            </div>
+          </form>
+          <p id="space-status" role="status"></p>
+          <h2>등록한 스페이스</h2>
+          <ul id="space-list"></ul>
+          <p id="spaces-empty">등록한 스페이스가 없습니다.</p>
+        </section>
         <section class="profile-card" aria-labelledby="profile-title">
           <h2 id="profile-title">연결된 Confluence 계정</h2>
           <strong id="profile-name"></strong>
