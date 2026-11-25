@@ -16,6 +16,7 @@
   <main>
     <section class="panel" aria-labelledby="form-title">
       <div class="story">
+        <span class="brand-mark story-symbol" aria-hidden="true"></span>
         <p class="service-name" lang="en">Confluence Studio</p>
         <h1>메모에서<br>Confluence 문서로.</h1>
         <p class="intro">회의 메모와 업무 기록을 팀이 함께 읽을 수 있는<br class="wide"> Confluence 페이지로 정리하세요.</p>
@@ -36,15 +37,28 @@
         <form id="token-form" hidden novalidate>
           <label for="token">Confluence Access Token</label>
           <div class="field">
-            <input id="token" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" required placeholder="Access Token 입력" aria-describedby="token-note message">
+            <input id="token" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" required placeholder="Confluence Access Token 붙여넣기" aria-describedby="token-note message">
             <button class="visibility" id="visibility" type="button" aria-controls="token" aria-label="토큰 표시" aria-pressed="false">표시</button>
           </div>
-          <button class="primary" id="submit" type="submit">연결 확인</button>
-          <p id="token-note">확인된 토큰은 로그인한 계정에 암호화해 저장합니다.</p>
+          <button class="primary" id="submit" type="submit">확인하고 연결하기 <span aria-hidden="true">→</span></button>
         </form>
         <p id="message" role="status" aria-live="polite">연결 정보를 확인하고 있습니다.</p>
         <button class="primary" id="retry" type="button" hidden>다시 확인</button>
         <button class="primary" id="replace" type="button" hidden>토큰 변경</button>
+        <section class="token-guide" aria-labelledby="guide-title">
+          <span class="guide-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h6"/></svg>
+          </span>
+          <div>
+            <h3 id="guide-title">Confluence 토큰 발급 가이드</h3>
+            <p id="guide-status">토큰 발급 절차를 담은 PDF를 준비하고 있습니다.</p>
+            <button class="guide-download" type="button" disabled aria-describedby="guide-status">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5 M4 16v4h16v-4"/></svg>
+              PDF 가이드 다운로드
+            </button>
+          </div>
+        </section>
+        <p id="token-note">토큰은 서버에 암호화해 저장합니다.<br>토큰이 만료되면 새 토큰을 입력해 주세요.</p>
       </div>
     </section>
   </main>
