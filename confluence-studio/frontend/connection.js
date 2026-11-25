@@ -304,7 +304,7 @@ const sourceFormats = [
   { label: 'Markdown (.md)', extensions: ['md'], recommended: true, note: '이미지 주소만 적은 경우 MD 파일에는 그림이 포함되지 않습니다. 상대 경로 이미지는 원본 파일이 필요합니다.' },
   { label: 'HTML (.html)', extensions: ['html', 'htm'], note: '이미지를 data: URL로 넣으면 HTML 한 파일에 담을 수 있습니다. 파일 경로나 웹 주소로 연결했다면 해당 원본이 필요합니다.' },
   { label: 'Excel (.xlsx)', extensions: ['xlsx'], note: '통합 문서에 삽입한 그림은 XLSX 파일에 포함됩니다. 차트는 셀 데이터로 그리는 별도 개체일 수 있습니다.' },
-  { label: 'PDF (.pdf)', extensions: ['pdf'], note: 'PDF에 포함된 이미지는 추출할 수 있습니다. 텍스트 층이 없는 스캔본에서 글자를 얻으려면 문자 인식(OCR)이 필요합니다.' },
+  { label: 'PDF (.pdf)', extensions: ['pdf'], recommended: true, note: 'PDF에 포함된 이미지는 추출할 수 있습니다. 텍스트 층이 없는 스캔본에서 글자를 얻으려면 문자 인식(OCR)이 필요합니다.' },
   { label: 'Power Point (.pptx)', extensions: ['pptx'], note: '슬라이드에 삽입한 그림은 PPTX 파일에 포함됩니다. 외부 파일로 연결한 그림은 원본이 필요합니다.' },
 ];
 let sourceFile = null;
