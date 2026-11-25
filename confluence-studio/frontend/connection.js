@@ -325,11 +325,15 @@ function clearSources() {
   el('source-error').textContent = '';
   el('source-name').textContent = '';
   el('source-files').hidden = true;
-  el('source-drop').querySelector('strong').textContent = '파일 추가';
+  el('source-drop').hidden = false;
   showFormat(null);
 }
 
-el('source-remove').addEventListener('click', clearSources);
+el('source-remove').addEventListener('click', () => {
+  clearSources();
+  el('source-drop').focus();
+});
+el('source-replace').addEventListener('click', () => sourceInput.click());
 for (const format of sourceFormats) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -360,9 +364,19 @@ function attachSource(files) {
   }
   sourceFile = file;
   el('source-name').textContent = sourceFile.name;
+  el('source-name').title = sourceFile.name;
+  el('source-type').textContent = ext.toUpperCase();
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let size = file.size;
+  let unit = 0;
+  while (size >= 1000 && unit < units.length - 1) {
+    size /= 1000;
+    unit++;
+  }
+  el('source-meta').textContent = '첨부됨 · ' + size.toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + ' ' + units[unit];
   el('source-remove').setAttribute('aria-label', sourceFile.name + ' 삭제');
   el('source-files').hidden = false;
-  el('source-drop').querySelector('strong').textContent = '파일 교체';
+  el('source-drop').hidden = true;
   el('source-error').textContent = '';
   showFormat(format);
 }
@@ -370,8 +384,8 @@ sourceInput.addEventListener('change', () => {
   attachSource(sourceInput.files);
   sourceInput.value = '';
 });
-const drop = el('source-drop');
-drop.addEventListener('click', () => sourceInput.click());
+const drop = el('source-zone');
+el('source-drop').addEventListener('click', () => sourceInput.click());
 drop.addEventListener('dragover', event => { event.preventDefault(); drop.classList.add('dragging'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
 drop.addEventListener('drop', event => {

@@ -119,12 +119,21 @@
             <h2 id="source-title">작성 자료</h2>
             <p>형식을 선택해 페이지 작성에 활용할 수 있는 이미지를 확인하세요.</p>
             <div id="source-formats" aria-label="파일 형식"></div>
-            <button type="button" id="source-drop"><strong>파일 추가</strong><span>클릭하거나 문서 한 개를 끌어다 놓으세요</span></button>
+            <div id="source-zone">
+              <button type="button" id="source-drop"><strong>파일 추가</strong><span>클릭하거나 문서 한 개를 끌어다 놓으세요</span></button>
+              <div id="source-files" hidden>
+                <div class="source-summary" role="status">
+                  <span id="source-type" aria-hidden="true"></span>
+                  <div><strong id="source-name"></strong><small id="source-meta"></small></div>
+                </div>
+                <div class="source-actions">
+                  <button type="button" id="source-replace">파일 교체</button>
+                  <button type="button" id="source-remove">삭제</button>
+                </div>
+              </div>
+            </div>
             <input type="file" id="source-input" hidden>
             <p id="source-error" role="status"></p>
-            <ul id="source-files" aria-label="첨부한 파일" hidden><li>
-              <span id="source-name"></span><button type="button" id="source-remove">삭제</button>
-            </li></ul>
             <aside id="source-warning" hidden aria-live="polite">
               <strong>페이지 작성 시 이미지 활용</strong>
               <p></p>
