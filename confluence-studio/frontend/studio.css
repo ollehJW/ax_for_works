@@ -99,4 +99,3 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 }
 
 [hidden] { display: none !important; }
-#login { display: inline-block; color: var(--blue); margin-top: 16px; font-weight: 650; }

@@ -16,8 +16,7 @@ function reveal(visible) {
 }
 function screen(state, result = {}) {
   form.hidden = !['missing', 'invalid', 'replace'].includes(state);
-  el('login').hidden = state !== 'login';
-  el('retry').hidden = !['error', 'login'].includes(state);
+  el('retry').hidden = state !== 'error';
   el('replace').hidden = state !== 'connected';
   field.value = '';
   reveal(false);
@@ -27,7 +26,6 @@ function screen(state, result = {}) {
   })[state] || 'Confluence 계정 연결';
   el('description').textContent = ({
     connected: result.display_name + ' 계정으로 연결되었습니다.',
-    login: 'AX for Works에 로그인한 뒤 다시 확인해 주세요.',
     error: '연결 상태를 확인하지 못했습니다.',
     loading: '저장된 연결 정보를 확인하고 있습니다.',
   })[state] || '개인 Access Token을 입력해 계정을 연결하세요.';
@@ -56,14 +54,17 @@ async function check(save = false) {
     screen('loading');
   }
   try {
-    const response = await fetch('/api/connection', save ? {
+    const response = await fetch('./api/connection', save ? {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Studio-Request': '1' },
       body: JSON.stringify({ token }), cache: 'no-store',
     } : { cache: 'no-store' });
     const result = await response.json().catch(() => ({}));
     if (response.ok) screen(result.state, result);
-    else if (response.status === 401 || response.status === 403) screen('login', result);
-    else if (save && response.status === 422) {
+    else if (response.status === 401 || (!save && response.status === 403)) {
+      const login = window.location.pathname.startsWith('/confluencestudio/')
+        ? '/login?next=%2Fconfluencestudio%2F' : '/login';
+      window.location.replace(login);
+    } else if (save && response.status === 422) {
       screen('invalid');
       notice(result.detail || '새 토큰을 입력해 주세요.', true);
     } else screen('error', result);
@@ -85,6 +86,3 @@ el('retry').addEventListener('click', () => check());
 el('replace').addEventListener('click', () => { screen('replace'); field.focus(); });
 window.addEventListener('pagehide', () => { field.value = ''; reveal(false); });
 window.addEventListener('pageshow', () => check());
-window.addEventListener('focus', () => {
-  if (!el('login').hidden) check();
-});

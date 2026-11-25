@@ -47,6 +47,13 @@
 version: 1
 
 gateways:
+  - prefix: /confluencestudio
+    upstream: http://127.0.0.1:1008
+    enabled: true
+    require_login: true
+    redirect_hosts: []
+    read_timeout_seconds: 30
+
   # 기술 뉴스 서비스: 소개 /wianews/, 실제 서비스 /wianews/agent
   - prefix: /wianews
     upstream: https://dev-axforwork.wia.co.kr:9802

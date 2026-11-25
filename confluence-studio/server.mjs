@@ -20,7 +20,8 @@ createServer(async (request, response) => {
     "default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'");
   const path = request.url.split('?')[0];
   if (path === '/login' && request.method === 'GET') {
-    const destination = new URL(loginUrl);
+    const destination = new URL('/login', loginUrl);
+    destination.searchParams.set('next', '/confluencestudio/');
     const localHost = /^(localhost|127\.0\.0\.1)(?::[0-9]+)?$/.exec(request.headers.host || '');
     if (localHost && ['localhost', '127.0.0.1'].includes(destination.hostname)) {
       destination.hostname = localHost[1];
