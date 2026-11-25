@@ -164,6 +164,13 @@ function showCompose(active) {
   }
 }
 
+function leafPage(title) {
+  const leaf = document.createElement('div');
+  leaf.className = 'tree-leaf';
+  leaf.textContent = title;
+  return leaf;
+}
+
 async function loadBranch(container, spaceKey, parentId = null, start = 0) {
   const status = document.createElement('p');
   status.setAttribute('role', 'status');
@@ -192,9 +199,20 @@ async function loadBranch(container, spaceKey, parentId = null, start = 0) {
     }
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || '페이지 조회에 실패했습니다.');
+    if (parentId && !start && !data.pages.length && data.next_start == null) {
+      const branch = container.parentElement;
+      if (branch?.matches('details')) {
+        branch.replaceWith(leafPage(branch.querySelector('summary').textContent));
+        return;
+      }
+    }
     if (data.pages.length || start) status.remove();
     else status.textContent = parentId ? '하위 페이지가 없습니다.' : '표시할 페이지가 없습니다.';
     for (const page of data.pages) {
+      if (page.has_children === false) {
+        container.append(leafPage(page.title));
+        continue;
+      }
       const branch = document.createElement('details');
       const title = document.createElement('summary');
       title.textContent = page.title;

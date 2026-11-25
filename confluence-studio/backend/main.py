@@ -221,7 +221,7 @@ def page_branch(body: PageBranch, user_id: str = Depends(account)):
             WHERE c.user_id=%s AND s.space_key=%s""", (user_id, body.space_key)).fetchone()
     if not row:
         raise HTTPException(404, "등록한 스페이스를 확인해 주세요.")
-    params = {"limit": 50, "start": body.start, "expand": "space"}
+    params = {"limit": 50, "start": body.start, "expand": "space,children.page"}
     if body.parent_id:
         path = f"/rest/api/content/{body.parent_id}/child/page"
     else:
@@ -243,7 +243,12 @@ def page_branch(body: PageBranch, user_id: str = Depends(account)):
         for item in results:
             if item["space"]["key"] != body.space_key:
                 raise HTTPException(404, "선택한 스페이스의 페이지가 아닙니다.")
-            pages.append({"id": str(item["id"]), "title": item["title"]})
+            children = item.get("children", {}).get("page", {})
+            preview = children.get("results")
+            has_children = None
+            if isinstance(preview, list):
+                has_children = bool(preview or children.get("size") or children.get("_links", {}).get("next"))
+            pages.append({"id": str(item["id"]), "title": item["title"], "has_children": has_children})
         more = data.get("_links", {}).get("next") and results
     except (ValueError, KeyError, TypeError, AttributeError):
         raise HTTPException(502, "Confluence 페이지 목록을 읽을 수 없습니다.") from None
