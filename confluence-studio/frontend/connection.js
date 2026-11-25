@@ -304,7 +304,7 @@ const sourceFormats = [
   { label: 'Markdown (.md)', extensions: ['md'], recommended: true, note: '접근 가능한 URL로 연결된 이미지만 활용합니다.' },
   { label: 'HTML (.html)', extensions: ['html', 'htm'], note: '접근 가능한 URL로 연결된 이미지만 활용합니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
   { label: 'Excel (.xlsx)', extensions: ['xlsx'], note: '통합 문서에 삽입한 그림은 XLSX 파일에 포함됩니다. 차트는 셀 데이터로 그리는 별도 개체일 수 있습니다.' },
-  { label: 'PDF (.pdf)', extensions: ['pdf'], recommended: true, note: 'PDF에 포함된 이미지는 추출할 수 있습니다. 텍스트 층이 없는 스캔본에서 글자를 얻으려면 문자 인식(OCR)이 필요합니다.' },
+  { label: 'PDF (.pdf)', extensions: ['pdf'], recommended: true, note: 'PDF에 포함된 이미지는 추출할 수 있습니다.' },
   { label: 'Power Point (.pptx)', extensions: ['pptx'], note: '슬라이드에 삽입한 그림은 PPTX 파일에 포함됩니다.' },
 ];
 let sourceFile = null;
