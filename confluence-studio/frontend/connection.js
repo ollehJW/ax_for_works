@@ -21,6 +21,7 @@ function screen(state, result = {}) {
   document.title = connected ? 'Confluence Studio' : '계정 연결 · Confluence Studio';
   field.value = '';
   reveal(false);
+  resetDraft();
   if (connected) {
     loadPlatformAccount();
     clearSources();
@@ -392,4 +393,87 @@ drop.addEventListener('drop', event => {
   event.preventDefault();
   drop.classList.remove('dragging');
   attachSource(event.dataTransfer.files);
+});
+
+let generation = null;
+let rendering = null;
+function resetDraft() {
+  generation?.abort();
+  rendering?.abort();
+  generation = rendering = null;
+  for (const id of ['draft-request', 'draft-storage', 'draft-title']) el(id).value = '';
+  el('draft-status').textContent = '';
+  el('preview-status').textContent = '';
+  el('view-content').replaceChildren();
+  el('draft-result').hidden = el('draft-view').hidden = true;
+  el('generate-draft').disabled = false;
+}
+function filePayload(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('첨부 자료를 읽을 수 없습니다.'));
+    reader.onload = () => resolve({ name: file.name, data: reader.result.split(',')[1] });
+    reader.readAsDataURL(file);
+  });
+}
+async function draftPost(path, body, signal) {
+  const response = await fetch('./api/draft' + path, {
+    method: 'POST', signal, headers: { 'Content-Type': 'application/json', 'X-Studio-Request': '1' },
+    body: JSON.stringify(body),
+  });
+  if (response.status === 401) { goToLogin(); throw new Error('플랫폼 로그인이 필요합니다.'); }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.detail) throw new Error(data.detail || '요청을 처리하지 못했습니다. 다시 시도해 주세요.');
+  return data;
+}
+async function previewDraft() {
+  rendering?.abort();
+  const request = new AbortController();
+  rendering = request;
+  el('draft-view').hidden = true;
+  el('preview-status').textContent = 'Confluence에서 미리보기를 불러오는 중입니다.';
+  try {
+    const result = await draftPost('/preview', {
+      storage: el('draft-storage').value, parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
+    }, request.signal);
+    if (request.signal.aborted) return;
+    el('view-title').textContent = el('draft-title').value;
+    // The server removes active content and all external references before returning rendered HTML.
+    el('view-content').innerHTML = result.view;
+    el('draft-view').hidden = false;
+    el('preview-status').textContent = '';
+  } catch (error) {
+    if (!request.signal.aborted) el('preview-status').textContent = error.message;
+  }
+}
+el('generate-draft').addEventListener('click', async () => {
+  const instructions = el('draft-request').value.trim();
+  const file = sourceFile;
+  if (!instructions && !file) { el('draft-status').textContent = '작성 요청을 입력하거나 자료를 첨부해 주세요.'; return; }
+  if (file && file.size > 8 * 1024 * 1024) { el('draft-status').textContent = '8 MB 이하의 문서를 첨부해 주세요.'; return; }
+  const request = new AbortController();
+  generation = request;
+  el('generate-draft').disabled = true;
+  el('draft-status').textContent = '초안을 작성하고 있습니다.';
+  try {
+    const source = file ? await filePayload(file) : null;
+    const draft = await draftPost('', { instructions, source }, request.signal);
+    if (request.signal.aborted) return;
+    el('draft-title').value = draft.title;
+    el('draft-storage').value = draft.storage;
+    el('draft-status').textContent = '초안을 작성했습니다.';
+    el('draft-result').hidden = false;
+    await previewDraft();
+  } catch (error) {
+    if (!request.signal.aborted) el('draft-status').textContent = error.message;
+  } finally {
+    if (generation === request) el('generate-draft').disabled = false;
+  }
+});
+el('refresh-preview').addEventListener('click', previewDraft);
+el('draft-title').addEventListener('input', () => { el('view-title').textContent = el('draft-title').value; });
+el('draft-storage').addEventListener('input', () => {
+  rendering?.abort();
+  el('draft-view').hidden = true;
+  el('preview-status').textContent = '수정한 내용을 확인하려면 다시 보기를 눌러주세요.';
 });

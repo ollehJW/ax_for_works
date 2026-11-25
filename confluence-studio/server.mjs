@@ -30,7 +30,7 @@ createServer(async (request, response) => {
     return;
   }
   const readConnection = path === '/api/connection' && request.method === 'GET';
-  const studioPost = request.method === 'POST' && ['/api/connection', '/api/spaces', '/api/pages'].includes(path);
+  const studioPost = request.method === 'POST' && ['/api/connection', '/api/spaces', '/api/pages', '/api/draft', '/api/draft/preview'].includes(path);
   if (readConnection || studioPost) {
     let body;
     if (request.method === 'POST') {
@@ -50,7 +50,7 @@ createServer(async (request, response) => {
       try {
         for await (const chunk of request) {
           size += chunk.length;
-          if (size > 12000) {
+          if (size > (path === '/api/draft' ? 11500000 : path === '/api/draft/preview' ? 650000 : 12000)) {
             response.writeHead(413).end();
             return;
           }
@@ -67,7 +67,7 @@ createServer(async (request, response) => {
     const upstream = backendRequest({
       host: '127.0.0.1', port: backendPort, path, method: request.method,
       headers: { Cookie: session || '', 'Content-Type': 'application/json', 'X-Studio-Request': '1' },
-      timeout: 12000,
+      timeout: path.startsWith('/api/draft') ? 30000 : 12000,
     }, reply => {
       response.writeHead(reply.statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
       reply.pipe(response);

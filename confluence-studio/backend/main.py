@@ -17,6 +17,9 @@ from psycopg.rows import dict_row
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 
+from . import drafts
+
+
 app = FastAPI(title="Confluence Studio", docs_url=None, redoc_url=None, openapi_url=None)
 
 
@@ -253,3 +256,6 @@ def page_branch(body: PageBranch, user_id: str = Depends(account)):
     except (ValueError, KeyError, TypeError, AttributeError):
         raise HTTPException(502, "Confluence 페이지 목록을 읽을 수 없습니다.") from None
     return {"pages": pages, "next_start": body.start + len(results) if more else None}
+
+
+drafts.install(app, account, database, decrypt_token)

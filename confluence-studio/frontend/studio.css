@@ -237,7 +237,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .ax-account button:focus-visible{outline:2px solid #83b4ff;outline-offset:3px}
 #logout-status { font-size: 12px; }
 
-#compose-columns { display: grid; grid-template-columns: minmax(0, 25%); align-items: start; gap: 14px; }
+#compose-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr); align-items: start; gap: 14px; }
 .source-panel { min-width: 0; padding: 18px; border: 1px solid #d9e3f0; border-radius: 14px; background: white; box-shadow: 0 4px 14px #244a8110; font: 500 14px/1.55 "Studio Pretendard", "Malgun Gothic", sans-serif; }
 .source-panel h2 { font-size: 16px; margin: 0; }
 .source-panel > p { color: #526983; font-size: 13px; margin: 4px 0 12px; overflow-wrap: anywhere; }
@@ -261,3 +261,26 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #source-formats button[aria-pressed="true"] { background: #e7f0fc; border-color: #7296cb; }
 .source-panel #source-error:empty { margin: 0; }
 @media (max-width: 700px) { #compose-columns { grid-template-columns: minmax(0, 1fr); } }
+
+.compose-sidebar { display: grid; align-content: start; gap: 14px; min-width: 0; }
+.draft-editor { grid-column: 3; min-width: 0; padding: 22px; background: white; border: 1px solid #d9e3f0; border-radius: 14px; }
+.draft-editor h2 { margin: 0 0 16px; font-size: 20px; }
+.draft-editor textarea, #draft-title { display: block; width: 100%; padding: 10px; border: 1px solid #bccde1; border-radius: 8px; font: inherit; line-height: 1.5; }
+.draft-editor textarea { resize: vertical; }
+.draft-editor textarea:focus-visible, #draft-title:focus-visible { outline: 2px solid #7296cb; }
+.draft-hint, #draft-status, #preview-status { font-size: 13px; color: #526983; }
+.draft-editor .primary { width: auto; min-height: 38px; padding: 8px 16px; }
+.draft-editor .primary:disabled { opacity: .65; }
+#draft-result { margin-top: 18px; padding-top: 18px; border-top: 1px solid #dce5ef; }
+#draft-result details { margin: 12px 0; }
+#draft-result summary { cursor: pointer; font-size: 14px; }
+#draft-storage { font: 13px/1.55 monospace; margin-top: 8px; }
+.preview-heading { display: flex; align-items: center; justify-content: space-between; }
+.preview-heading button { padding: 7px 10px; color: #345477; background: #edf3fb; }
+#draft-view { padding: 18px; border: 1px solid #dce5ef; border-radius: 8px; overflow: auto; overflow-wrap: anywhere; color: #172b4d; font: 14px/1.6 Arial, sans-serif; }
+#draft-view :is(th,td) { border: 1px solid #dfe1e6; padding: 6px 10px; }
+#draft-view th { background: #f4f5f7; }
+#draft-view table { border-collapse: collapse; }
+#draft-view pre { white-space: pre-wrap; }
+#draft-view :is(.confluence-information-macro,.code,.expand-container) { margin: 10px 0; padding: 10px 14px; border: 1px solid #c1d5ef; background: #f5f8ff; border-radius: 4px; }
+@media (max-width: 700px) { .draft-editor { grid-column: 1; } }
