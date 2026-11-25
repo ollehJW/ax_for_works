@@ -300,12 +300,12 @@ el('logout').addEventListener('click', async () => {
 });
 
 const sourceFormats = [
-  { label: 'Word (.docx)', extensions: ['docx'], recommended: true, note: '문서 안에 그림을 삽입하면 DOCX 파일에 이미지 원본도 포함됩니다.' },
-  { label: 'Markdown (.md)', extensions: ['md'], recommended: true, note: '접근 가능한 URL로 연결된 이미지만 활용합니다.' },
-  { label: 'HTML (.html)', extensions: ['html', 'htm'], note: '접근 가능한 URL로 연결된 이미지만 활용합니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
-  { label: 'Excel (.xlsx)', extensions: ['xlsx'], note: '통합 문서에 삽입한 그림은 XLSX 파일에 포함됩니다. 차트는 셀 데이터로 그리는 별도 개체일 수 있습니다.' },
-  { label: 'PDF (.pdf)', extensions: ['pdf'], recommended: true, note: 'PDF에 포함된 이미지는 추출할 수 있습니다.' },
-  { label: 'Power Point (.pptx)', extensions: ['pptx'], note: '슬라이드에 삽입한 그림은 PPTX 파일에 포함됩니다.' },
+  { label: 'Word (.docx)', extensions: ['docx'], recommended: true, note: '문서에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
+  { label: 'Markdown (.md)', extensions: ['md'], recommended: true, note: '페이지 작성에는 접근 가능한 URL로 연결된 이미지만 활용할 수 있습니다.' },
+  { label: 'PDF (.pdf)', extensions: ['pdf'], recommended: true, note: 'PDF의 사진과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
+  { label: 'Power Point (.pptx)', extensions: ['pptx'], note: '슬라이드에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
+  { label: 'HTML (.html)', extensions: ['html', 'htm'], note: '페이지 작성에는 접근 가능한 URL로 연결된 이미지만 활용할 수 있습니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
+  { label: 'Excel (.xlsx)', extensions: ['xlsx'], note: '시트에 넣은 그림을 페이지 작성에 활용할 수 있습니다. 셀 데이터로 만든 차트는 별도 처리가 필요할 수 있습니다.' },
 ];
 let sourceFile = null;
 const sourceInput = el('source-input');
@@ -334,7 +334,7 @@ for (const format of sourceFormats) {
   const button = document.createElement('button');
   button.type = 'button';
   button.textContent = format.label;
-  button.title = format.extensions.map(ext => '.' + ext).join(', ') + ' 이미지 처리 안내';
+  button.title = format.extensions.map(ext => '.' + ext).join(', ') + ' 이미지 활용 안내';
   button.dataset.format = format.label;
   button.setAttribute('aria-pressed', 'false');
   if (format.recommended) {
