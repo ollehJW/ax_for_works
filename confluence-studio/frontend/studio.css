@@ -221,7 +221,6 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .tree-toggle::before { content: ""; box-sizing: border-box; width: .36em; height: .36em; border: solid #536f92; border-width: 0 1px 1px 0; transform: rotate(-45deg); }
 .tree-toggle[aria-expanded="true"]::before { transform: rotate(45deg); }
 .tree-leaf::before { content: ""; justify-self: center; margin-top: 9px; width: 9px; height: 12px; border: 1px solid #6a809b; border-radius: 2px; background: linear-gradient(#8b9eb4, #8b9eb4) center 4px / 5px 1px no-repeat, linear-gradient(#8b9eb4, #8b9eb4) center 7px / 5px 1px no-repeat; }
-#parent-location:not(:empty) { display: block; margin-top: 12px; padding-top: 12px; border-top: 1px solid #dce5ef; color: #345781; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 .studio-menu button:not(:disabled):not([aria-current]) { color: white; background: transparent; }
 @media (max-width: 700px) { #compose-panel { width: 100%; } }
 

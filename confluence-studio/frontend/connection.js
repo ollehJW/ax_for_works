@@ -157,7 +157,6 @@ function showCompose(active) {
   el('compose-panel').hidden = !active;
   el('tree-panel').hidden = true;
   el('page-tree').replaceChildren();
-  el('parent-location').textContent = '';
   if (active) {
     el('compose-space').replaceChildren(
       new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
@@ -186,13 +185,6 @@ function pageNode(page, spaceKey) {
   label.append(document.createTextNode(page.title), radio);
   row.append(label);
   node.append(row);
-  radio.addEventListener('change', () => {
-    const path = [];
-    for (let ancestor = node; ancestor; ancestor = ancestor.parentElement.closest('.page-node')) {
-      path.unshift(ancestor.querySelector('.page-row label').textContent);
-    }
-    el('parent-location').textContent = '선택한 위치 · ' + [spaceKey, ...path].join(' › ');
-  });
   if (page.has_children === false) {
     row.classList.add('tree-leaf');
     return node;
@@ -263,7 +255,6 @@ async function loadBranch(container, spaceKey, parentId = null, start = 0) {
 }
 el('compose-space').addEventListener('change', event => {
   const key = event.target.value;
-  el('parent-location').textContent = '';
   const root = document.createElement('div');
   el('page-tree').replaceChildren(root);
   el('tree-panel').hidden = !key;
