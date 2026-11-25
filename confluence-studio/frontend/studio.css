@@ -184,14 +184,34 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #compose-space:hover:enabled { border-color: #789bc7; }
 #compose-space:focus-visible { outline: 3px solid #c5dafa; outline-offset: 2px; border-color: #527cb2; }
 #compose-space:disabled { background: #f2f5f9; color: #677b93; cursor: default; }
+@supports (appearance: base-select) {
+  #compose-space, #compose-space::picker(select) { appearance: base-select; }
+  #compose-space { display: flex; align-items: center; white-space: nowrap; overflow: hidden; }
+  #compose-space::picker-icon { display: none; }
+  #compose-space::picker(select) {
+    margin-block: 5px; padding: 4px; max-height: min(320px, 45vh); overflow-y: auto;
+    border: 1px solid #cfdbeb; border-radius: 10px; background: white;
+    box-shadow: 0 8px 24px #203c661c; font: inherit;
+  }
+  #compose-space option {
+    display: grid; grid-template-columns: minmax(0, 1fr) 16px; gap: 3px 8px;
+    padding: 10px 11px; border-radius: 6px; color: #293f60; font-size: 14px;
+    font-weight: 600; line-height: 1.4; white-space: normal; overflow-wrap: anywhere;
+  }
+  #compose-space option small { grid-column: 1; font-size: 12px; font-weight: 500; color: #61758e; }
+  #compose-space option::checkmark { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: #315d9f; }
+  #compose-space option:checked { color: #234e89; background: #edf4ff; }
+  #compose-space option:is(:hover, :focus-visible) { background: #e2edfc; outline-offset: -2px; }
+  #compose-space option[value=""] { font-weight: 500; color: #63758b; }
+}
 #tree-panel { margin-top: 18px; padding-top: 16px; border-top: 1px solid #e4ebf4; }
 #tree-heading { font-size: 16px; }
 #page-tree { max-height: 65vh; overflow: auto; font-size: 14px; }
 #page-tree details > div { margin-left: 8px; padding-left: 6px; border-left: 1px solid #dce5ef; }
 #page-tree summary, .tree-leaf { display: grid; grid-template-columns: 14px minmax(0, 1fr); align-items: baseline; gap: 5px; padding: 6px 0; overflow-wrap: anywhere; }
-#page-tree summary { cursor: pointer; list-style: none; }
+#page-tree summary { line-height: 1.5; cursor: pointer; list-style: none; }
 #page-tree summary::-webkit-details-marker { display: none; }
-#page-tree summary::before { content: ""; align-self: start; margin: 4px 0 0 4px; width: 6px; height: 6px; border: solid #536f92; border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); }
+#page-tree summary::before { content: ""; align-self: start; box-sizing: border-box; justify-self: center; width: .36em; height: .36em; margin-top: .57em; border: solid #536f92; border-width: 0 1px 1px 0; transform: rotate(-45deg); }
 #page-tree details[open] > summary::before { transform: rotate(45deg); }
 .tree-leaf::before { content: ""; align-self: start; margin: 2px 0 0 2px; width: 9px; height: 12px; border: 1px solid #6a809b; border-radius: 2px; background: linear-gradient(#8b9eb4, #8b9eb4) center 4px / 5px 1px no-repeat, linear-gradient(#8b9eb4, #8b9eb4) center 7px / 5px 1px no-repeat; }
 #page-tree button { padding: 6px 10px; background: #edf3fb; color: #345781; }

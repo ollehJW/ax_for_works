@@ -160,7 +160,13 @@ function showCompose(active) {
   if (active) {
     el('compose-space').replaceChildren(
       new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
-      ...spaces.map(space => new Option(space.name + ' (' + space.space_key + ')', space.space_key)),
+      ...spaces.map(space => {
+        const option = new Option('', space.space_key);
+        const key = document.createElement('small');
+        key.textContent = space.space_key;
+        option.append(document.createTextNode(space.name + ' '), key);
+        return option;
+      }),
     );
     el('compose-space').disabled = !spaces.length;
   }
