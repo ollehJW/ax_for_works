@@ -112,6 +112,9 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .studio-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; font-size: 22px; font-weight: 700; letter-spacing: -.7px; }
 .studio-brand .brand-mark { flex: 0 0 35px; background: transparent; }
 .studio-brand .brand-mark::before, .studio-brand .brand-mark::after { border-color: white; background: #0b2d8e; }
+.studio-menu { display: grid; gap: 7px; margin-top: 32px; }
+.studio-menu button { padding: 12px 14px; text-align: left; font-size: 14px; font-weight: 500; }
+.studio-menu button:disabled { color: #d3e0f7; background: transparent; opacity: 1; cursor: default; }
 .workspace-header { min-height: 67px; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 39px; background: white; border-bottom: 1px solid #e3e8ef; }
 .workspace-header nav { display: flex; align-items: center; gap: 15px; color: #465a73; font-size: 13px; }
 .workspace-header strong { font-weight: 500; }
@@ -127,6 +130,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
   #workspace { display: block; }
   .sidebar { position: static; height: auto; padding: 12px 16px; }
   .studio-brand { font-size: 19px; }
+  .studio-menu { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .studio-menu button { padding: 8px; }
   .workspace-header { padding: 12px 16px; flex-wrap: wrap; }
   .workspace-header nav { gap: 7px; }
   .workspace-content { padding: 24px 16px; }
