@@ -84,9 +84,13 @@
         <section id="registration-card" class="profile-card spaces-card" aria-label="스페이스 등록">
           <form id="space-form">
             <label for="space-key">스페이스 키</label>
-            <p id="space-help">Confluence 주소의 /display/ 다음에 나오는 키를 입력하세요.</p>
+            <div class="space-key-guide">
+              <p class="guide-caption">Confluence 주소 예시</p>
+              <code class="space-example">https://confluence.hmg-corp.io/spaces/<mark>WIADXLAB</mark>/overview</code>
+              <p id="space-help">주소에서 <code>/spaces/</code> 다음에 있는 <strong>WIADXLAB</strong>이 스페이스 키입니다. 내 스페이스 주소에서 같은 위치의 값을 입력하세요.</p>
+            </div>
             <div class="space-entry">
-              <input id="space-key" required maxlength="255" placeholder="예: TEAM" aria-describedby="space-help" autocomplete="off">
+              <input id="space-key" required maxlength="255" placeholder="예: WIADXLAB" aria-describedby="space-help" autocomplete="off">
               <button class="primary" type="submit">등록</button>
             </div>
           </form>
