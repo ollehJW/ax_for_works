@@ -157,6 +157,7 @@ function showCompose(active) {
   el('compose-panel').hidden = !active;
   el('tree-panel').hidden = true;
   el('page-tree').replaceChildren();
+  el('parent-location').textContent = '';
   if (active) {
     el('compose-space').replaceChildren(
       new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
@@ -172,11 +173,46 @@ function showCompose(active) {
   }
 }
 
-function leafPage(title) {
-  const leaf = document.createElement('div');
-  leaf.className = 'tree-leaf';
-  leaf.textContent = title;
-  return leaf;
+function pageNode(page, spaceKey) {
+  const node = document.createElement('div');
+  node.className = 'page-node';
+  const row = document.createElement('div');
+  row.className = 'page-row';
+  const label = document.createElement('label');
+  const radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = 'parent-page';
+  radio.value = page.id;
+  label.append(radio, document.createTextNode(page.title));
+  row.append(label);
+  node.append(row);
+  radio.addEventListener('change', () => {
+    const path = [];
+    for (let ancestor = node; ancestor; ancestor = ancestor.parentElement.closest('.page-node')) {
+      path.unshift(ancestor.querySelector('.page-row label').textContent);
+    }
+    el('parent-location').textContent = '선택한 위치 · ' + [spaceKey, ...path].join(' › ');
+  });
+  if (page.has_children === false) {
+    row.classList.add('tree-leaf');
+    return node;
+  }
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'tree-toggle';
+  toggle.setAttribute('aria-label', page.title + ' 하위 페이지');
+  toggle.setAttribute('aria-expanded', 'false');
+  const children = document.createElement('div');
+  children.className = 'page-children';
+  children.hidden = true;
+  row.prepend(toggle);
+  node.append(children);
+  toggle.addEventListener('click', () => {
+    children.hidden = !children.hidden;
+    toggle.setAttribute('aria-expanded', String(!children.hidden));
+    if (!children.hidden && !children.childElementCount) loadBranch(children, spaceKey, page.id);
+  });
+  return node;
 }
 
 async function loadBranch(container, spaceKey, parentId = null, start = 0) {
@@ -208,30 +244,17 @@ async function loadBranch(container, spaceKey, parentId = null, start = 0) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || '페이지 조회에 실패했습니다.');
     if (parentId && !start && !data.pages.length && data.next_start == null) {
-      const branch = container.parentElement;
-      if (branch?.matches('details')) {
-        branch.replaceWith(leafPage(branch.querySelector('summary').textContent));
-        return;
-      }
+      const row = container.previousElementSibling;
+      const toggle = row.querySelector('.tree-toggle');
+      if (document.activeElement === toggle) row.querySelector('input').focus();
+      toggle.remove();
+      row.classList.add('tree-leaf');
+      container.remove();
+      return;
     }
     if (data.pages.length || start) status.remove();
-    else status.textContent = parentId ? '하위 페이지가 없습니다.' : '표시할 페이지가 없습니다.';
-    for (const page of data.pages) {
-      if (page.has_children === false) {
-        container.append(leafPage(page.title));
-        continue;
-      }
-      const branch = document.createElement('details');
-      const title = document.createElement('summary');
-      title.textContent = page.title;
-      branch.append(title);
-      const children = document.createElement('div');
-      branch.append(children);
-      branch.addEventListener('toggle', () => {
-        if (branch.open && !children.childElementCount) loadBranch(children, spaceKey, page.id);
-      });
-      container.append(branch);
-    }
+    else status.textContent = '표시할 페이지가 없습니다.';
+    for (const page of data.pages) container.append(pageNode(page, spaceKey));
     if (data.next_start != null) action('더 보기', data.next_start);
   } catch (error) {
     status.textContent = error instanceof TypeError ? '서비스에 연결할 수 없습니다.' : error.message;
@@ -240,6 +263,7 @@ async function loadBranch(container, spaceKey, parentId = null, start = 0) {
 }
 el('compose-space').addEventListener('change', event => {
   const key = event.target.value;
+  el('parent-location').textContent = '';
   const root = document.createElement('div');
   el('page-tree').replaceChildren(root);
   el('tree-panel').hidden = !key;
