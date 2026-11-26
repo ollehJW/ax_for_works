@@ -352,6 +352,8 @@ p{margin:0}
 .dv{color:var(--both)}
 .pipe.p-dev{--c:var(--both);--cs:var(--both-soft);--ci:var(--both);border-left:5px solid var(--both)}
 .chain .d b{color:var(--both)}
+.rules.r2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:860px){.rules.r2{grid-template-columns:1fr}}
 .src{margin-top:16px;font-size:13px;color:var(--muted)}
 footer{padding:0 0 56px;color:var(--muted);font-size:13px}
 .foot{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px}
@@ -597,27 +599,26 @@ footer{padding:0 0 56px;color:var(--muted);font-size:13px}
 <section class="appx">
   <div class="wrap">
     <p class="eyebrow rv">부록 · R&amp;D 코딩</p>
-    <h2 class="rv"><span class="cp">Copilot은 사무 영역의 강자</span>, <span class="dv">R&amp;D 코딩 Agent는 H-Chat API 연동</span>이 맞습니다</h2>
-    <p class="lead rv">문서와 메일, 회의에서는 Copilot이 가장 가까운 도구입니다. 다만 R&amp;D의 코딩 Agent는 일하는 자리가 다릅니다. Office 앱이 아니라 개발자의 저장소와 터미널 안에서 일해야 합니다. 기능 하나를 개발하는 과정으로 비교하면 이렇습니다.</p>
+    <h2 class="rv"><span class="cp">채팅은 Copilot으로</span>, <span class="dv">LLM API와 Coding Agent 연결은 H-Chat으로</span></h2>
+    <p class="lead rv">H-Chat의 채팅 기능은 모두 Copilot으로 대체합니다. 문서와 메일, 회의 같은 사무 영역에서는 Copilot이 가장 가까운 도구이기 때문입니다. 다만 R&amp;D의 Coding Agent는 일하는 자리가 다릅니다. Office 앱이 아니라 개발자의 저장소와 터미널 안에서 일해야 합니다. 기능 하나를 개발하는 과정으로 비교하면 이렇습니다.</p>
     <div class="pipes rv">
       <div class="pipe p-dev"><div class="ph"><b>H-Chat API + VS Code · Claude Code</b><span>다섯 단계 모두 Agent가 개발 환경 안에서 직접 합니다</span></div><div class="flow5"><div class="st lit"><small>파악</small>저장소 전체 읽기</div><div class="st lit"><small>수정</small>여러 파일 직접 수정</div><div class="st lit"><small>실행</small>터미널 명령 실행</div><div class="st lit"><small>검증</small>빌드·테스트 반복</div><div class="st lit"><small>반영</small>Git 커밋</div></div></div>
       <div class="pipe p-cp"><div class="ph"><b>Microsoft 365 Copilot</b><span>대화창에서 코드를 제안하고, 나머지는 개발자가 옮깁니다</span></div><div class="flow5"><div class="st me"><small>파악</small>붙여 넣은 코드만</div><div class="st lit"><small>수정</small>코드 조각 제안</div><div class="st me"><small>실행</small>직접 실행</div><div class="st me"><small>검증</small>직접 확인</div><div class="st me"><small>반영</small>직접 반영</div></div></div>
       <p class="pipe-note">색이 채워진 칸은 AI가 맡는 단계, 점선 칸은 개발자가 직접 하는 단계입니다.</p>
     </div>
     <div class="keys k3">
-      <div class="key rv"><div class="n">01 · 일하는 자리</div><h3>코딩 Agent는 저장소와 터미널에서 일합니다</h3><p>코딩 Agent는 코드 전체를 읽고, 파일을 고치고, 빌드와 테스트를 돌려 결과를 스스로 확인합니다. Copilot의 일터는 Office 문서와 대화창이라 이 흐름에 직접 들어오지 못합니다.</p><div class="vs-cp"><b>Copilot의 자리는</b>코드 설명, 짧은 스크립트, Excel 수식처럼 대화로 끝나는 일입니다.</div></div>
+      <div class="key rv"><div class="n">01 · 일하는 자리</div><h3>Coding Agent는 저장소와 터미널에서 일합니다</h3><p>Coding Agent는 코드 전체를 읽고, 파일을 고치고, 빌드와 테스트를 돌려 결과를 스스로 확인합니다. Copilot의 일터는 Office 문서와 대화창이라 이 흐름에 직접 들어오지 못합니다.</p><div class="vs-cp"><b>Copilot의 자리는</b>코드 설명, 짧은 스크립트, Excel 수식처럼 대화로 끝나는 일입니다.</div></div>
       <div class="key rv"><div class="n">02 · Copilot의 Code 기능</div><h3>새 Code 기능은 누구나 만드는 작은 앱을 위한 것입니다</h3><p>2026년 9월에 발표된 Code는 말로 설명하면 대시보드나 자동화 같은 작은 앱을 만들어 주는 기능입니다. Microsoft 365 환경 안의 격리된 공간에서 실행되며, 우리 저장소나 개발 PC와 연결하는 방법은 안내되어 있지 않습니다.</p><div class="vs-cp"><b>Microsoft도</b>개발자는 일상 개발에 GitHub Copilot을 계속 쓴다고 설명합니다.</div></div>
-      <div class="key rv"><div class="n">03 · 제품과 계약</div><h3>개발 도구 안의 Copilot은 다른 제품입니다</h3><p>VS Code에서 코딩 Agent로 동작하는 것은 GitHub Copilot이고, 별도 구독이 필요합니다. Microsoft 365 Copilot 라이선스로는 켜지지 않으며, Claude Code에 연결하는 공식 방법도 확인되지 않습니다.</p><div class="vs-cp"><b>이름은 같아도</b>사무용 Copilot과 개발용 Copilot은 계약이 따로입니다.</div></div>
+      <div class="key rv"><div class="n">03 · 연결 방식</div><h3>Coding Agent는 LLM API를 호출해 움직입니다</h3><p>VS Code와 Claude Code는 LLM API의 주소와 키를 받아 연결합니다. Copilot은 사람이 쓰는 화면으로 제공되는 제품이라, 개발 도구나 프로그램이 이렇게 호출해 쓰는 방법은 확인되지 않습니다.</p><div class="vs-cp"><b>VS Code 안의 Copilot은</b>GitHub Copilot이라는 다른 제품이고, 계약도 따로입니다.</div></div>
     </div>
     <div class="chains rv">
-      <h3>그래서 R&amp;D 코딩은 지금처럼 H-Chat API로 연결합니다</h3>
-      <div class="chain"><div class="d"><b>H-Chat API</b>사내에서 이미 쓰고 있는 AI 연결을</div><i></i><div class="d"><b>VS Code · Claude Code</b>개발자가 쓰던 도구에 그대로 연동합니다</div></div>
-      <div class="chain"><div class="a"><b>WiaCoding</b>업무 아이디어를 첫 개발 프롬프트로 정리하고</div><i></i><div class="d"><b>VS Code · Claude Code</b>그 프롬프트로 바로 개발을 시작합니다</div></div>
+      <h3>그래서 H-Chat의 API는 지금처럼 유지합니다</h3>
+      <div class="chain"><div class="d"><b>H-Chat API</b>사내 LLM API를</div><i></i><div class="d"><b>Coding Agent 연결</b>VS Code와 Claude Code에 지금처럼 연동합니다</div></div>
+      <div class="chain"><div class="d"><b>H-Chat API</b>사내 LLM API를</div><i></i><div class="d"><b>LLM 호출</b>프로그램에서 직접 호출해 씁니다</div></div>
     </div>
-    <div class="rules">
-      <div class="r c rv"><span class="tag cp">사무 업무</span><h3>Microsoft 365 Copilot</h3><p>Word, Excel, Outlook, Teams 안에서 그때그때 생기는 일</p></div>
-      <div class="r a rv"><span class="tag ax">정해진 업무</span><h3>AX for Works</h3><p>회의록, 주간보고처럼 반복되고 팀이 같이 보는 일</p></div>
-      <div class="r b rv"><span class="tag both">R&amp;D 코딩</span><h3>H-Chat API 연동</h3><p>VS Code와 Claude Code에서 저장소를 직접 다루는 개발</p></div>
+    <div class="rules r2">
+      <div class="r c rv"><span class="tag cp">Copilot으로 대체</span><h3>H-Chat의 채팅 기능</h3><p>질문과 답변, 문서 요약, 초안 작성처럼 사람이 대화창에서 하는 일</p></div>
+      <div class="r b rv"><span class="tag both">H-Chat 유지</span><h3>H-Chat의 API</h3><p>API를 통한 LLM 호출과 VS Code · Claude Code의 Coding Agent 연결</p></div>
     </div>
     <p class="src rv">2026년 11월 기준 공개 자료로 정리했습니다. Copilot의 Code 기능은 미리보기 단계라 이후 달라질 수 있습니다.</p>
   </div>
