@@ -121,8 +121,9 @@
         </dialog>
         <div id="compose-columns">
           <nav class="compose-steps" aria-label="페이지 작성 단계">
-            <button type="button" id="step-one" aria-current="step"><span>01</span> 초안 작성</button>
-            <button type="button" id="step-two" disabled><span>02</span> 초안 검토 및 수정</button>
+            <button type="button" id="step-one" aria-current="step"><span>1</span> 초안 작성</button>
+            <button type="button" id="step-two" disabled><span>2</span> 검토 및 수정</button>
+            <button type="button" id="step-three" disabled><span>3</span> 발행</button>
           </nav>
           <fieldset id="compose-setup" aria-label="초안 작성">
             <div class="compose-sidebar">
@@ -160,7 +161,7 @@
             </div>
             <section id="compose-panel" aria-label="페이지 작성 위치">
               <div class="space-heading">
-                <label for="compose-space">스페이스 선택</label>
+                <label for="compose-space">발행 위치</label>
                 <button type="button" id="open-space" aria-haspopup="dialog" aria-controls="space-dialog">신규 스페이스 등록</button>
               </div>
               <div class="space-picker">
@@ -194,14 +195,26 @@
                 <label for="draft-title">페이지 제목</label>
                 <div class="document-title-row">
                   <input id="draft-title" placeholder="페이지 제목을 입력하세요" maxlength="255">
-                  <button type="button" class="primary" id="publish-draft" disabled>작성</button>
+                  <button type="button" class="primary" id="review-next" disabled>발행 단계로</button>
                 </div>
-                <p id="publish-status" role="status"></p>
               </header>
               <p id="preview-status" role="status">초안을 생성하면 문서가 여기에 표시됩니다.</p>
               <div id="draft-view" hidden><div id="view-content"></div></div>
             </article>
           </div>
+          <section id="compose-publish" aria-labelledby="publish-heading" hidden>
+            <h2 id="publish-heading" tabindex="-1">발행 정보</h2>
+            <dl>
+              <dt>페이지 제목</dt><dd id="publish-title"></dd>
+              <dt>스페이스</dt><dd id="publish-space"></dd>
+              <dt>상위 페이지</dt><dd id="publish-parent"></dd>
+            </dl>
+            <div class="publish-actions">
+              <button type="button" id="back-to-review">검토 및 수정으로</button>
+              <button type="button" class="primary" id="publish-draft" disabled>페이지 발행</button>
+            </div>
+            <p id="publish-status" role="status"></p>
+          </section>
         </div>
       </main>
     </div>

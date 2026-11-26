@@ -427,24 +427,43 @@ let chatHistory = [];
 function showStep(step) {
   el('compose-setup').hidden = step !== 1;
   el('compose-review').hidden = step !== 2;
-  for (const [id, current] of [['step-one', step === 1], ['step-two', step === 2]]) {
-    if (current) el(id).setAttribute('aria-current', 'step');
-    else el(id).removeAttribute('aria-current');
+  el('compose-publish').hidden = step !== 3;
+  const steps = ['step-one', 'step-two', 'step-three'];
+  steps.forEach((id, index) => {
+    const button = el(id);
+    button.classList.toggle('step-complete', index + 1 < step);
+    if (index + 1 === step) button.setAttribute('aria-current', 'step');
+    else button.removeAttribute('aria-current');
+  });
+  if (step === 3) {
+    if (!published) {
+      el('publish-title').textContent = el('draft-title').value.trim();
+      el('publish-space').textContent = el('selected-space-name').textContent;
+      el('publish-parent').textContent = document.querySelector('[name="parent-page"]:checked')?.labels[0]?.textContent || '';
+    }
+    el('publish-heading').focus();
   }
 }
 el('step-one').addEventListener('click', () => showStep(1));
 el('step-two').addEventListener('click', () => showStep(2));
+el('step-three').addEventListener('click', () => showStep(3));
+el('review-next').addEventListener('click', () => showStep(3));
+el('back-to-review').addEventListener('click', () => showStep(2));
 function updatePublish() {
   const hasParent = !!document.querySelector('[name="parent-page"]:checked');
   const busy = !!(publishing || generation || revision);
   el('step-one').disabled = busy;
   el('step-two').disabled = busy || !draftStorage || !hasParent;
+  const canConfirm = !busy && draftStorage && hasParent && el('draft-title').value.trim();
+  el('step-three').disabled = !canConfirm;
+  el('review-next').disabled = !canConfirm;
+  el('back-to-review').disabled = busy;
   el('compose-setup').disabled = busy;
   el('draft-title').disabled = busy || published;
   el('chat-message').disabled = busy || published;
   el('chat-send').disabled = busy || published || !el('chat-message').value.trim();
   const button = el('publish-draft');
-  button.disabled = !!(busy || published || !draftStorage || !hasParent || !el('draft-title').value.trim());
+  button.disabled = !canConfirm || published;
   button.title = !hasParent ? '작성할 상위 페이지를 선택하세요.' : '';
 }
 function syncPrompt() {
@@ -635,7 +654,7 @@ el('chat-form').addEventListener('submit', async event => {
 el('page-tree').addEventListener('change', updatePublish);
 el('draft-title').addEventListener('input', updatePublish);
 el('publish-draft').addEventListener('click', async () => {
-  if (el('publish-draft').disabled) return;
+  if (el('compose-publish').hidden || el('publish-draft').disabled) return;
   const request = new AbortController();
   publishing = request;
   updatePublish();
