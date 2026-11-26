@@ -11,6 +11,7 @@ from psycopg.types.json import Jsonb
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
+from .sections import align_sections, representative_headings
 from .layout import visual_layout
 from ..authoring.routes import stream_completion
 from ..authoring.storage import safe_view
@@ -108,11 +109,12 @@ def fetch_page(token, path):
     return data
 
 
-def structure(storage):
+def structure(storage, page_title=None):
     # Preserve layout evidence while withholding example values, links and attachment names.
     if not storage.strip():
         raise HTTPException(422, '본문이 비어 있어 추출할 구조가 없습니다.')
     root = html.fragment_fromstring(storage, create_parent='div')
+    headings = representative_headings(root, page_title)
     generic = {'개요','목적','배경','범위','절차','담당자','일정','결과','상태','비고','항목','내용','요약','결론','구분','날짜','부서'}
     for node in root.iterdescendants():
         if not isinstance(node.tag, str) or node.tag in {'script', 'style'}:
@@ -129,6 +131,14 @@ def structure(storage):
         if node.text and node.text.strip() not in generic:
             node.text = '[내용]' if node.text.strip() else ''
         node.tail = '[내용]' if (node.tail or '').strip() else ''
+    major_index = 0
+    for node, (label, is_major) in headings.items():
+        for child in list(node):
+            node.remove(child)
+        node.text = label
+        if is_major:
+            major_index += 1
+            node.set('data-section', f'S{major_index}')
     root.text = '[내용]' if (root.text or '').strip() else ''
     sample = html.tostring(root, encoding='unicode')
     if len(sample) > 100000:
@@ -152,7 +162,7 @@ async def extract(body: Extraction, user=Depends(account)):
     page = await run_in_threadpool(fetch_page, token, f'/rest/api/content/{body.page_id}?expand=body.storage,version')
     if page['version']['number'] != body.version:
         raise HTTPException(409, '원본이 변경되었습니다. 페이지를 다시 불러와 주세요.')
-    sample = structure(page['body']['storage']['value'])
+    sample = structure(page['body']['storage']['value'], page.get('title'))
 
     async def completion():
         try:
@@ -167,6 +177,7 @@ async def extract(body: Extraction, user=Depends(account)):
             blueprint = Blueprint.model_validate_json(choice.message.content or '')
             if not blueprint.name.strip() or not blueprint.sections:
                 raise ValueError
+            align_sections(blueprint, sample)
         except (OpenAIError, ValueError, IndexError):
             return {'detail':'템플릿을 추출하지 못했습니다. 다시 시도해 주세요.'}
 

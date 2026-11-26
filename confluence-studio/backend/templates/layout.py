@@ -27,6 +27,8 @@ def visual_layout(sample):
                 label = ''.join(node.itertext()).strip()
                 result.append({'type': 'heading', 'level': int(tag[1]), 'label': label if '[내용]' not in label else ''})
                 continue
+            elif tag in {'ac:task-list', 'ac:task'}:
+                tag = 'ul' if tag == 'ac:task-list' else 'li'
             elif tag == 'ac:structured-macro':
                 kind = node.get('ac:name')
                 tag = kind if kind in macros else 'panel'

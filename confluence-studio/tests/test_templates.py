@@ -32,5 +32,24 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual([block['type'] for block in layout], ['heading','ol','table','info'])
         self.assertEqual(layout[2]['children'][0]['children'][0]['colspan'], 2)
         self.assertEqual(layout[3]['children'], [{'type':'line'}])
-        self.assertNotIn('Private', str(layout))
+        self.assertEqual(layout[0]['label'], '(예: Private title)')
+        self.assertNotIn('Private task', str(layout))
+        self.assertNotIn('Private column', str(layout))
         self.assertNotIn('Secret', str(layout))
+
+    def test_major_examples_and_three_representative_topics(self):
+        from backend.templates.routes import Blueprint
+        from backend.templates.sections import align_sections
+        body = ''.join(f'<h3>실제 하위 제목 {i}</h3><ul><li>행</li></ul>' for i in range(8))
+        rows = '<tr><td>값</td></tr>' * 7
+        sample = structure(f'<h2>장비 <em>점검</em></h2>{body}<h2>진행 일정</h2><table>{rows}</table>')
+        layout = visual_layout(sample)
+        labels = [block['label'] for block in layout if block['type'] == 'heading']
+        self.assertEqual(labels, ['(예: 장비 점검)', '세부 주제 1', '세부 주제 2', '세부 주제 3', '(예: 진행 일정)'])
+        self.assertEqual(len(layout[-1]['children']), 3)
+        self.assertNotIn('실제 하위', sample)
+        model = Blueprint(name='점검', purpose='보고', styles=[], sections=[
+            {'heading':'S2','instruction':'일정 표'}, {'heading':'S1','instruction':'점검 목록'}])
+        align_sections(model, sample)
+        self.assertEqual([s.heading for s in model.sections], [labels[0], labels[-1]])
+        self.assertEqual(model.sections[0].instruction, '점검 목록')

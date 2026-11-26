@@ -73,7 +73,7 @@ async def generate(body: DraftRequest, token=Depends(connected_token), user=Depe
                     'url':'data:image/jpeg;base64,' + image['thumbnail']}})
             prompt = system_prompt(body.source.name if body.source else None)
             if template:
-                prompt += '\nFollow the supplied template blueprint for section order, format and style. Use the new source for facts. Leave unfilled slots as placeholders when evidence is absent.'
+                prompt += '\nFollow the supplied template blueprint for section order, format and style. Section labels marked (예: ...) are source-title examples: adapt them to the new material. Use the new source for facts. Leave unfilled slots as placeholders when evidence is absent.'
                 content.append({'type':'text','text':json.dumps({'template_blueprint':template}, ensure_ascii=False)})
             result = await complete(prompt, content)
             storage = place_images(result['storage'], images)
