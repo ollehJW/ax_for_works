@@ -31,16 +31,14 @@ function screen(state, result = {}) {
     renderSpacePicker();
     el('space-form').reset();
     el('space-status').textContent = '';
-    el('profile-name').textContent = result.display_name;
-    el('verified').textContent = '최근 확인 ' + new Date(result.last_verified_at).toLocaleString('ko-KR');
     el('workspace-title').focus();
     return;
   }
-  form.hidden = !['missing', 'invalid', 'replace'].includes(state);
+  form.hidden = !['missing', 'invalid'].includes(state);
   el('retry').hidden = state !== 'error';
   field.setAttribute('aria-invalid', String(state === 'invalid'));
   el('form-title').textContent = ({
-    invalid: 'Confluence 계정 다시 연결', replace: 'Access Token 변경',
+    invalid: 'Confluence 계정 다시 연결',
   })[state] || 'Confluence 계정 연결';
   el('description').textContent = ({
     error: '연결 상태를 확인하지 못했습니다.',
@@ -98,7 +96,6 @@ field.addEventListener('input', () => {
 });
 form.addEventListener('submit', event => { event.preventDefault(); check(true); });
 el('retry').addEventListener('click', () => check());
-el('replace').addEventListener('click', () => { screen('replace'); field.focus(); });
 window.addEventListener('pagehide', () => { field.value = ''; reveal(false); });
 window.addEventListener('pageshow', () => check());
 
@@ -148,6 +145,7 @@ el('space-form').addEventListener('submit', async event => {
     renderSpacePicker();
     if (!el('space-dialog').open) {
       picker.value = selected;
+      showSelectedSpaceName();
       return;
     }
     picker.value = result.space_key;
@@ -161,6 +159,11 @@ el('space-form').addEventListener('submit', async event => {
   }
 });
 
+function showSelectedSpaceName() {
+  const picker = el('compose-space');
+  el('selected-space-name').textContent = spaces.find(space => space.space_key === picker.value)?.name
+    ?? picker.selectedOptions[0]?.textContent ?? '';
+}
 function renderSpacePicker() {
   el('compose-space').replaceChildren(
     new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
@@ -173,6 +176,7 @@ function renderSpacePicker() {
     }),
   );
   el('compose-space').disabled = !spaces.length;
+  showSelectedSpaceName();
 }
 
 function pageNode(page, spaceKey) {
@@ -258,6 +262,7 @@ async function loadBranch(container, spaceKey, parentId = null, start = 0) {
 }
 el('compose-space').addEventListener('change', event => {
   const key = event.target.value;
+  showSelectedSpaceName();
   const root = document.createElement('div');
   el('page-tree').replaceChildren(root);
   updatePublish();

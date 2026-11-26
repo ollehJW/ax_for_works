@@ -107,15 +107,9 @@
             </div>
           </form>
           <p id="space-status" role="status"></p>
-          <h2>등록한 스페이스</h2>
+          <h2>등록된 스페이스</h2>
           <ul id="space-list"></ul>
-          <p id="spaces-empty">등록한 스페이스가 없습니다.</p>
-          <section id="account-card" aria-labelledby="profile-title">
-            <h2 id="profile-title">연결된 Confluence 계정</h2>
-            <strong id="profile-name"></strong>
-            <p id="verified"></p>
-            <button id="replace" type="button">토큰 변경</button>
-          </section>
+          <p id="spaces-empty">등록된 스페이스가 없습니다.</p>
         </dialog>
         <div id="compose-columns">
           <nav class="compose-steps" aria-label="페이지 작성 단계">
@@ -164,6 +158,7 @@
               <div class="space-picker">
                 <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
                 <select id="compose-space"></select>
+                <span id="selected-space-name" aria-hidden="true"></span>
               </div>
               <section id="tree-panel" hidden aria-labelledby="tree-heading">
                 <h2 id="tree-heading">페이지 트리</h2>
