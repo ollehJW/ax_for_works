@@ -15,7 +15,7 @@ class DraftLayoutTests(unittest.TestCase):
         prepared, assets = prepare_layout(storage, set())
         names = {image['name'] for image in assets}
         self.assertEqual(len(names), 2)
-        self.assertEqual(prepared.count('<p><br/></p>'), 1)
+        self.assertEqual(prepared.count('<p><br/></p>'), 2)
         self.assertIn('<p><br/></p><h2>B', prepared)
         self.assertEqual(prepare_layout(prepared, names), (prepared, []))
         for asset in assets:
@@ -33,5 +33,18 @@ class DraftLayoutTests(unittest.TestCase):
                          '<ac:rich-text-body><p>문서 안내</p></ac:rich-text-body></ac:structured-macro>'
                          for kind, title in [('panel','결정'),('info','참고'),('tip','가이드'),('warning','주의')])
         storage = macros + '<p><code>=SUM(A1:A5)</code></p>'
-        self.assertEqual(prepare_layout(storage, set()), (storage, []))
+        formatted, assets = prepare_layout(storage, set())
+        self.assertEqual(assets, [])
+        self.assertEqual(formatted.replace('<p><br/></p>', ''), storage)
+        self.assertEqual(formatted.count('<p><br/></p>'), 4)
         validate_storage(storage)
+
+    def test_block_spacing_is_stable_and_preserves_nested_content(self):
+        table = '<table><tbody><tr><td>A</td><td>B</td></tr></tbody></table>'
+        items = '<ul><li>첫째</li><li>둘째</li></ul>'
+        blocks = ['<p>소개</p>', table, items, '<blockquote>인용</blockquote>', '<h2>2. 결론</h2>']
+        gap = '<p><br/></p>'
+        storage = '<h2>1. 개요</h2>' + ''.join(blocks) + '<p>결론 본문</p>'
+        expected = '<h2>1. 개요</h2>' + gap.join(blocks) + '<p>결론 본문</p>'
+        self.assertEqual(prepare_layout(storage, set()), (expected, []))
+        self.assertEqual(prepare_layout(expected.replace(gap, gap * 2), set()), (expected, []))

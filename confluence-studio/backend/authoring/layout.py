@@ -18,13 +18,30 @@ def spacer(node):
             and all(child.tag == 'br' for child in node))
 
 
+HEADINGS = {'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}
+BLOCKS = HEADINGS | {'p', 'table', 'ul', 'ol', 'pre', 'blockquote', 'hr',
+                    f'{{{AC}}}structured-macro', f'{{{AC}}}image'}
+
+
+def space_blocks(root):
+    # Work only on document flow. Rows, list items and macro bodies retain their layout.
+    previous = None
+    for node in list(root):
+        if spacer(node):
+            if spacer(previous) and not (previous.tail or '').strip() and not (node.tail or '').strip():
+                root.remove(node)
+                continue
+        elif previous is not None and not spacer(previous) and not (previous.tail or '').strip():
+            if previous.tag in BLOCKS and node.tag in BLOCKS:
+                starts_chapter = node.tag in {'h1', 'h2'}
+                if previous.tag not in HEADINGS or starts_chapter:
+                    node.addprevious(etree.fromstring(b'<p><br/></p>'))
+        previous = node
+
+
 def prepare_layout(storage, image_names):
     root = validate_storage(storage, image_names)
-    chapters = [n for n in root if n.tag in ('h1', 'h2')]
-    level = 'h1' if any(n.tag == 'h1' for n in chapters) else 'h2'
-    for heading in [n for n in chapters if n.tag == level][1:]:
-        if not spacer(heading.getprevious()):
-            heading.addprevious(etree.fromstring(b'<p><br/></p>'))
+    space_blocks(root)
 
     targets = []
     existing = set()
