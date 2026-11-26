@@ -329,6 +329,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .writing-modes label:has(:checked) { background: #edf4ff; border-color: #799bc8; color: #254f88; }
 .writing-modes input { width: 1em; height: 1em; margin: 0; padding: 0; accent-color: var(--blue); }
 .writing-modes input:focus-visible { outline: 2px solid #7296cb; outline-offset: 2px; }
+#template-empty { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid #ecdbb7; border-radius: 9px; background: #fff9ee; color: #785b26; font-size: 14px; }
+#create-template { flex: none; padding: 7px 12px; border: 1px solid #d2ddeb; border-radius: 7px; background: white; color: #315984; font-size: 13px; }
 #template-field { margin-top: 12px; font-family: "Studio Pretendard", "Malgun Gothic", sans-serif; }
 .draft-editor textarea { resize: vertical; margin-top: 12px; }
 .draft-editor textarea:focus-visible, #draft-title:focus-visible { outline: 2px solid #7296cb; }

@@ -69,7 +69,7 @@
       <nav class="studio-menu" aria-label="주요 메뉴">
         <button type="button" id="compose-menu" aria-current="page">페이지 작성</button>
         <button type="button" disabled>페이지 편집</button>
-        <button type="button" disabled>템플릿 관리</button>
+        <button type="button" id="templates-menu">템플릿 관리</button>
         <button type="button" disabled>마켓플레이스</button>
         <button type="button" disabled>작업 기록</button>
       </nav>
@@ -89,6 +89,7 @@
         <a class="return-link" href="/">← AX for Works로 돌아가기</a>
       </header>
       <main class="workspace-content">
+        <div id="compose-page">
         <header class="compose-heading">
           <div class="compose-heading-copy">
             <span lang="en">CONFLUENCE STUDIO</span>
@@ -170,9 +171,13 @@
                   <label><input type="radio" name="writing-mode" id="use-prompt" aria-controls="draft-request">프롬프팅</label>
                 </div>
                 <div id="template-field" hidden>
-                  <div class="studio-picker">
+                  <div id="template-picker" class="studio-picker" hidden>
                     <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M10 9v12"/></svg>
-                    <select id="draft-template" aria-label="템플릿 선택" disabled><option value="">등록된 템플릿이 없습니다.</option></select>
+                    <select id="draft-template" aria-label="템플릿 선택" disabled><option value="">템플릿을 선택하세요</option></select>
+                  </div>
+                  <div id="template-empty">
+                    <span role="status">등록된 템플릿이 없습니다.</span>
+                    <button type="button" id="create-template">신규 템플릿 생성</button>
                   </div>
                 </div>
                 <textarea id="draft-request" aria-label="작성 방식 프롬프트" hidden disabled maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
@@ -239,6 +244,8 @@
             <p id="publish-status" role="status"></p>
           </section>
         </div>
+        </div>
+        <section id="templates-page" aria-label="템플릿 관리" hidden></section>
       </main>
     </div>
   </div>

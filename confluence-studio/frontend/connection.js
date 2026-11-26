@@ -24,6 +24,7 @@ function screen(state, result = {}) {
   if (el('space-dialog').open) el('space-dialog').close();
   resetDraft();
   if (connected) {
+    showWorkspacePage();
     loadPlatformAccount();
     clearSources();
     spaces = result.spaces || [];
@@ -121,7 +122,28 @@ el('space-list').addEventListener('wheel', event => {
   const rowHeight = list.firstElementChild.offsetHeight;
   list.scrollTop = (Math.round(list.scrollTop / rowHeight) + Math.sign(event.deltaY)) * rowHeight;
 }, { passive: false });
-el('compose-menu').addEventListener('click', () => el('workspace-title').focus());
+function showWorkspacePage() {
+  const templates = location.hash === '#templates';
+  el('compose-page').hidden = templates;
+  el('templates-page').hidden = !templates;
+  const active = el(templates ? 'templates-menu' : 'compose-menu');
+  el(templates ? 'compose-menu' : 'templates-menu').removeAttribute('aria-current');
+  active.setAttribute('aria-current', 'page');
+  el('breadcrumb-menu').textContent = active.textContent;
+  document.title = active.textContent + ' · Confluence Studio';
+}
+window.addEventListener('hashchange', () => {
+  if (!el('workspace').hidden) showWorkspacePage();
+});
+el('compose-menu').addEventListener('click', () => {
+  if (location.hash === '#templates') location.hash = 'compose';
+  else el('workspace-title').focus();
+});
+el('templates-menu').addEventListener('click', () => { location.hash = 'templates'; });
+el('create-template').addEventListener('click', () => {
+  location.hash = 'templates';
+  el('templates-menu').focus();
+});
 el('open-space').addEventListener('click', () => {
   el('space-status').textContent = '';
   el('space-dialog').showModal();
@@ -468,11 +490,17 @@ function updatePublish() {
 }
 function syncWritingMode() {
   el('template-field').hidden = !el('template-mode').checked;
+  const picker = el('draft-template');
+  const hasTemplates = Array.from(picker.options).some(option => option.value);
+  picker.disabled = !hasTemplates;
+  el('template-picker').hidden = !hasTemplates;
+  el('template-empty').hidden = hasTemplates;
   const enabled = el('use-prompt').checked;
   el('draft-request').hidden = !enabled;
   el('draft-request').disabled = !enabled;
   updatePublish();
 }
+el('draft-template').addEventListener('change', updatePublish);
 document.querySelector('.writing-modes').addEventListener('change', syncWritingMode);
 
 function resetChat() {
