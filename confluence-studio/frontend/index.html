@@ -166,7 +166,12 @@
                 <h2 id="draft-heading">작성 방식</h2>
                 <div class="writing-modes" role="radiogroup" aria-labelledby="draft-heading">
                   <label><input type="radio" name="writing-mode" id="free-mode" checked>자유 양식</label>
+                  <label><input type="radio" name="writing-mode" id="template-mode" aria-controls="template-field">템플릿 양식</label>
                   <label><input type="radio" name="writing-mode" id="use-prompt" aria-controls="draft-request">프롬프팅</label>
+                </div>
+                <div id="template-field" hidden>
+                  <label for="draft-template">템플릿 선택</label>
+                  <select id="draft-template" disabled><option value="">등록된 템플릿이 없습니다.</option></select>
                 </div>
                 <textarea id="draft-request" aria-label="작성 방식 프롬프트" hidden disabled maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
               </section>

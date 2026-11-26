@@ -458,6 +458,7 @@ function updatePublish() {
   el('review-next').disabled = !canConfirm;
   el('back-to-review').disabled = busy;
   el('compose-setup').disabled = busy;
+  el('generate-draft').disabled = busy || (el('template-mode').checked && !el('draft-template').value);
   el('draft-title').disabled = busy || published;
   el('chat-message').disabled = busy || published;
   el('chat-send').disabled = busy || published || !el('chat-message').value.trim();
@@ -465,13 +466,14 @@ function updatePublish() {
   button.disabled = !canConfirm || published;
   button.title = !hasParent ? '작성할 상위 페이지를 선택하세요.' : '';
 }
-function syncPrompt() {
+function syncWritingMode() {
+  el('template-field').hidden = !el('template-mode').checked;
   const enabled = el('use-prompt').checked;
   el('draft-request').hidden = !enabled;
   el('draft-request').disabled = !enabled;
+  updatePublish();
 }
-el('free-mode').addEventListener('change', syncPrompt);
-el('use-prompt').addEventListener('change', syncPrompt);
+document.querySelector('.writing-modes').addEventListener('change', syncWritingMode);
 
 function resetChat() {
   chatHistory = [];
@@ -488,7 +490,7 @@ function resetDraft() {
   el('tree-panel').hidden = true;
   el('page-tree').replaceChildren();
   el('free-mode').checked = true;
-  syncPrompt();
+  syncWritingMode();
   publishing = null;
   published = false;
   draftStorage = '';
@@ -503,7 +505,6 @@ function resetDraft() {
   el('view-content').replaceChildren();
   el('draft-view').hidden = true;
   updatePublish();
-  el('generate-draft').disabled = false;
 }
 function filePayload(file) {
   return new Promise((resolve, reject) => {
@@ -574,7 +575,6 @@ el('generate-draft').addEventListener('click', async () => {
   const request = new AbortController();
   generation = request;
   updatePublish();
-  el('generate-draft').disabled = true;
   el('draft-status').textContent = '초안을 작성하고 있습니다.';
   try {
     const source = file ? await filePayload(file) : null;
@@ -598,7 +598,6 @@ el('generate-draft').addEventListener('click', async () => {
   } finally {
     if (generation === request) {
       generation = null;
-      el('generate-draft').disabled = false;
       updatePublish();
     }
   }
@@ -658,7 +657,6 @@ el('publish-draft').addEventListener('click', async () => {
   const request = new AbortController();
   publishing = request;
   updatePublish();
-  el('generate-draft').disabled = true;
   el('publish-status').textContent = 'Confluence에 페이지를 작성하고 있습니다.';
   try {
     const result = await draftPost('/publish', {
@@ -680,7 +678,6 @@ el('publish-draft').addEventListener('click', async () => {
   } finally {
     if (publishing === request) {
       publishing = null;
-      el('generate-draft').disabled = false;
       updatePublish();
     }
   }

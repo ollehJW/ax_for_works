@@ -328,6 +328,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .writing-modes label:has(:checked) { background: #edf4ff; border-color: #799bc8; color: #254f88; }
 .writing-modes input { width: 1em; height: 1em; margin: 0; padding: 0; accent-color: var(--blue); }
 .writing-modes input:focus-visible { outline: 2px solid #7296cb; outline-offset: 2px; }
+#template-field { margin-top: 12px; }
+#draft-template { width: 100%; padding: 10px; border: 1px solid #d4dfed; border-radius: 8px; background: #f5f7fa; color: #526983; font: inherit; }
 .draft-editor textarea { resize: vertical; margin-top: 12px; }
 .draft-editor textarea:focus-visible, #draft-title:focus-visible { outline: 2px solid #7296cb; }
 #draft-status, #preview-status { font-size: 13px; color: #526983; }
