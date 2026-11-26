@@ -78,7 +78,7 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
     const options = () => templates.map(item => new Option(item.blueprint.name, item.page_id));
     picker.replaceChildren(new Option('템플릿을 선택하세요', ''), ...options());
     picker.value = selected || previous || '';
-    el('library-cards').replaceChildren(...templates.map(item => {
+    el('library-cards').replaceChildren(el('new-template'), ...templates.map(item => {
       const card = document.createElement('button');
       card.type = 'button';
       const name = document.createElement('strong');

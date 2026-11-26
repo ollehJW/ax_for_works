@@ -403,10 +403,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .sheet-note, .sheet-warning { border-color: #d5a054; background: #fff7e9; }
 #blueprint-details summary { cursor: pointer; color: #415d82; font-size: 14px; }
 
-.template-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.template-toolbar h2 { margin: 0; }
-#library-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 14px; }
-#library-cards:not(:empty) { margin-top: 20px; }
+#library-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 14px; margin-top: 20px; }
 #library-cards button { display: grid; align-content: start; gap: 8px; padding: 20px; min-height: 110px; border: 1px solid #d2dfee; border-radius: 12px; background: #f8fbff; text-align: left; overflow-wrap: anywhere; color: #264b7d; }
 #library-cards button:hover { background: #edf4ff; border-color: #7a9cca; }
 #library-cards button span, .preview-label { font-size: 13px; color: #546d89; }
@@ -414,3 +411,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #template-entry { margin-bottom: 16px; }
 .preview-label { display: block; margin-bottom: 6px; }
 #blueprint h3 { margin-top: 0; }
+
+#library-cards #new-template { place-content: center; justify-items: center; border: 2px dashed #9ab4d5; background: #f4f8ff; }
+#library-cards #new-template:hover { background: #eaf2ff; border-color: #6286b4; }
+#library-cards #new-template span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #deebff; color: #375f93; font-size: 22px; line-height: 1; }

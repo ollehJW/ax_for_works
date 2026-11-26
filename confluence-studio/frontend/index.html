@@ -251,11 +251,13 @@
             <p>기존 페이지의 구성을 추출해 새 문서의 양식으로 사용하세요.</p>
           </div></header>
           <section class="template-card" id="template-library">
-            <header class="template-toolbar"><h2>내 템플릿</h2>
-              <button class="primary" id="new-template" type="button">신규 템플릿 생성</button>
-            </header>
+            <h2>내 템플릿</h2>
+            <div id="library-cards">
+              <button id="new-template" type="button">
+                <span aria-hidden="true">+</span><strong>신규 템플릿 생성</strong>
+              </button>
+            </div>
             <p id="library-empty">추출한 템플릿이 없습니다.</p>
-            <div id="library-cards"></div>
           </section>
           <div id="template-workbench" hidden>
             <button type="button" id="back-to-library">← 내 템플릿</button>
