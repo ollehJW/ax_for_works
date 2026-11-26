@@ -18,16 +18,17 @@ function screen(state, result = {}) {
   const connected = state === 'connected';
   el('setup').hidden = connected;
   el('workspace').hidden = !connected;
-  document.title = connected ? 'Confluence Studio' : '계정 연결 · Confluence Studio';
+  document.title = connected ? '페이지 작성 · Confluence Studio' : '계정 연결 · Confluence Studio';
   field.value = '';
   reveal(false);
+  if (el('space-dialog').open) el('space-dialog').close();
   resetDraft();
   if (connected) {
     loadPlatformAccount();
     clearSources();
-    showCompose(false);
     spaces = result.spaces || [];
     renderSpaces();
+    renderSpacePicker();
     el('space-form').reset();
     el('space-status').textContent = '';
     el('profile-name').textContent = result.display_name;
@@ -110,8 +111,14 @@ function renderSpaces() {
     return item;
   }));
 }
-el('spaces-menu').addEventListener('click', () => showCompose(false));
-el('compose-menu').addEventListener('click', () => showCompose(true));
+el('compose-menu').addEventListener('click', () => el('workspace-title').focus());
+el('open-space').addEventListener('click', () => {
+  el('space-status').textContent = '';
+  el('space-dialog').showModal();
+  el('space-key').focus();
+});
+el('close-space').addEventListener('click', () => el('space-dialog').close());
+el('space-dialog').addEventListener('close', () => el('space-form').reset());
 el('space-form').addEventListener('submit', async event => {
   event.preventDefault();
   const button = event.submitter || el('space-form').querySelector('button');
@@ -135,9 +142,18 @@ el('space-form').addEventListener('submit', async event => {
     spaces = spaces.filter(space => space.space_key !== result.space_key);
     spaces.push(result);
     spaces.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    const picker = el('compose-space');
+    const selected = picker.value;
     renderSpaces();
-    el('space-form').reset();
-    el('space-status').textContent = result.name + ' 스페이스를 등록했습니다.';
+    renderSpacePicker();
+    if (!el('space-dialog').open) {
+      picker.value = selected;
+      return;
+    }
+    picker.value = result.space_key;
+    picker.dispatchEvent(new Event('change'));
+    el('space-dialog').close();
+    picker.focus();
   } catch {
     el('space-status').textContent = '서비스에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.';
   } finally {
@@ -145,36 +161,18 @@ el('space-form').addEventListener('submit', async event => {
   }
 });
 
-function showCompose(active) {
-  for (const [id, current] of [['compose-menu', active], ['spaces-menu', !active]]) {
-    if (current) el(id).setAttribute('aria-current', 'page');
-    else el(id).removeAttribute('aria-current');
-  }
-  const menu = el(active ? 'compose-menu' : 'spaces-menu').textContent;
-  el('workspace-title').textContent = menu;
-  el('breadcrumb-menu').textContent = menu;
-  document.title = menu + ' · Confluence Studio';
-  el('registration-card').hidden = active;
-  el('account-card').hidden = active;
-  el('compose-columns').hidden = !active;
-  const selected = el('compose-space').value;
-  if (active && !(selected && spaces.some(space => space.space_key === selected))) {
-    el('tree-panel').hidden = true;
-    el('page-tree').replaceChildren();
-    el('compose-space').replaceChildren(
-      new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
-      ...spaces.map(space => {
-        const option = new Option('', space.space_key);
-        const key = document.createElement('small');
-        key.textContent = space.space_key;
-        option.append(document.createTextNode(space.name + ' '), key);
-        return option;
-      }),
-    );
-    el('compose-space').disabled = !spaces.length;
-    showStep(1);
-  }
-  updatePublish();
+function renderSpacePicker() {
+  el('compose-space').replaceChildren(
+    new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
+    ...spaces.map(space => {
+      const option = new Option('', space.space_key);
+      const key = document.createElement('small');
+      key.textContent = space.space_key;
+      option.append(document.createTextNode(space.name + ' '), key);
+      return option;
+    }),
+  );
+  el('compose-space').disabled = !spaces.length;
 }
 
 function pageNode(page, spaceKey) {

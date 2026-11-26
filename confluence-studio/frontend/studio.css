@@ -138,7 +138,12 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 }
 
 .studio-menu [aria-current="page"] { background: #ffffff2b; color: white; font-weight: 600; }
-.spaces-card { margin-bottom: 20px; }
+.spaces-card { width: min(560px, 92vw); max-height: 85vh; margin: auto; color: #1e314f; box-shadow: 0 18px 64px #172e4e35; }
+.spaces-card::backdrop { background: #172e4e66; }
+.space-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.space-heading label, .spaces-card .space-heading h2 { margin: 0; }
+.space-heading button { padding: 7px 12px; border: 1px solid #cbd9ea; border-radius: 7px; color: #315984; background: #f5f8fd; font-size: 13px; }
+#account-card { margin-top: 20px; border-top: 1px solid #dfe6ef; }
 .spaces-card p, #space-list { color: #526983; font-size: 14px; line-height: 1.6; }
 .space-key-guide { margin: 10px 0 16px; padding: 14px 16px; border: 1px solid #dbe5f3; border-radius: 9px; background: #f6f9fe; }
 .space-key-guide .guide-caption { margin: 0 0 8px; font-size: 12px; font-weight: 600; }
@@ -172,7 +177,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
   box-shadow: 0 4px 14px #244a8110;
   font-family: "Studio Pretendard", "Malgun Gothic", sans-serif; font-weight: 500;
 }
-#compose-panel > label { margin-bottom: 10px; font-size: 15px; font-weight: 600; letter-spacing: -.025em; }
+#compose-panel .space-heading label { font-size: 15px; font-weight: 600; letter-spacing: -.025em; }
 .space-picker { position: relative; color: #446ca5; }
 .space-picker svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .space-picker::after { content: ""; position: absolute; right: 13px; top: calc(50% - 5px); width: 7px; height: 7px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); pointer-events: none; }
