@@ -102,12 +102,26 @@ window.addEventListener('pageshow', () => check());
 let spaces = [];
 function renderSpaces() {
   el('spaces-empty').hidden = spaces.length > 0;
-  el('space-list').replaceChildren(...spaces.map(space => {
+  const list = el('space-list');
+  list.tabIndex = spaces.length > 5 ? 0 : -1;
+  list.replaceChildren(...spaces.map(space => {
     const item = document.createElement('li');
-    item.textContent = space.name + ' (' + space.space_key + ')';
+    const name = document.createElement('strong');
+    name.textContent = space.name;
+    const key = document.createElement('small');
+    key.textContent = space.space_key;
+    item.title = space.name + ' (' + space.space_key + ')';
+    item.append(name, key);
     return item;
   }));
 }
+el('space-list').addEventListener('wheel', event => {
+  const list = event.currentTarget;
+  if (event.ctrlKey || !event.deltaY || list.scrollHeight <= list.clientHeight) return;
+  event.preventDefault();
+  const rowHeight = list.firstElementChild.offsetHeight;
+  list.scrollTop = (Math.round(list.scrollTop / rowHeight) + Math.sign(event.deltaY)) * rowHeight;
+}, { passive: false });
 el('compose-menu').addEventListener('click', () => el('workspace-title').focus());
 el('open-space').addEventListener('click', () => {
   el('space-status').textContent = '';

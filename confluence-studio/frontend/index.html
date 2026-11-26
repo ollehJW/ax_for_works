@@ -92,24 +92,32 @@
         <dialog id="space-dialog" class="profile-card spaces-card" aria-labelledby="space-dialog-title">
           <header class="space-heading">
             <h2 id="space-dialog-title">신규 스페이스 등록</h2>
-            <button type="button" id="close-space">닫기</button>
+            <button type="button" id="close-space" aria-label="닫기" title="닫기">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m4 4 8 8m0-8-8 8"/></svg>
+            </button>
           </header>
-          <form id="space-form">
-            <label for="space-key">스페이스 키</label>
-            <div class="space-key-guide">
-              <p class="guide-caption">Confluence 주소 예시</p>
-              <code class="space-example">https://confluence.hmg-corp.io/spaces/<mark>WIADXLAB</mark>/overview</code>
-              <p id="space-help">주소에서 <code>/spaces/</code> 다음에 있는 <strong>WIADXLAB</strong>이 스페이스 키입니다. 내 스페이스 주소에서 같은 위치의 값을 입력하세요.</p>
+          <div class="space-dialog-body">
+            <div>
+              <form id="space-form">
+                <label for="space-key">스페이스 키</label>
+                <div class="space-key-guide">
+                  <p class="guide-caption">Confluence 주소 예시</p>
+                  <code class="space-example">https://confluence.hmg-corp.io/spaces/<mark>WIADXLAB</mark>/overview</code>
+                  <p id="space-help">주소에서 <code>/spaces/</code> 다음에 있는 <strong>WIADXLAB</strong>이 스페이스 키입니다. 내 스페이스 주소에서 같은 위치의 값을 입력하세요.</p>
+                </div>
+                <div class="space-entry">
+                  <input id="space-key" required maxlength="255" placeholder="예: WIADXLAB" aria-describedby="space-help" autocomplete="off">
+                  <button class="primary" type="submit">등록</button>
+                </div>
+              </form>
+              <p id="space-status" role="status"></p>
             </div>
-            <div class="space-entry">
-              <input id="space-key" required maxlength="255" placeholder="예: WIADXLAB" aria-describedby="space-help" autocomplete="off">
-              <button class="primary" type="submit">등록</button>
-            </div>
-          </form>
-          <p id="space-status" role="status"></p>
-          <h2>등록된 스페이스</h2>
-          <ul id="space-list"></ul>
-          <p id="spaces-empty">등록된 스페이스가 없습니다.</p>
+            <section class="space-directory" aria-labelledby="space-list-title">
+              <h3 id="space-list-title">등록된 스페이스</h3>
+              <ul id="space-list" aria-labelledby="space-list-title"></ul>
+              <p id="spaces-empty">등록된 스페이스가 없습니다.</p>
+            </section>
+          </div>
         </dialog>
         <div id="compose-columns">
           <nav class="compose-steps" aria-label="페이지 작성 단계">
