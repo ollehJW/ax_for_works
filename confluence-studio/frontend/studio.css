@@ -266,9 +266,12 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .draft-editor { min-width: 0; padding: 22px; background: white; border: 1px solid #d9e3f0; border-radius: 14px; }
 .draft-editor h2 { margin: 0 0 16px; font-size: 16px; }
 .draft-editor textarea, #draft-title { display: block; width: 100%; padding: 10px; border: 1px solid #bccde1; border-radius: 8px; font: inherit; line-height: 1.5; }
-.draft-editor textarea { resize: vertical; }
+.prompt-toggle { display: flex; align-items: center; gap: 8px; width: fit-content; cursor: pointer; }
+.prompt-toggle input { width: 1em; height: 1em; margin: 0; padding: 0; accent-color: var(--blue); }
+.prompt-toggle input:focus-visible { outline: 2px solid #7296cb; outline-offset: 2px; }
+.draft-editor textarea { resize: vertical; margin-bottom: 12px; }
 .draft-editor textarea:focus-visible, #draft-title:focus-visible { outline: 2px solid #7296cb; }
-.draft-hint, #draft-status, #preview-status { font-size: 13px; color: #526983; }
+#draft-status, #preview-status { font-size: 13px; color: #526983; }
 .draft-editor .primary { width: auto; min-height: 38px; padding: 8px 16px; }
 .draft-editor .primary:disabled { opacity: .65; }
 #draft-result { min-width: 0; min-height: 500px; padding: clamp(24px, 3vw, 52px); background: white; border: 1px solid #d9e3f0; border-radius: 14px; box-shadow: 0 4px 16px #244a8110; }

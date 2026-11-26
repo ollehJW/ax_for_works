@@ -409,7 +409,16 @@ function updatePublish() {
   button.disabled = !!(publishing || generation || published || !draftStorage || !hasParent || !el('draft-title').value.trim());
   button.title = !hasParent ? '작성할 상위 페이지를 선택하세요.' : '';
 }
+function syncPrompt() {
+  const enabled = el('use-prompt').checked;
+  el('draft-request').hidden = !enabled;
+  el('draft-request').disabled = !enabled;
+}
+el('use-prompt').addEventListener('change', syncPrompt);
+
 function resetDraft() {
+  el('use-prompt').checked = false;
+  syncPrompt();
   publishing = null;
   published = false;
   draftStorage = '';
@@ -478,9 +487,9 @@ async function previewDraft() {
   }
 }
 el('generate-draft').addEventListener('click', async () => {
-  const instructions = el('draft-request').value.trim();
+  const instructions = el('use-prompt').checked ? el('draft-request').value.trim() : '';
   const file = sourceFile;
-  if (!instructions && !file) { el('draft-status').textContent = '작성 요청을 입력하거나 자료를 첨부해 주세요.'; return; }
+  if (!instructions && !file) { el('draft-status').textContent = '자료를 첨부하거나 작성 프롬프트를 입력해 주세요.'; return; }
   if (file && file.size > 8 * 1024 * 1024) { el('draft-status').textContent = '8 MB 이하의 문서를 첨부해 주세요.'; return; }
   const request = new AbortController();
   generation = request;
