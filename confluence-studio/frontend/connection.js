@@ -471,6 +471,7 @@ function syncPrompt() {
   el('draft-request').hidden = !enabled;
   el('draft-request').disabled = !enabled;
 }
+el('free-mode').addEventListener('change', syncPrompt);
 el('use-prompt').addEventListener('change', syncPrompt);
 
 function resetChat() {
@@ -487,7 +488,7 @@ function resetDraft() {
   el('compose-space').replaceChildren();
   el('tree-panel').hidden = true;
   el('page-tree').replaceChildren();
-  el('use-prompt').checked = false;
+  el('free-mode').checked = true;
   syncPrompt();
   publishing = null;
   published = false;
