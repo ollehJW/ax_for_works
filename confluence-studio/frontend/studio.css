@@ -383,3 +383,22 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #blueprint ol, #blueprint ul { padding-left: 24px; }
 #blueprint-sections li { margin-bottom: 10px; }
 #blueprint-sections strong { display: block; }
+.template-sheet { margin: 18px 0; padding: 18px; background: #f3f6fa; border-radius: 10px; }
+.template-sheet figcaption { margin-bottom: 10px; font-size: 13px; font-weight: 650; color: #4e6482; }
+#sheet-body { background: white; padding: 20px; border: 1px solid #dce4ef; border-radius: 5px; box-shadow: 0 2px 6px #3149650d; max-height: 52vh; overflow: auto; }
+#sheet-body .sheet-heading { margin: 16px 0 8px; font-size: 15px; font-weight: 700; color: #29496e; }
+#sheet-body > :first-child { margin-top: 0; }
+#sheet-body .subheading { font-size: 13px; }
+.sheet-line { width: 80%; min-width: 12px; height: 5px; border-radius: 3px; margin: 7px 0; background: #dce3eb; }
+.sheet-line:nth-child(even) { width: 60%; }
+.sheet-divider { border-top: 1px solid #dce3eb; margin: 12px 0; }
+.sheet-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.sheet-table :is(th,td) { border: 1px solid #d2dce7; padding: 3px 7px; }
+.sheet-table th { background: #eef3f9; }
+.sheet-columns { display: flex; gap: 10px; }
+.sheet-column { flex: 1; min-width: 0; }
+.sheet-image { display: grid; place-items: center; min-height: 46px; color: #6b8099; border: 1px dashed #b1c3d6; border-radius: 5px; font-size: 12px; }
+.sheet-info, .sheet-tip, .sheet-note, .sheet-warning, .sheet-panel, .sheet-code, .sheet-expand, .sheet-toc, .sheet-blockquote { margin: 9px 0; border-left: 3px solid #84a5cf; background: #f0f5fc; padding: 8px 12px; font-size: 12px; }
+.sheet-tip { border-color: #68a58a; background: #eff7f3; }
+.sheet-note, .sheet-warning { border-color: #d5a054; background: #fff7e9; }
+#blueprint-details summary { cursor: pointer; color: #415d82; font-size: 14px; }

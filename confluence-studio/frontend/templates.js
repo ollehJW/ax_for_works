@@ -1,3 +1,47 @@
+const layoutTags = new Set(['table', 'tr', 'th', 'td', 'ul', 'ol', 'li', 'blockquote']);
+const panelNames = { info: '정보', tip: '가이드', warning: '주의', note: '참고', panel: '패널',
+  code: '코드', expand: '접기 영역', toc: '목차' };
+
+function drawTemplate(blueprint) {
+  // Older templates have section instructions but no source layout snapshot.
+  const layout = blueprint.layout || blueprint.sections.flatMap(section => {
+    const line = { type: 'line' };
+    let body = line;
+    if (/표로|표를|표 형식|테이블/.test(section.instruction)) {
+      body = { type: 'table', children: ['th', 'td'].map(type => ({
+        type: 'tr', children: Array.from({ length: 2 }, () => ({ type, children: [line] })),
+      })) };
+    } else if (/목록|리스트|글머리/.test(section.instruction)) {
+      body = { type: 'ul', children: [1, 2].map(() => ({ type: 'li', children: [line] })) };
+    }
+    return [{ type: 'heading', level: 2, label: section.heading }, body];
+  });
+  let headingIndex = 0;
+  function block(item) {
+    const kind = item.type;
+    const node = document.createElement(layoutTags.has(kind) ? kind : 'div');
+    node.className = 'sheet-' + kind;
+    if (kind === 'heading') {
+      node.textContent = item.label || blueprint.sections[headingIndex]?.heading || '섹션 제목';
+      node.classList.toggle('subheading', item.level > 2);
+      headingIndex++;
+    } else if (Object.hasOwn(panelNames, kind)) {
+      const label = document.createElement('strong');
+      label.textContent = panelNames[kind];
+      node.append(label);
+    } else if (kind === 'image') {
+      node.textContent = '이미지';
+    }
+    if (kind === 'th' || kind === 'td') {
+      node.colSpan = item.colspan || 1;
+      node.rowSpan = item.rowspan || 1;
+    }
+    for (const child of item.children || []) node.append(block(child));
+    return node;
+  }
+  return layout.map(block);
+}
+
 export function setupTemplates(el, syncWritingMode, goToLogin) {
   let templates = [];
   let source = null;
@@ -11,6 +55,9 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
     const { name, purpose, sections, styles } = item.blueprint;
     el('blueprint-name').textContent = name;
     el('blueprint-purpose').textContent = purpose;
+    el('sheet-caption').textContent = item.blueprint.layout ? '양식 미리보기' : '섹션 구성 미리보기';
+    el('sheet-body').replaceChildren(...drawTemplate(item.blueprint));
+    el('blueprint-details').open = false;
     el('blueprint-sections').replaceChildren(...sections.map(section => {
       const row = document.createElement('li');
       const title = document.createElement('strong');

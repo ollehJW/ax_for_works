@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi import HTTPException
+from backend.templates.layout import visual_layout
 from backend.templates.routes import page_path, structure
 
 
@@ -23,3 +24,13 @@ class TemplateTests(unittest.TestCase):
             self.assertIn(expected,shape)
         for secret in ('Company confidential','Alice','private.png'):
             self.assertNotIn(secret,shape)
+
+    def test_visual_layout_keeps_order_without_body_values(self):
+        layout = visual_layout(structure('<h2>Private title</h2><ol><li>Private task</li></ol>'
+            '<table><tr><th colspan="2">Private column</th></tr></table>'
+            '<ac:structured-macro ac:name="info"><ac:rich-text-body><p>Secret</p></ac:rich-text-body></ac:structured-macro>'))
+        self.assertEqual([block['type'] for block in layout], ['heading','ol','table','info'])
+        self.assertEqual(layout[2]['children'][0]['children'][0]['colspan'], 2)
+        self.assertEqual(layout[3]['children'], [{'type':'line'}])
+        self.assertNotIn('Private', str(layout))
+        self.assertNotIn('Secret', str(layout))

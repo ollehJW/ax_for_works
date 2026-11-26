@@ -11,6 +11,7 @@ from psycopg.types.json import Jsonb
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
+from .layout import visual_layout
 from ..authoring.routes import stream_completion
 from ..authoring.storage import safe_view
 from ..core.confluence import confluence_get
@@ -179,6 +180,6 @@ async def extract(body: Extraction, user=Depends(account)):
                     SET version=excluded.version, blueprint=excluded.blueprint
                     WHERE confluence_studio.templates.version <= excluded.version
                     RETURNING page_id, blueprint""",
-                    (body.page_id, body.version, Jsonb(blueprint.model_dump()), user, key)).fetchone()
+                    (body.page_id, body.version, Jsonb({**blueprint.model_dump(), 'layout': visual_layout(sample)}), user, key)).fetchone()
         return await run_in_threadpool(save) or {'detail':'페이지 또는 연결 정보가 변경되었습니다. 다시 확인해 주세요.'}
     return stream_completion(completion)

@@ -271,8 +271,14 @@
               <select id="library-picker" aria-label="저장된 템플릿" hidden></select>
               <div id="blueprint" hidden>
                 <h3 id="blueprint-name"></h3><p id="blueprint-purpose"></p>
-                <h4>섹션 구성</h4><ol id="blueprint-sections"></ol>
-                <h4 id="style-heading">서식과 스타일</h4><ul id="blueprint-styles"></ul>
+                <figure class="template-sheet">
+                  <figcaption id="sheet-caption"></figcaption>
+                  <div id="sheet-body"></div>
+                </figure>
+                <details id="blueprint-details"><summary>작성 지침 보기</summary>
+                  <h4>섹션 구성</h4><ol id="blueprint-sections"></ol>
+                  <h4 id="style-heading">서식과 스타일</h4><ul id="blueprint-styles"></ul>
+                </details>
               </div>
             </section>
           </div>

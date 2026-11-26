@@ -57,7 +57,7 @@ async def generate(body: DraftRequest, token=Depends(connected_token), user=Depe
                 WHERE user_id=%s AND page_id=%s""", (user,body.template_id)).fetchone()
         if not row:
             raise HTTPException(404, '선택한 템플릿을 다시 확인해 주세요.')
-        template = row['blueprint']
+        template = {key: value for key, value in row['blueprint'].items() if key != 'layout'}
     material = await run_in_threadpool(source_material, body.source) if body.source else {'text': '', 'images': []}
     images = material['images']
     if not material['text'] and not images and not body.instructions.strip() and not template:
