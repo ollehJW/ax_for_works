@@ -122,7 +122,18 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .workspace-header a:hover { text-decoration: underline; }
 .return-link { padding: 8px 12px; border: 1px solid #dce5ef; border-radius: 5px; background: white; color: #365674; font-size: 13px; }
 .workspace-content { margin: 0; padding: 36px 39px; }
-.workspace-content h1 { margin: 0 0 24px; color: #1e3656; font-size: 28px; }
+.compose-heading { display: flex; align-items: center; justify-content: space-between; min-height: 174px; margin-bottom: 20px; padding: 30px 36px; overflow: hidden; border: 1px solid #dce6f4; border-radius: 18px; background: radial-gradient(ellipse at 100% 0%, #ddeaff, transparent 60%), linear-gradient(110deg, white 10%, #f0f6ff); font-family: "Studio Pretendard", "Malgun Gothic", sans-serif; }
+.compose-heading-copy { padding-left: 20px; border-left: 3px solid #3868b7; }
+.compose-heading-copy > span { display: block; margin-bottom: 9px; font-size: 11px; font-weight: 700; letter-spacing: 2.2px; color: #436ba5; }
+.compose-heading h1 { margin: 0; color: #173c72; font-size: 32px; letter-spacing: -1px; line-height: 1.35; }
+.compose-heading p { margin: 10px 0 0; font-size: 15px; line-height: 1.7; color: #506783; }
+.compose-heading-art { position: relative; display: grid; place-items: center; flex: none; width: 150px; height: 110px; margin: 0 24px 0 36px; }
+.compose-heading-art::before { content: ""; position: absolute; width: 132px; height: 132px; border: 1px solid #cbdcf4; border-radius: 50%; }
+.compose-heading-sheet { position: relative; display: grid; align-content: center; gap: 9px; width: 88px; height: 102px; padding: 18px; transform: rotate(-8deg); border: 1px solid #d3e1f4; border-radius: 14px; background: #ffffffed; box-shadow: 0 10px 24px #244e8d0d; }
+.compose-heading-sheet i { height: 4px; border-radius: 4px; background: #d8e5f7; }
+.compose-heading-sheet i:first-child { width: 55%; height: 7px; background: #7194c7; }
+.compose-heading-sheet i:last-child { width: 72%; }
+.compose-heading-art > span { position: absolute; right: 14px; top: 0; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid white; border-radius: 11px; background: #3566ad; color: white; font: 24px/1 sans-serif; }
 .profile-card { max-width: 560px; padding: 26px; border: 1px solid #dfe6ef; border-radius: 14px; background: white; overflow-wrap: anywhere; }
 .profile-card h2 { margin-bottom: 18px; font-size: 18px; }
 @media (max-width: 700px) {
