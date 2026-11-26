@@ -126,7 +126,8 @@ el('space-list').addEventListener('wheel', event => {
   list.scrollTop = (Math.round(list.scrollTop / rowHeight) + Math.sign(event.deltaY)) * rowHeight;
 }, { passive: false });
 function showWorkspacePage() {
-  const templates = location.hash === '#templates';
+  const templates = /^#templates(?:\/|$)/.test(location.hash);
+  templateLibrary.navigate(location.hash);
   el('compose-page').hidden = templates;
   el('templates-page').hidden = !templates;
   const active = el(templates ? 'templates-menu' : 'compose-menu');
@@ -139,12 +140,12 @@ window.addEventListener('hashchange', () => {
   if (!el('workspace').hidden) showWorkspacePage();
 });
 el('compose-menu').addEventListener('click', () => {
-  if (location.hash === '#templates') location.hash = 'compose';
+  if (!el('templates-page').hidden) location.hash = 'compose';
   else el('workspace-title').focus();
 });
 el('templates-menu').addEventListener('click', () => { location.hash = 'templates'; });
 el('create-template').addEventListener('click', () => {
-  location.hash = 'templates';
+  location.hash = 'templates/new';
   el('templates-menu').focus();
 });
 el('open-space').addEventListener('click', () => {

@@ -250,8 +250,16 @@
             <span lang="en">CONFLUENCE STUDIO</span><h1 id="templates-title">템플릿 관리</h1>
             <p>기존 페이지의 구성을 추출해 새 문서의 양식으로 사용하세요.</p>
           </div></header>
-          <div class="template-workspace">
-            <section class="template-card">
+          <section class="template-card" id="template-library">
+            <header class="template-toolbar"><h2>내 템플릿</h2>
+              <button class="primary" id="new-template" type="button">신규 템플릿 생성</button>
+            </header>
+            <p id="library-empty">추출한 템플릿이 없습니다.</p>
+            <div id="library-cards"></div>
+          </section>
+          <div id="template-workbench" hidden>
+            <button type="button" id="back-to-library">← 내 템플릿</button>
+            <section id="template-entry" class="template-card">
               <form id="template-source-form">
                 <label for="template-url">Confluence 페이지 URL</label>
                 <div class="template-url-row">
@@ -260,16 +268,14 @@
                 </div>
               </form>
               <p id="template-status" role="status"></p>
-              <section id="template-preview" hidden>
-                <header><h2 id="template-source-title"></h2><button type="button" class="primary" id="extract-template">템플릿 추출</button></header>
+            </section>
+            <div class="template-workspace">
+              <section id="template-preview" class="template-card" hidden>
+                <header><div><span class="preview-label">Confluence 원본</span><h2 id="template-source-title"></h2></div>
+                  <button type="button" class="primary" id="extract-template">템플릿 추출</button></header>
                 <div id="template-view"></div>
               </section>
-            </section>
-            <section class="template-card">
-              <h2>내 템플릿</h2>
-              <p id="library-empty">추출한 템플릿이 없습니다.</p>
-              <select id="library-picker" aria-label="저장된 템플릿" hidden></select>
-              <div id="blueprint" hidden>
+              <section id="blueprint" class="template-card" hidden>
                 <h3 id="blueprint-name"></h3><p id="blueprint-purpose"></p>
                 <figure class="template-sheet">
                   <figcaption id="sheet-caption"></figcaption>
@@ -279,8 +285,8 @@
                   <h4>섹션 구성</h4><ol id="blueprint-sections"></ol>
                   <h4 id="style-heading">서식과 스타일</h4><ul id="blueprint-styles"></ul>
                 </details>
-              </div>
-            </section>
+              </section>
+            </div>
           </div>
         </section>
       </main>

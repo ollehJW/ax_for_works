@@ -46,10 +46,9 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
   let templates = [];
   let source = null;
   let request = null;
-  let timer;
+  let currentRoute = null;
 
-  function showBlueprint() {
-    const item = templates.find(entry => entry.page_id === el('library-picker').value);
+  function showBlueprint(item) {
     el('blueprint').hidden = !item;
     if (!item) return;
     const { name, purpose, sections, styles } = item.blueprint;
@@ -79,11 +78,18 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
     const options = () => templates.map(item => new Option(item.blueprint.name, item.page_id));
     picker.replaceChildren(new Option('템플릿을 선택하세요', ''), ...options());
     picker.value = selected || previous || '';
-    el('library-picker').replaceChildren(...options());
-    if (selected) el('library-picker').value = selected;
-    el('library-picker').hidden = !templates.length;
+    el('library-cards').replaceChildren(...templates.map(item => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      const name = document.createElement('strong');
+      name.textContent = item.blueprint.name;
+      const purpose = document.createElement('span');
+      purpose.textContent = item.blueprint.purpose;
+      card.append(name, purpose);
+      card.addEventListener('click', () => { location.hash = 'templates/' + item.page_id; });
+      return card;
+    }));
     el('library-empty').hidden = !!templates.length;
-    showBlueprint();
     syncWritingMode();
   }
 
@@ -99,7 +105,7 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
   }
 
   function clearSource() {
-    clearTimeout(timer);
+    showBlueprint(null);
     request?.abort();
     request = null;
     source = null;
@@ -127,11 +133,9 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
     }
   }
   el('template-source-form').addEventListener('submit', event => { event.preventDefault(); load(); });
-  el('template-url').addEventListener('input', () => {
-    clearSource();
-    if (el('template-url').value && el('template-url').validity.valid) timer = setTimeout(load, 650);
-  });
-  el('library-picker').addEventListener('change', showBlueprint);
+  el('template-url').addEventListener('input', clearSource);
+  el('new-template').addEventListener('click', () => { location.hash = 'templates/new'; });
+  el('back-to-library').addEventListener('click', () => { location.hash = 'templates'; });
   el('extract-template').addEventListener('click', async () => {
     if (!source || el('extract-template').disabled) return;
     const task = new AbortController();
@@ -143,6 +147,7 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
       if (request !== task) return;
       templates = [item, ...templates.filter(entry => entry.page_id !== item.page_id)];
       render(item.page_id);
+      showBlueprint(item);
       el('template-status').textContent = '내 템플릿에 저장했습니다. 페이지 작성에서 사용할 수 있습니다.';
     } catch (error) {
       if (request === task) el('template-status').textContent = error.message;
@@ -151,7 +156,22 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
     }
   });
   return {
+    navigate(hash) {
+      if (currentRoute === hash) return;
+      currentRoute = hash;
+      clearSource();
+      el('template-url').value = '';
+      const creating = hash === '#templates/new';
+      const item = templates.find(entry => hash === '#templates/' + entry.page_id);
+      const working = creating || !!item;
+      el('template-library').hidden = working;
+      el('template-workbench').hidden = !working;
+      el('template-entry').hidden = !creating;
+      el('templates-title').textContent = creating ? '신규 템플릿 생성' : '템플릿 관리';
+      if (item) showBlueprint(item);
+    },
     reset(items) {
+      currentRoute = null;
       clearSource();
       el('template-url').value = '';
       templates = items;
