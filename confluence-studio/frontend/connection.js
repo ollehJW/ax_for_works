@@ -343,12 +343,12 @@ el('logout').addEventListener('click', async () => {
 });
 
 const sourceFormats = [
-  { name: 'Word', icon: 'W', extensions: ['docx'], recommended: true, note: '문서에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
-  { name: 'Markdown', icon: 'M↓', extensions: ['md'], recommended: true, note: '이미지의 설명과 출처 URL을 페이지 작성에 활용합니다.' },
-  { name: 'PDF', icon: 'PDF', extensions: ['pdf'], recommended: true, note: 'PDF의 사진과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
-  { name: 'Power Point', icon: 'P', extensions: ['pptx'], note: '슬라이드에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
-  { name: 'HTML', icon: '</>', extensions: ['html', 'htm'], note: '이미지의 설명과 출처 URL을 페이지 작성에 활용합니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
-  { name: 'Excel', icon: 'X', extensions: ['xlsx'], note: '시트에 넣은 그림을 페이지 작성에 활용할 수 있습니다. 셀 데이터로 만든 차트는 별도 처리가 필요할 수 있습니다.' },
+  { name: 'Word', extensions: ['docx'], recommended: true, note: '문서에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
+  { name: 'Markdown', extensions: ['md'], recommended: true, note: '이미지의 설명과 출처 URL을 페이지 작성에 활용합니다.' },
+  { name: 'PDF', extensions: ['pdf'], recommended: true, note: 'PDF의 사진과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
+  { name: 'Power Point', extensions: ['pptx'], note: '슬라이드에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
+  { name: 'HTML', extensions: ['html', 'htm'], note: '이미지의 설명과 출처 URL을 페이지 작성에 활용합니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
+  { name: 'Excel', extensions: ['xlsx'], note: '시트에 넣은 그림을 페이지 작성에 활용할 수 있습니다. 셀 데이터로 만든 차트는 별도 처리가 필요할 수 있습니다.' },
 ];
 function formatLabel(format) {
   return format.name + ' (.' + format.extensions[0] + ')';
@@ -361,6 +361,7 @@ function showFormat(format) {
   for (const button of el('source-formats').children) {
     button.setAttribute('aria-pressed', String(button.dataset.format === format?.extensions[0]));
   }
+  el('source-zone').hidden = !format;
   el('source-warning').hidden = !format;
   el('source-warning').querySelector('p').textContent = format ? formatLabel(format) + ' · ' + format.note : '';
 }
@@ -376,17 +377,18 @@ function clearSources() {
 }
 
 el('source-remove').addEventListener('click', () => {
+  const selected = el('source-formats').querySelector('[aria-pressed="true"]');
   clearSources();
-  el('source-drop').focus();
+  selected?.focus();
 });
 el('source-replace').addEventListener('click', () => sourceInput.click());
 for (const format of sourceFormats) {
   const button = document.createElement('button');
   button.type = 'button';
-  const icon = document.createElement('span');
+  const icon = document.createElement('img');
   icon.className = 'format-icon';
-  icon.setAttribute('aria-hidden', 'true');
-  icon.textContent = format.icon;
+  icon.src = './icons/' + format.extensions[0] + '.svg';
+  icon.alt = '';
   const caption = document.createElement('span');
   caption.className = 'format-caption';
   const name = document.createElement('strong');
@@ -395,6 +397,7 @@ for (const format of sourceFormats) {
   extension.textContent = '(.' + format.extensions[0] + ')';
   caption.append(name, extension);
   button.append(icon, caption);
+  button.setAttribute('aria-controls', 'source-zone source-warning');
   button.title = format.extensions.map(ext => '.' + ext).join(', ') + ' 이미지 활용 안내';
   button.dataset.format = format.extensions[0];
   button.setAttribute('aria-pressed', 'false');

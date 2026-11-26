@@ -12,6 +12,10 @@ const assets = new Map([
   ['/connection.js', ['connection.js', 'text/javascript']],
 ]);
 
+for (const ext of ['docx', 'md', 'pdf', 'pptx', 'html', 'xlsx']) {
+  assets.set('/icons/' + ext + '.svg', ['icons/' + ext + '.svg', 'image/svg+xml']);
+}
+
 createServer(async (request, response) => {
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('X-Content-Type-Options', 'nosniff');

@@ -301,13 +301,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .source-panel > p { color: #526983; font-size: 13px; margin: 4px 0 12px; overflow-wrap: anywhere; }
 #source-formats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 #source-formats button { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 72px; padding: 10px 14px; border: 1px solid #cedbe9; border-radius: 12px; background: #fff; box-shadow: 0 2px 4px #244a810a; color: #29415e; text-align: left; }
-.format-icon { --ink: #3264a6; --paper: #e9f1fd; position: relative; flex: none; display: grid; place-items: center; width: 32px; height: 39px; padding-top: 4px; border-radius: 5px; background: var(--paper); color: var(--ink); font: 750 13px/1 system-ui, sans-serif; clip-path: polygon(0 0, 69% 0, 100% 25%, 100% 100%, 0 100%); }
-.format-icon::after { content: ""; position: absolute; top: 0; right: 0; width: 10px; height: 10px; border-bottom-left-radius: 2px; background: var(--ink); opacity: .24; }
-[data-format="md"] .format-icon { --ink: #4f5a70; --paper: #edf0f5; }
-[data-format="pdf"] .format-icon { --ink: #aa4147; --paper: #fbecef; }
-[data-format="pptx"] .format-icon { --ink: #a34f23; --paper: #fff0e5; }
-[data-format="html"] .format-icon { --ink: #7352ab; --paper: #f2edfa; }
-[data-format="xlsx"] .format-icon { --ink: #237251; --paper: #e5f4ed; }
+.format-icon { display: block; flex: none; width: 36px; height: 40px; object-fit: contain; }
 .format-caption { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 6px; min-width: 0; font-size: 12px; color: #586c84; }
 .format-caption strong { width: 100%; font-size: 15px; font-weight: 650; color: #253e5c; }
 .format-caption small { padding: 1px 6px; border-radius: 5px; background: #eaf2fd; color: #345b90; font-size: 10px; }
