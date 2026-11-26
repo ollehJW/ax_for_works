@@ -7,6 +7,7 @@ class Source(BaseModel):
 
 
 class DraftRequest(BaseModel):
+    template_id: str | None = Field(default=None, pattern=r"^[0-9]{1,20}$")
     instructions: str = Field(default='', max_length=12000)
     source: Source | None = None
 

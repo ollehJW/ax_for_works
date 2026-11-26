@@ -1,3 +1,5 @@
+import { setupTemplates } from './templates.js';
+
 const el = id => document.getElementById(id);
 const form = el('token-form');
 const field = el('token');
@@ -22,6 +24,7 @@ function screen(state, result = {}) {
   field.value = '';
   reveal(false);
   if (el('space-dialog').open) el('space-dialog').close();
+  templateLibrary.reset(connected ? result.templates || [] : []);
   resetDraft();
   if (connected) {
     showWorkspacePage();
@@ -615,7 +618,8 @@ el('generate-draft').addEventListener('click', async () => {
     el('draft-status').textContent = '스페이스와 상위 페이지를 선택해 주세요.';
     return;
   }
-  if (!instructions && !file) { el('draft-status').textContent = '자료를 첨부하거나 작성 방식 프롬프트를 입력해 주세요.'; return; }
+  const templateId = el('template-mode').checked ? el('draft-template').value : null;
+  if (!instructions && !file && !templateId) { el('draft-status').textContent = '자료를 첨부하거나 작성 방식 프롬프트를 입력해 주세요.'; return; }
   if (file && file.size > 8 * 1024 * 1024) { el('draft-status').textContent = '8 MB 이하의 문서를 첨부해 주세요.'; return; }
   const request = new AbortController();
   generation = request;
@@ -623,7 +627,7 @@ el('generate-draft').addEventListener('click', async () => {
   el('draft-status').textContent = '초안을 작성하고 있습니다.';
   try {
     const source = file ? await filePayload(file) : null;
-    const draft = await draftPost('', { instructions, source }, request.signal);
+    const draft = await draftPost('', { instructions, source, template_id: templateId }, request.signal);
     if (request.signal.aborted) return;
     draftImages = new Map((draft.images || []).map(image => [image.name, image]));
     el('draft-title').value = draft.title.slice(0, 255);
@@ -727,3 +731,5 @@ el('publish-draft').addEventListener('click', async () => {
     }
   }
 });
+
+const templateLibrary = setupTemplates(el, syncWritingMode, goToLogin);

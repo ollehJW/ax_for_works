@@ -12,7 +12,9 @@ def connected(row, db, user_id, key):
     spaces = db.execute("""SELECT space_key, name FROM confluence_studio.registered_spaces
             WHERE user_id=%s AND confluence_user_key=%s ORDER BY name,space_key""",
             (user_id, key)).fetchall()
-    return {"state": "connected", "spaces": spaces, "display_name": row["display_name"],
+    templates = db.execute("""SELECT page_id, blueprint FROM confluence_studio.templates
+            WHERE user_id=%s AND confluence_user_key=%s ORDER BY blueprint->>'name',page_id""", (user_id,key)).fetchall()
+    return {"state": "connected", "spaces": spaces, "templates": templates, "display_name": row["display_name"],
             "connected_date": row["connected_date"], "last_verified_at": row["last_verified_at"]}
 
 

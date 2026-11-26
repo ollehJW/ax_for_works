@@ -9,6 +9,7 @@ const loginUrl = process.env.PLATFORM_LOGIN_URL || 'https://axforwork.wia.co.kr/
 const assets = new Map([
   ['/', ['index.html', 'text/html']],
   ['/studio.css', ['studio.css', 'text/css']],
+  ['/templates.js', ['templates.js', 'text/javascript']],
   ['/connection.js', ['connection.js', 'text/javascript']],
 ]);
 
@@ -34,7 +35,7 @@ createServer(async (request, response) => {
     return;
   }
   const readConnection = path === '/api/connection' && request.method === 'GET';
-  const studioPost = request.method === 'POST' && ['/api/connection', '/api/spaces', '/api/pages', '/api/draft', '/api/draft/preview', '/api/draft/revise', '/api/draft/publish'].includes(path);
+  const studioPost = request.method === 'POST' && ['/api/connection', '/api/spaces', '/api/templates/preview', '/api/templates/extract', '/api/pages', '/api/draft', '/api/draft/preview', '/api/draft/revise', '/api/draft/publish'].includes(path);
   if (readConnection || studioPost) {
     let body;
     if (request.method === 'POST') {
@@ -71,7 +72,7 @@ createServer(async (request, response) => {
     const upstream = backendRequest({
       host: '127.0.0.1', port: backendPort, path, method: request.method,
       headers: { Cookie: session || '', 'Content-Type': 'application/json', 'X-Studio-Request': '1' },
-      timeout: path === '/api/draft/publish' ? 120000 : path.startsWith('/api/draft') ? 30000 : 12000,
+      timeout: path === '/api/draft/publish' ? 120000 : (path.startsWith('/api/draft') || path.startsWith('/api/templates')) ? 30000 : 12000,
     }, reply => {
       response.writeHead(reply.statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
       reply.pipe(response);

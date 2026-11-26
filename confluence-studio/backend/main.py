@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from .authoring.publish import router as publishing
 from .authoring.routes import router as authoring
 from .connections.routes import router as connections
+from .templates.routes import router as templates
 from .spaces.routes import router as spaces
 from .core.db import database
 from .core.security import cipher
@@ -41,3 +42,4 @@ app.include_router(connections)
 app.include_router(spaces)
 app.include_router(authoring)
 app.include_router(publishing)
+app.include_router(templates)

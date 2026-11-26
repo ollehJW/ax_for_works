@@ -16,3 +16,12 @@ CREATE TABLE IF NOT EXISTS confluence_studio.registered_spaces (
     name text NOT NULL,
     PRIMARY KEY (user_id, confluence_user_key, space_key)
 );
+
+CREATE TABLE IF NOT EXISTS confluence_studio.templates (
+    user_id text NOT NULL REFERENCES confluence_studio.connections(user_id) ON DELETE CASCADE,
+    confluence_user_key text NOT NULL,
+    page_id text NOT NULL,
+    version integer NOT NULL,
+    blueprint jsonb NOT NULL,
+    PRIMARY KEY (user_id, confluence_user_key, page_id)
+);

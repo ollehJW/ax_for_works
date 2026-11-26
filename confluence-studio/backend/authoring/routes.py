@@ -48,10 +48,19 @@ async def complete(prompt, content, schema=SCHEMA):
 
 
 @router.post('/api/draft')
-async def generate(body: DraftRequest, token=Depends(connected_token)):
+async def generate(body: DraftRequest, token=Depends(connected_token), user=Depends(account)):
+    template = None
+    if body.template_id:
+        with database() as db:
+            row = db.execute("""SELECT blueprint FROM confluence_studio.templates
+                JOIN confluence_studio.connections USING (user_id,confluence_user_key)
+                WHERE user_id=%s AND page_id=%s""", (user,body.template_id)).fetchone()
+        if not row:
+            raise HTTPException(404, '선택한 템플릿을 다시 확인해 주세요.')
+        template = row['blueprint']
     material = await run_in_threadpool(source_material, body.source) if body.source else {'text': '', 'images': []}
     images = material['images']
-    if not material['text'] and not images and not body.instructions.strip():
+    if not material['text'] and not images and not body.instructions.strip() and not template:
         raise HTTPException(422, '작성 요청을 입력하거나 자료를 첨부해 주세요.')
 
     async def completion():
@@ -62,7 +71,11 @@ async def generate(body: DraftRequest, token=Depends(connected_token)):
                 content.append({'type':'text','text':f"Source image {image['name']}; location: {image['locations']}"})
                 content.append({'type':'image_url','image_url':{
                     'url':'data:image/jpeg;base64,' + image['thumbnail']}})
-            result = await complete(system_prompt(body.source.name if body.source else None), content)
+            prompt = system_prompt(body.source.name if body.source else None)
+            if template:
+                prompt += '\nFollow the supplied template blueprint for section order, format and style. Use the new source for facts. Leave unfilled slots as placeholders when evidence is absent.'
+                content.append({'type':'text','text':json.dumps({'template_blueprint':template}, ensure_ascii=False)})
+            result = await complete(prompt, content)
             storage = place_images(result['storage'], images)
             storage, formulas = await run_in_threadpool(prepare_layout, storage, {i['name'] for i in images})
             validate_storage(storage, {i['name'] for i in images + formulas})
