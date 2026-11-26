@@ -301,8 +301,8 @@ p{margin:0}
 }
 
 /* picker */
-.picker{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;margin-top:32px;align-items:stretch}
-.qs-wrap{position:relative;min-height:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.picker{--ph:520px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;margin-top:32px}
+.qs-wrap{position:relative;height:var(--ph);border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
 .qs-wrap::after{content:"";position:absolute;left:0;right:0;bottom:0;height:44px;pointer-events:none;
   background:linear-gradient(transparent,var(--surface))}
 .qs{position:absolute;inset:0;overflow-y:auto;counter-reset:q;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-bottom:28px}
@@ -312,22 +312,29 @@ p{margin:0}
 .q:hover{background:var(--surface2)}
 .q:focus-visible{outline:3px solid var(--ax);outline-offset:-3px}
 .q[aria-pressed=true]{background:var(--surface2);font-weight:700;box-shadow:inset 5px 0 0 var(--text)}
-.ans{min-height:440px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
-.meter{position:relative;height:10px;border-radius:999px;margin:34px 0 8px;
-  background:linear-gradient(90deg,var(--ax),var(--both) 50%,var(--cp))}
-.knob{position:absolute;top:50%;width:26px;height:26px;border-radius:50%;background:var(--surface);border:4px solid var(--text);
-  transform:translate(-50%,-50%);left:50%;transition:left .8s cubic-bezier(.3,1.4,.4,1);box-shadow:var(--shadow)}
-.meter-l{display:flex;justify-content:space-between;font-size:12px;font-weight:700}
-.ans-body{margin-top:20px}
-.ans-body.swap{animation:swap .45s ease}
+.ans{--c:var(--ax);--cs:var(--ax-soft);--ci:var(--ax-ink);height:var(--ph);display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.ans.k-cp{--c:var(--cp);--cs:var(--cp-soft);--ci:var(--cp-ink)}
+.ans.k-both{--c:var(--both);--cs:var(--both-soft);--ci:var(--both)}
+.ans-head{flex:none;background:var(--cs);padding:22px 24px 16px;transition:background .5s}
+.ans-head .tag{background:var(--surface)}
+.ans-head h3{font-size:24px;margin-top:8px;color:var(--ci)}
+.ans-head .swap,.ans-body.swap{animation:swap .45s ease}
 @keyframes swap{from{opacity:0;transform:translateY(10px)}}
-.ans h3{font-size:22px;margin:10px 0 8px}
-.ans .why{color:var(--muted);font-size:15px}
-.steps{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px;counter-reset:s}
-.steps li{counter-increment:s;display:flex;gap:10px;align-items:flex-start;font-size:14.5px;
-  background:var(--surface2);border-radius:10px;padding:10px 12px}
-.steps li::before{content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;background:var(--text);color:var(--bg);
-  font-size:12px;font-weight:800;display:grid;place-items:center;margin-top:1px}
+.meter{position:relative;height:8px;border-radius:999px;margin:24px 0 8px;
+  background:linear-gradient(90deg,var(--ax),var(--both) 50%,var(--cp))}
+.knob{position:absolute;top:50%;width:24px;height:24px;border-radius:50%;background:var(--surface);border:4px solid var(--c);
+  transform:translate(-50%,-50%);left:50%;transition:left .8s cubic-bezier(.3,1.4,.4,1),border-color .5s;box-shadow:var(--shadow)}
+.meter-l{display:flex;justify-content:space-between;font-size:12px;font-weight:700}
+.ans-body{flex:1;min-height:0;overflow-y:auto;padding:20px 24px 22px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.ans-t{font-size:12.5px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin-bottom:6px}
+.ans-why{font-size:15.5px;margin-bottom:20px}
+.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;display:flex;gap:12px;align-items:flex-start;font-size:15px;padding-bottom:14px}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:counter(s);flex:none;position:relative;z-index:1;width:24px;height:24px;border-radius:50%;background:var(--c);color:var(--surface);
+  font-size:12.5px;font-weight:800;display:grid;place-items:center}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:11px;top:24px;bottom:0;border-left:2px solid var(--cs)}
 
 /* day: two-lane timeline */
 .day{margin-top:32px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow)}
@@ -449,7 +456,7 @@ footer{padding:0 0 56px;color:var(--muted);font-size:13px}
 @media (max-width:860px){
   section{padding:52px 0}
   .keys,.rules,.match,.picker{grid-template-columns:1fr}
-  .ans{min-height:0}
+  .ans{height:auto}
   .qs-wrap{height:280px}
   .sorter{grid-template-columns:1fr 1fr}
   .stage{grid-column:1/-1;order:-1;min-height:150px}
@@ -698,9 +705,12 @@ footer{padding:0 0 56px;color:var(--muted);font-size:13px}
     <p class="lead rv">목록을 내려 상황을 고르면 어느 쪽이 맞는지와 순서가 나옵니다.</p>
     <div class="picker rv">
       <div class="qs-wrap"><div class="qs" id="qs"></div></div>
-      <div class="ans" aria-live="polite">
-        <div class="meter-l"><span class="ax">AX for Works</span><span style="color:var(--both)">함께</span><span class="cp">Copilot</span></div>
-        <div class="meter"><div class="knob" id="knob"></div></div>
+      <div class="ans" id="ansBox" aria-live="polite">
+        <div class="ans-head">
+          <div id="ansHead"></div>
+          <div class="meter"><div class="knob" id="knob"></div></div>
+          <div class="meter-l"><span class="ax">AX for Works</span><span style="color:var(--both)">함께</span><span class="cp">Copilot</span></div>
+        </div>
         <div class="ans-body" id="ans"></div>
       </div>
     </div>
@@ -962,21 +972,21 @@ footer{padding:0 0 56px;color:var(--muted);font-size:13px}
      why:'회의록은 WiaMeet에서 만들고, 받는 사람에 맞춘 안내 메일은 Copilot이 빠르게 씁니다.',
      steps:['WiaMeet에서 회의록을 내려받습니다','Outlook의 Copilot에게 결정 사항과 담당자 중심의 공유 메일을 요청합니다','내용을 확인하고 보냅니다']}
   ];
-  var qs = $('qs'), ans = $('ans'), knob = $('knob');
+  var qs = $('qs'), ans = $('ans'), knob = $('knob'), ansBox = $('ansBox'), ansHead = $('ansHead');
+  function mk(tag, cls, text){ var el = document.createElement(tag); if (cls) el.className = cls; if (text) el.textContent = text; return el; }
   function show(i){
     var s = sc[i];
     qs.querySelectorAll('.q').forEach(function(b, j){ b.setAttribute('aria-pressed', j === i); });
+    ansBox.className = 'ans k-' + s.k;
     knob.style.left = s.pos + '%';
-    knob.style.borderColor = 'var(--' + s.k + ')';
     var label = s.k === 'ax' ? 'AX for Works' : s.k === 'cp' ? 'Copilot' : '함께 사용';
-    ans.innerHTML = '';
-    var tag = document.createElement('span'); tag.className = 'tag ' + s.k; tag.textContent = label;
-    var h = document.createElement('h3'); h.textContent = s.tool;
-    var p = document.createElement('p'); p.className = 'why'; p.textContent = s.why;
-    var ol = document.createElement('ol'); ol.className = 'steps';
-    s.steps.forEach(function(t){ var li = document.createElement('li'); li.textContent = t; ol.appendChild(li); });
-    ans.append(tag, h, p, ol);
-    ans.classList.remove('swap'); void ans.offsetWidth; ans.classList.add('swap');
+    ansHead.innerHTML = ''; ans.innerHTML = '';
+    ansHead.append(mk('span', 'tag ' + s.k, label), mk('h3', '', s.tool));
+    var ol = mk('ol', 'steps');
+    s.steps.forEach(function(t){ ol.appendChild(mk('li', '', t)); });
+    ans.append(mk('div', 'ans-t', '이유'), mk('p', 'ans-why', s.why), mk('div', 'ans-t', '이렇게 합니다'), ol);
+    ans.scrollTop = 0;
+    [ansHead, ans].forEach(function(el){ el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); });
   }
   sc.forEach(function(s, i){
     var b = document.createElement('button'); b.type = 'button'; b.className = 'q'; b.textContent = s.q;
