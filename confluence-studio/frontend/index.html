@@ -140,6 +140,14 @@
                 <p></p>
               </aside>
             </section>
+            <section class="draft-editor" aria-labelledby="draft-heading">
+              <h2 id="draft-heading">초안 작성</h2>
+              <label for="draft-request">작성 요청</label>
+              <textarea id="draft-request" maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
+              <p class="draft-hint">자료를 첨부하면 문서 형식에 맞춰 표·수식·이미지를 초안에 반영합니다. 첨부 없이 메모만 입력해도 됩니다.</p>
+              <button type="button" class="primary" id="generate-draft">초안 생성</button>
+              <p id="draft-status" role="status"></p>
+            </section>
             <section id="compose-panel" aria-label="페이지 작성 위치">
               <label for="compose-space">스페이스 선택</label>
               <div class="space-picker">
@@ -156,26 +164,18 @@
               </section>
             </section>
           </div>
-          <section class="draft-editor" aria-labelledby="draft-heading">
-            <h2 id="draft-heading">초안 작성</h2>
-            <label for="draft-request">작성 요청</label>
-            <textarea id="draft-request" maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
-            <p class="draft-hint">자료를 첨부하면 문서 형식에 맞춰 표·수식·이미지를 초안에 반영합니다. 첨부 없이 메모만 입력해도 됩니다.</p>
-            <button type="button" class="primary" id="generate-draft">초안 생성</button>
-            <p id="draft-status" role="status"></p>
-            <section id="draft-result" hidden>
+          <article id="draft-result" aria-label="작성할 문서">
+            <header class="document-header">
               <label for="draft-title">페이지 제목</label>
-              <input id="draft-title" maxlength="255">
-              <details><summary>Storage Format 편집</summary>
-                <textarea id="draft-storage" maxlength="100000" rows="10" aria-label="Confluence Storage Format"></textarea>
-              </details>
-              <div class="preview-heading"><h3>Confluence 미리보기</h3>
-                <button type="button" id="refresh-preview">다시 보기</button>
+              <div class="document-title-row">
+                <input id="draft-title" placeholder="페이지 제목을 입력하세요" maxlength="255">
+                <button type="button" class="primary" id="publish-draft" disabled>작성</button>
               </div>
-              <p id="preview-status" role="status"></p>
-              <article id="draft-view" hidden><h2 id="view-title"></h2><div id="view-content"></div></article>
-            </section>
-          </section>
+              <p id="publish-status" role="status"></p>
+            </header>
+            <p id="preview-status" role="status">초안을 생성하면 문서가 여기에 표시됩니다.</p>
+            <div id="draft-view" hidden><div id="view-content"></div></div>
+          </article>
         </div>
       </main>
     </div>

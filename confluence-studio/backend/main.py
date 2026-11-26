@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from .authoring.publish import router as publishing
 from .authoring.routes import router as authoring
 from .connections.routes import router as connections
 from .spaces.routes import router as spaces
@@ -39,3 +40,4 @@ def health():
 app.include_router(connections)
 app.include_router(spaces)
 app.include_router(authoring)
+app.include_router(publishing)

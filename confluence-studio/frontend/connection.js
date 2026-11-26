@@ -159,6 +159,7 @@ function showCompose(active) {
   el('compose-columns').hidden = !active;
   el('tree-panel').hidden = true;
   el('page-tree').replaceChildren();
+  updatePublish();
   if (active) {
     el('compose-space').replaceChildren(
       new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
@@ -259,6 +260,7 @@ el('compose-space').addEventListener('change', event => {
   const key = event.target.value;
   const root = document.createElement('div');
   el('page-tree').replaceChildren(root);
+  updatePublish();
   el('tree-panel').hidden = !key;
   if (key) loadBranch(root, key);
 });
@@ -398,16 +400,30 @@ drop.addEventListener('drop', event => {
 let generation = null;
 let rendering = null;
 let draftImages = new Map();
+let draftStorage = '';
+let publishing = null;
+let published = false;
+function updatePublish() {
+  const hasParent = !!document.querySelector('[name="parent-page"]:checked');
+  const button = el('publish-draft');
+  button.disabled = !!(publishing || generation || published || !draftStorage || !hasParent || !el('draft-title').value.trim());
+  button.title = !hasParent ? '작성할 상위 페이지를 선택하세요.' : '';
+}
 function resetDraft() {
+  publishing = null;
+  published = false;
+  draftStorage = '';
+  el('publish-status').replaceChildren();
   generation?.abort();
   rendering?.abort();
   generation = rendering = null;
   draftImages.clear();
-  for (const id of ['draft-request', 'draft-storage', 'draft-title']) el(id).value = '';
+  for (const id of ['draft-request', 'draft-title']) el(id).value = '';
   el('draft-status').textContent = '';
-  el('preview-status').textContent = '';
+  el('preview-status').textContent = '초안을 생성하면 문서가 여기에 표시됩니다.';
   el('view-content').replaceChildren();
-  el('draft-result').hidden = el('draft-view').hidden = true;
+  el('draft-view').hidden = true;
+  updatePublish();
   el('generate-draft').disabled = false;
 }
 function filePayload(file) {
@@ -436,15 +452,14 @@ async function previewDraft() {
   el('preview-status').textContent = 'Confluence에서 미리보기를 불러오는 중입니다.';
   try {
     const result = await draftPost('/preview', {
-      storage: el('draft-storage').value, image_names: [...draftImages.keys()], parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
+      storage: draftStorage, image_names: [...draftImages.keys()], parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
     }, request.signal);
     if (request.signal.aborted) return;
-    if (result.storage) el('draft-storage').value = result.storage;
+    if (result.storage) draftStorage = result.storage;
     for (const image of result.formulas || []) draftImages.set(image.name, image);
     for (const name of draftImages.keys()) {
-      if (name.startsWith('math-') && !el('draft-storage').value.includes(name)) draftImages.delete(name);
+      if (name.startsWith('math-') && !draftStorage.includes(name)) draftImages.delete(name);
     }
-    el('view-title').textContent = el('draft-title').value;
     // The server removes active content and all external references before returning rendered HTML.
     el('view-content').innerHTML = result.view;
     for (const slot of el('view-content').querySelectorAll('[data-studio-image]')) {
@@ -469,6 +484,12 @@ el('generate-draft').addEventListener('click', async () => {
   if (file && file.size > 8 * 1024 * 1024) { el('draft-status').textContent = '8 MB 이하의 문서를 첨부해 주세요.'; return; }
   const request = new AbortController();
   generation = request;
+  published = false;
+  draftStorage = '';
+  el('draft-view').hidden = true;
+  el('publish-status').replaceChildren();
+  el('preview-status').textContent = '초안을 생성하고 있습니다.';
+  updatePublish();
   el('generate-draft').disabled = true;
   el('draft-status').textContent = '초안을 작성하고 있습니다.';
   try {
@@ -476,21 +497,55 @@ el('generate-draft').addEventListener('click', async () => {
     const draft = await draftPost('', { instructions, source }, request.signal);
     if (request.signal.aborted) return;
     draftImages = new Map((draft.images || []).map(image => [image.name, image]));
-    el('draft-title').value = draft.title;
-    el('draft-storage').value = draft.storage;
+    if (!el('draft-title').value.trim() || el('draft-title').value === el('draft-title').defaultValue) el('draft-title').value = draft.title;
+    el('draft-title').defaultValue = draft.title;
+    draftStorage = draft.storage;
     el('draft-status').textContent = '초안을 작성했습니다.';
-    el('draft-result').hidden = false;
     await previewDraft();
   } catch (error) {
-    if (!request.signal.aborted) el('draft-status').textContent = error.message;
+    if (!request.signal.aborted) {
+      el('draft-status').textContent = error.message;
+      el('preview-status').textContent = '';
+    }
   } finally {
-    if (generation === request) el('generate-draft').disabled = false;
+    if (generation === request) {
+      generation = null;
+      el('generate-draft').disabled = false;
+      updatePublish();
+    }
   }
 });
-el('refresh-preview').addEventListener('click', previewDraft);
-el('draft-title').addEventListener('input', () => { el('view-title').textContent = el('draft-title').value; });
-el('draft-storage').addEventListener('input', () => {
-  rendering?.abort();
-  el('draft-view').hidden = true;
-  el('preview-status').textContent = '수정한 내용을 확인하려면 다시 보기를 눌러주세요.';
+el('page-tree').addEventListener('change', updatePublish);
+el('draft-title').addEventListener('input', updatePublish);
+el('publish-draft').addEventListener('click', async () => {
+  if (el('publish-draft').disabled) return;
+  const request = new AbortController();
+  publishing = request;
+  updatePublish();
+  el('generate-draft').disabled = true;
+  el('publish-status').textContent = 'Confluence에 페이지를 작성하고 있습니다.';
+  try {
+    const result = await draftPost('/publish', {
+      title: el('draft-title').value.trim(), storage: draftStorage,
+      space_key: el('compose-space').value,
+      parent_id: document.querySelector('[name="parent-page"]:checked').value,
+      images: [...draftImages.values()].map(({ name, data }) => ({ name, data })),
+    }, request.signal);
+    if (publishing !== request) return;
+    published = true;
+    const link = document.createElement('a');
+    link.href = result.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = '작성한 페이지 열기';
+    el('publish-status').replaceChildren(result.warning || '페이지를 작성했습니다.', ' ', link);
+  } catch (error) {
+    if (publishing === request) el('publish-status').textContent = error.message;
+  } finally {
+    if (publishing === request) {
+      publishing = null;
+      el('generate-draft').disabled = false;
+      updatePublish();
+    }
+  }
 });
