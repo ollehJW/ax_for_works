@@ -370,6 +370,40 @@ p{margin:0}
   .stop small{display:block;font-size:12.5px;font-variant-numeric:tabular-nums;width:40px;text-align:left}
 }
 
+/* operating principles: decision flow */
+.dflow{margin-top:32px;display:grid;grid-template-columns:1fr 72px 1fr 72px 1fr;grid-template-rows:auto auto auto;column-gap:8px}
+.dstart{grid-column:1;grid-row:1;justify-self:start;position:relative;margin-bottom:26px;font-size:13.5px;font-weight:800;
+  background:var(--text);color:var(--bg);border-radius:999px;padding:6px 16px}
+.dstart::after{content:"";position:absolute;left:28px;top:100%;height:26px;border-left:2px solid var(--muted)}
+.dq{grid-row:2;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:16px 18px;font-size:17px;font-weight:800;
+  box-shadow:var(--shadow);transition:border-color .4s,transform .4s}
+.dq small{display:block;font-size:12px;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
+.da{grid-row:3;position:relative;margin-top:44px;border-radius:14px;padding:18px;background:var(--cs);border-left:5px solid var(--c);
+  transition:box-shadow .4s,transform .4s}
+.da.d-cp{--c:var(--cp);--cs:var(--cp-soft);--ci:var(--cp-ink)}
+.da.d-ax{--c:var(--ax);--cs:var(--ax-soft);--ci:var(--ax-ink)}
+.da.d-both{--c:var(--both);--cs:var(--both-soft);--ci:var(--both)}
+.da::before{content:"";position:absolute;left:28px;bottom:100%;height:44px;border-left:2px solid var(--c)}
+.da i{position:absolute;left:40px;top:-33px;font-style:normal;font-size:13px;font-weight:800;color:var(--ci)}
+.da .tag{background:var(--surface)}
+.da h3{font-size:20px;margin:8px 0 6px;color:var(--ci)}
+.da p{font-size:14.5px}
+.c1{grid-column:1}.c2{grid-column:3}.c3{grid-column:5}
+.dx{grid-row:2;align-self:center;text-align:center;font-size:12.5px;font-weight:800;color:var(--muted)}
+.dx.x1{grid-column:2}.dx.x2{grid-column:4}
+.dx span{display:block}
+.dx svg{display:block;width:100%;height:16px}
+.dx path{fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dq.now{border-color:var(--text);transform:translateY(-3px)}
+.da.now{box-shadow:0 0 0 4px var(--c);transform:translateY(-3px)}
+@media (max-width:860px){
+  .dflow{grid-template-columns:1fr}
+  .dflow>*{grid-column:1!important;grid-row:auto!important}
+  .dx{padding:10px 0 10px 18px;text-align:left;display:flex;gap:8px;align-items:center}
+  .dx svg{width:16px;transform:rotate(90deg)}
+  .dq.now,.da.now{transform:none}
+}
+
 /* principles */
 .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
 .r{border-radius:var(--r);padding:24px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
@@ -644,11 +678,15 @@ footer{padding:0 0 56px;color:var(--muted);font-size:13px}
 <section class="tight">
   <div class="wrap">
     <p class="eyebrow rv">운영 원칙</p>
-    <h2 class="rv">두 서비스를 함께 쓰는 세 가지 원칙</h2>
-    <div class="rules">
-      <div class="r c rv"><span class="tag cp">원칙 1</span><h3>Copilot이 잘하는 일은 새로 만들지 않습니다</h3><p>메일 요약, 문서 초안, 문장 다듬기처럼 Copilot으로 되는 일은 Copilot에 맡깁니다.</p></div>
-      <div class="r a rv"><span class="tag ax">원칙 2</span><h3>Copilot으로 안 되는 정해진 업무만 서비스로 만듭니다</h3><p>우리 양식과 절차가 있는 반복 업무, Office 밖에서 생기는 업무가 대상입니다.</p></div>
-      <div class="r b rv"><span class="tag both">원칙 3</span><h3>하나로 끝나지 않는 일은 이어서 씁니다</h3><p>AX for Works의 결과물을 Copilot으로 다듬고, Copilot으로 쓴 초안을 AX for Works에 넣습니다.</p></div>
+    <h2 class="rv">새 업무가 생기면 이 순서로 판단합니다</h2>
+    <p class="lead rv">Copilot으로 되는지를 먼저 보고, 안 되는 반복 업무만 서비스로 만듭니다.</p>
+    <div class="dflow rv" id="dflow">
+      <div class="dstart">새 업무가 생기면</div>
+      <div class="dq c1" data-s="1"><small>질문 1</small>Copilot으로 되는 일인가요?</div><div class="da c1 d-cp" data-s="1"><i>예</i><span class="tag cp">Copilot</span><h3>Copilot으로 합니다</h3><p>새로 만들지 않습니다. 메일 요약, 문서 초안, 문장 다듬기가 여기에 해당합니다.</p></div>
+      <div class="dx x1"><span>아니오</span><svg viewBox="0 0 64 16" aria-hidden="true"><path d="M2 8H60M53 2l7 6-7 6"/></svg></div>
+      <div class="dq c2" data-s="2"><small>질문 2</small>반복되고 양식이 정해진 일인가요?</div><div class="da c2 d-ax" data-s="2"><i>예</i><span class="tag ax">AX for Works</span><h3>서비스로 만듭니다</h3><p>우리 양식과 절차가 있는 반복 업무, Office 밖에서 생기는 업무가 대상입니다.</p></div>
+      <div class="dx x2"><span>그다음</span><svg viewBox="0 0 64 16" aria-hidden="true"><path d="M2 8H60M53 2l7 6-7 6"/></svg></div>
+      <div class="dq c3" data-s="3"><small>질문 3</small>한 도구로 끝나지 않는 일인가요?</div><div class="da c3 d-both" data-s="3"><i>예</i><span class="tag both">함께</span><h3>이어서 씁니다</h3><p>AX for Works의 결과물을 Copilot으로 다듬고, Copilot으로 쓴 초안을 AX for Works에 넣습니다.</p></div>
     </div>
   </div>
 </section>
@@ -818,6 +856,11 @@ footer{padding:0 0 56px;color:var(--muted);font-size:13px}
   }
   for (var w = 0; w < 4; w++) tmStep();
   if (!reduce) setInterval(tmStep, 1600);
+
+  /* operating principles: walk the three questions */
+  var dEls = document.querySelectorAll('#dflow [data-s]'), di = 0;
+  function dStep(){ di = di % 3 + 1; dEls.forEach(function(el){ el.classList.toggle('now', +el.getAttribute('data-s') === di); }); }
+  if (!reduce){ dStep(); setInterval(dStep, 2200); }
 
   /* operating direction: Venn regions switch the panel below; auto-rotate until the user picks one */
   var vKeys = ['cp', 'both', 'ax'], vi = -1, vTimer = null;
