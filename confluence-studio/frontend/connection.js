@@ -439,6 +439,11 @@ async function previewDraft() {
       storage: el('draft-storage').value, image_names: [...draftImages.keys()], parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
     }, request.signal);
     if (request.signal.aborted) return;
+    if (result.storage) el('draft-storage').value = result.storage;
+    for (const image of result.formulas || []) draftImages.set(image.name, image);
+    for (const name of draftImages.keys()) {
+      if (name.startsWith('math-') && !el('draft-storage').value.includes(name)) draftImages.delete(name);
+    }
     el('view-title').textContent = el('draft-title').value;
     // The server removes active content and all external references before returning rendered HTML.
     el('view-content').innerHTML = result.view;
@@ -446,7 +451,8 @@ async function previewDraft() {
       const image = draftImages.get(slot.dataset.studioImage);
       if (!image) continue;
       const img = document.createElement('img');
-      img.alt = (image.locations || []).join(', ') + ' 이미지';
+      img.alt = image.latex || (image.locations || []).join(', ') + ' 이미지';
+      if (image.latex) img.title = image.latex;
       img.src = 'data:image/' + (image.name.endsWith('.jpg') ? 'jpeg' : 'png') + ';base64,' + image.data;
       slot.replaceWith(img);
     }

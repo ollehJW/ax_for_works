@@ -286,3 +286,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 @media (max-width: 700px) { .draft-editor { grid-column: 1; } }
 
 #view-content img { max-width: 100%; height: auto; vertical-align: middle; }
+
+#draft-view .panel { display: block; background: #f8fafc; border: 1px solid #d5deeb; border-radius: 5px; padding: 10px 14px; }
+#draft-view .panelHeader { font-weight: 600; }
+#draft-view .confluence-information-macro-tip { background: #effaf3; border-color: #a5d8b8; }
+#draft-view .confluence-information-macro-warning { background: #fff4eb; border-color: #efbc90; }

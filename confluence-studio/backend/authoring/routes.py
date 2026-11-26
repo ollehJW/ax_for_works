@@ -15,6 +15,7 @@ from ax_llm_client import create_llm_client, deployment
 from ..core.db import database
 from ..core.security import account, decrypt_token
 from ..sources.reader import source_material
+from .layout import prepare_layout
 from .prompts import system_prompt
 from .schemas import DraftRequest, PreviewRequest
 from .storage import ASSET_NAME, place_images, preview_storage, safe_view, validate_storage
@@ -58,9 +59,10 @@ async def generate(body: DraftRequest, token=Depends(connected_token)):
             if not isinstance(result['title'],str) or not result['title'].strip() or not isinstance(result['storage'],str):
                 raise ValueError
             storage = place_images(result['storage'], images)
-            validate_storage(storage, {i['name'] for i in images})
+            storage, formulas = await run_in_threadpool(prepare_layout, storage, {i['name'] for i in images})
+            validate_storage(storage, {i['name'] for i in images + formulas})
             return {'title':result['title'].strip(), 'storage':storage,
-                    'images':[{k:v for k,v in i.items() if k != 'thumbnail'} for i in images]}
+                    'images':[{k:v for k,v in i.items() if k != 'thumbnail'} for i in images + formulas]}
         except (OpenAIError, ValueError, TypeError, KeyError, IndexError, HTTPException) as exc:
             logging.getLogger(__name__).warning('Draft failed: %s status=%s',type(exc).__name__,getattr(exc,'status_code',None))
             return {'detail':'초안 생성에 실패했습니다. 작성 요청을 확인한 뒤 다시 시도해 주세요.'}
@@ -85,7 +87,9 @@ async def generate(body: DraftRequest, token=Depends(connected_token)):
 def preview(body: PreviewRequest, token=Depends(connected_token)):
     if any(not ASSET_NAME.fullmatch(name) for name in body.image_names):
         raise HTTPException(422, '자료 이미지 이름을 확인해 주세요.')
-    storage, markers = preview_storage(body.storage, set(body.image_names))
+    names = set(body.image_names)
+    formatted, formulas = prepare_layout(body.storage, names)
+    storage, markers = preview_storage(formatted, names | {i['name'] for i in formulas})
     base = os.environ['CONFLUENCE_BASE_URL'].rstrip('/')
     if not base.startswith('https://'):
         raise HTTPException(503, 'Confluence 주소를 확인해 주세요.')
@@ -101,7 +105,6 @@ def preview(body: PreviewRequest, token=Depends(connected_token)):
         value = reply.json()['value']
         if not isinstance(value,str) or not value.strip():
             raise ValueError
-        return {'view':safe_view(value, markers)}
+        return {'view':safe_view(value, markers), 'storage':formatted, 'formulas':formulas}
     except (httpx.HTTPError, KeyError, TypeError, ValueError, etree.ParserError):
         raise HTTPException(502,'Confluence 미리보기를 불러오지 못했습니다. 초안은 그대로 사용할 수 있습니다.') from None
-

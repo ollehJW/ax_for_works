@@ -7,9 +7,9 @@ from lxml import etree, html
 
 AC = 'http://atlassian.com/content'
 RI = 'http://atlassian.com/resource/identifier'
-ASSET_NAME = re.compile(r'(?:pdf|docx|xlsx|pptx)-[a-f0-9]{24}\.(?:png|jpg)')
+ASSET_NAME = re.compile(r'(?:pdf|docx|xlsx|pptx|math)-[a-f0-9]{24}\.(?:png|jpg)')
 TAGS = set('p h1 h2 h3 h4 h5 h6 strong em b i sub sup ul ol li blockquote table tbody thead tr th td br hr pre code'.split())
-MACROS = {'info', 'note', 'warning', 'tip', 'expand', 'code', 'toc'}
+MACROS = {'panel', 'info', 'note', 'warning', 'tip', 'expand', 'code', 'toc'}
 
 
 def validate_storage(value, image_names=()):
@@ -21,8 +21,10 @@ def validate_storage(value, image_names=()):
         for node in root.iterdescendants():
             if not isinstance(node.tag, str):
                 raise ValueError
-            if node.tag == f'{{{AC}}}image' and not node.attrib and len(node) == 1 and node[0].tag == f'{{{RI}}}attachment':
-                continue
+            if node.tag == f'{{{AC}}}image' and len(node) == 1 and node[0].tag == f'{{{RI}}}attachment':
+                if not node.attrib or (set(node.attrib) == {f'{{{AC}}}alt'} and
+                        node[0].get(f'{{{RI}}}filename', '').startswith('math-')):
+                    continue
             if (node.tag == f'{{{RI}}}attachment' and node.getparent().tag == f'{{{AC}}}image'
                     and set(node.attrib) == {f'{{{RI}}}filename'} and not len(node)
                     and node.get(f'{{{RI}}}filename') in image_names):
@@ -55,6 +57,11 @@ def place_images(storage, images):
     return storage
 
 
+def fragment(root):
+    wrapped = etree.tostring(root, encoding='unicode')
+    return wrapped.split('>', 1)[1].rsplit('</root>', 1)[0]
+
+
 def preview_storage(storage, names):
     root = validate_storage(storage, names)
     markers = {}
@@ -66,8 +73,7 @@ def preview_storage(storage, names):
         image.clear(keep_tail=True)
         image.tag = 'strong'
         image.text = marker
-    wrapped = etree.tostring(root, encoding='unicode')
-    return wrapped.split('>', 1)[1].rsplit('</root>', 1)[0], markers
+    return fragment(root), markers
 
 
 def safe_view(value, markers=None):
