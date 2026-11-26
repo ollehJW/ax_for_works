@@ -31,7 +31,6 @@ function screen(state, result = {}) {
     renderSpacePicker();
     el('space-form').reset();
     el('space-status').textContent = '';
-    el('workspace-title').focus();
     return;
   }
   form.hidden = !['missing', 'invalid'].includes(state);

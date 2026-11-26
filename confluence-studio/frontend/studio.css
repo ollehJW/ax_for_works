@@ -126,6 +126,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .compose-heading-copy { padding-left: 20px; border-left: 3px solid #3868b7; }
 .compose-heading-copy > span { display: block; margin-bottom: 9px; font-size: 11px; font-weight: 700; letter-spacing: 2.2px; color: #436ba5; }
 .compose-heading h1 { margin: 0; color: #173c72; font-size: 32px; letter-spacing: -1px; line-height: 1.35; }
+#workspace-title:focus-visible { outline: 2px solid #527cb2; outline-offset: 3px; border-radius: 3px; }
 .compose-heading p { margin: 10px 0 0; font-size: 15px; line-height: 1.7; color: #506783; }
 .compose-heading-art { position: relative; display: grid; place-items: center; flex: none; width: 150px; height: 110px; margin: 0 24px 0 36px; }
 .compose-heading-art::before { content: ""; position: absolute; width: 132px; height: 132px; border: 1px solid #cbdcf4; border-radius: 50%; }
