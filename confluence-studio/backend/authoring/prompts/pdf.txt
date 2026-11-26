@@ -1,0 +1,1 @@
+PDF source: use page numbers and adjacent paragraphs to reconstruct reading order. Recover tables with their headers and units where row/column alignment is unambiguous. Preserve equation layout and exponents where legible; flag uncertain symbols. Use visible image content, diagrams and scanned figures as evidence and insert them near the corresponding explanation.

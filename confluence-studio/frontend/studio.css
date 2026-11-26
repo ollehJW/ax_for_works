@@ -237,7 +237,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .ax-account button:focus-visible{outline:2px solid #83b4ff;outline-offset:3px}
 #logout-status { font-size: 12px; }
 
-#compose-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr); align-items: start; gap: 14px; }
+#compose-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); align-items: start; gap: 14px; }
 .source-panel { min-width: 0; padding: 18px; border: 1px solid #d9e3f0; border-radius: 14px; background: white; box-shadow: 0 4px 14px #244a8110; font: 500 14px/1.55 "Studio Pretendard", "Malgun Gothic", sans-serif; }
 .source-panel h2 { font-size: 16px; margin: 0; }
 .source-panel > p { color: #526983; font-size: 13px; margin: 4px 0 12px; overflow-wrap: anywhere; }
@@ -263,7 +263,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 @media (max-width: 700px) { #compose-columns { grid-template-columns: minmax(0, 1fr); } }
 
 .compose-sidebar { display: grid; align-content: start; gap: 14px; min-width: 0; }
-.draft-editor { grid-column: 3; min-width: 0; padding: 22px; background: white; border: 1px solid #d9e3f0; border-radius: 14px; }
+.draft-editor { grid-column: 2; min-width: 0; padding: 22px; background: white; border: 1px solid #d9e3f0; border-radius: 14px; }
 .draft-editor h2 { margin: 0 0 16px; font-size: 20px; }
 .draft-editor textarea, #draft-title { display: block; width: 100%; padding: 10px; border: 1px solid #bccde1; border-radius: 8px; font: inherit; line-height: 1.5; }
 .draft-editor textarea { resize: vertical; }
@@ -284,3 +284,5 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #draft-view pre { white-space: pre-wrap; }
 #draft-view :is(.confluence-information-macro,.code,.expand-container) { margin: 10px 0; padding: 10px 14px; border: 1px solid #c1d5ef; background: #f5f8ff; border-radius: 4px; }
 @media (max-width: 700px) { .draft-editor { grid-column: 1; } }
+
+#view-content img { max-width: 100%; height: auto; vertical-align: middle; }

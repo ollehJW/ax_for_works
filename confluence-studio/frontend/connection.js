@@ -302,10 +302,10 @@ el('logout').addEventListener('click', async () => {
 
 const sourceFormats = [
   { label: 'Word (.docx)', extensions: ['docx'], recommended: true, note: '문서에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
-  { label: 'Markdown (.md)', extensions: ['md'], recommended: true, note: '페이지 작성에는 접근 가능한 URL로 연결된 이미지만 활용할 수 있습니다.' },
+  { label: 'Markdown (.md)', extensions: ['md'], recommended: true, note: '이미지의 설명과 출처 URL을 페이지 작성에 활용합니다.' },
   { label: 'PDF (.pdf)', extensions: ['pdf'], recommended: true, note: 'PDF의 사진과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
   { label: 'Power Point (.pptx)', extensions: ['pptx'], note: '슬라이드에 넣은 그림과 스크린샷을 페이지 작성에 활용할 수 있습니다.' },
-  { label: 'HTML (.html)', extensions: ['html', 'htm'], note: '페이지 작성에는 접근 가능한 URL로 연결된 이미지만 활용할 수 있습니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
+  { label: 'HTML (.html)', extensions: ['html', 'htm'], note: '이미지의 설명과 출처 URL을 페이지 작성에 활용합니다. 동적 애니메이션이나 클릭·필터 동작은 Confluence 페이지에 그대로 옮기기 어렵습니다.' },
   { label: 'Excel (.xlsx)', extensions: ['xlsx'], note: '시트에 넣은 그림을 페이지 작성에 활용할 수 있습니다. 셀 데이터로 만든 차트는 별도 처리가 필요할 수 있습니다.' },
 ];
 let sourceFile = null;
@@ -397,10 +397,12 @@ drop.addEventListener('drop', event => {
 
 let generation = null;
 let rendering = null;
+let draftImages = new Map();
 function resetDraft() {
   generation?.abort();
   rendering?.abort();
   generation = rendering = null;
+  draftImages.clear();
   for (const id of ['draft-request', 'draft-storage', 'draft-title']) el(id).value = '';
   el('draft-status').textContent = '';
   el('preview-status').textContent = '';
@@ -434,12 +436,20 @@ async function previewDraft() {
   el('preview-status').textContent = 'Confluence에서 미리보기를 불러오는 중입니다.';
   try {
     const result = await draftPost('/preview', {
-      storage: el('draft-storage').value, parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
+      storage: el('draft-storage').value, image_names: [...draftImages.keys()], parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
     }, request.signal);
     if (request.signal.aborted) return;
     el('view-title').textContent = el('draft-title').value;
     // The server removes active content and all external references before returning rendered HTML.
     el('view-content').innerHTML = result.view;
+    for (const slot of el('view-content').querySelectorAll('[data-studio-image]')) {
+      const image = draftImages.get(slot.dataset.studioImage);
+      if (!image) continue;
+      const img = document.createElement('img');
+      img.alt = (image.locations || []).join(', ') + ' 이미지';
+      img.src = 'data:image/' + (image.name.endsWith('.jpg') ? 'jpeg' : 'png') + ';base64,' + image.data;
+      slot.replaceWith(img);
+    }
     el('draft-view').hidden = false;
     el('preview-status').textContent = '';
   } catch (error) {
@@ -459,6 +469,7 @@ el('generate-draft').addEventListener('click', async () => {
     const source = file ? await filePayload(file) : null;
     const draft = await draftPost('', { instructions, source }, request.signal);
     if (request.signal.aborted) return;
+    draftImages = new Map((draft.images || []).map(image => [image.name, image]));
     el('draft-title').value = draft.title;
     el('draft-storage').value = draft.storage;
     el('draft-status').textContent = '초안을 작성했습니다.';

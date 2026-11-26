@@ -1,0 +1,1 @@
+Word source: retain the section sequence, table column headers, rows, units, captions and nearby illustrations. Reconstruct row data as tables rather than a list of cells. Use supplied Office Math structure to preserve fractions, powers, subscripts and variable definitions. Put a screenshot immediately after the step it illustrates.

@@ -1,0 +1,1 @@
+PowerPoint source: turn slide order into a coherent document, grouping related slides. Preserve native table rows and chart categories or series. Keep equations and their units. Put each image near the finding or step that it supports using its slide context. Do not infer geometric relationships that are not visible in the supplied evidence.
