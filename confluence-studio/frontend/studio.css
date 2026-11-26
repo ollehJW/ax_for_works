@@ -237,7 +237,24 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .ax-account button:focus-visible{outline:2px solid #83b4ff;outline-offset:3px}
 #logout-status { font-size: 12px; }
 
-#compose-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 3fr); align-items: start; gap: 14px; }
+.compose-steps { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid #d4dfed; }
+.compose-steps button { background: transparent; color: #526983; padding: 10px 14px; border-bottom: 3px solid transparent; border-radius: 0; }
+.compose-steps button span { margin-right: 4px; font-variant-numeric: tabular-nums; }
+.compose-steps button[aria-current="step"] { color: #234e89; border-bottom-color: #315d9f; }
+.compose-steps button:disabled { opacity: .6; }
+#compose-setup, #compose-review { display: grid; align-items: start; gap: 18px; }
+#compose-setup { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0; margin: 0; border: 0; min-width: 0; }
+#compose-review { grid-template-columns: minmax(260px, 1fr) minmax(0, 2.5fr); }
+.chat-panel { display: flex; flex-direction: column; height: clamp(440px, 66vh, 760px); min-width: 0; padding: 20px; border: 1px solid #d9e3f0; border-radius: 14px; background: white; }
+.chat-panel h2 { margin: 0; font-size: 18px; }
+#chat-log { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 0; }
+#chat-log p { width: fit-content; max-width: 94%; padding: 10px 14px; border-radius: 12px; background: #f1f5fa; color: #263d56; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+#chat-log .chat-user { margin-left: auto; background: #e6efff; }
+#chat-form { padding-top: 14px; border-top: 1px solid #d9e3f0; }
+#chat-message { width: 100%; resize: vertical; border: 1px solid #bccde1; border-radius: 8px; padding: 10px; font: inherit; }
+#chat-send { margin-top: 8px; width: auto; float: right; }
+#chat-status { clear: both; font-size: 13px; color: #526983; }
+#chat-status:empty { display: none; }
 .source-panel { min-width: 0; padding: 18px; border: 1px solid #d9e3f0; border-radius: 14px; background: white; box-shadow: 0 4px 14px #244a8110; font: 500 14px/1.55 "Studio Pretendard", "Malgun Gothic", sans-serif; }
 .source-panel h2 { font-size: 16px; margin: 0; }
 .source-panel > p { color: #526983; font-size: 13px; margin: 4px 0 12px; overflow-wrap: anywhere; }

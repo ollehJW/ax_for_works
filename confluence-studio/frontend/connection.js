@@ -157,10 +157,10 @@ function showCompose(active) {
   el('registration-card').hidden = active;
   el('account-card').hidden = active;
   el('compose-columns').hidden = !active;
-  el('tree-panel').hidden = true;
-  el('page-tree').replaceChildren();
-  updatePublish();
-  if (active) {
+  const selected = el('compose-space').value;
+  if (active && !(selected && spaces.some(space => space.space_key === selected))) {
+    el('tree-panel').hidden = true;
+    el('page-tree').replaceChildren();
     el('compose-space').replaceChildren(
       new Option(spaces.length ? '스페이스를 선택하세요' : '먼저 스페이스를 등록하세요', ''),
       ...spaces.map(space => {
@@ -172,7 +172,9 @@ function showCompose(active) {
       }),
     );
     el('compose-space').disabled = !spaces.length;
+    showStep(1);
   }
+  updatePublish();
 }
 
 function pageNode(page, spaceKey) {
@@ -403,10 +405,29 @@ let draftImages = new Map();
 let draftStorage = '';
 let publishing = null;
 let published = false;
+let revision = null;
+let chatHistory = [];
+function showStep(step) {
+  el('compose-setup').hidden = step !== 1;
+  el('compose-review').hidden = step !== 2;
+  for (const [id, current] of [['step-one', step === 1], ['step-two', step === 2]]) {
+    if (current) el(id).setAttribute('aria-current', 'step');
+    else el(id).removeAttribute('aria-current');
+  }
+}
+el('step-one').addEventListener('click', () => showStep(1));
+el('step-two').addEventListener('click', () => showStep(2));
 function updatePublish() {
   const hasParent = !!document.querySelector('[name="parent-page"]:checked');
+  const busy = !!(publishing || generation || revision);
+  el('step-one').disabled = busy;
+  el('step-two').disabled = busy || !draftStorage || !hasParent;
+  el('compose-setup').disabled = busy;
+  el('draft-title').disabled = busy || published;
+  el('chat-message').disabled = busy || published;
+  el('chat-send').disabled = busy || published || !el('chat-message').value.trim();
   const button = el('publish-draft');
-  button.disabled = !!(publishing || generation || published || !draftStorage || !hasParent || !el('draft-title').value.trim());
+  button.disabled = !!(busy || published || !draftStorage || !hasParent || !el('draft-title').value.trim());
   button.title = !hasParent ? '작성할 상위 페이지를 선택하세요.' : '';
 }
 function syncPrompt() {
@@ -416,7 +437,20 @@ function syncPrompt() {
 }
 el('use-prompt').addEventListener('change', syncPrompt);
 
+function resetChat() {
+  chatHistory = [];
+  el('chat-log').replaceChildren();
+  el('chat-message').value = '';
+  el('chat-status').textContent = '';
+}
 function resetDraft() {
+  revision?.abort();
+  revision = null;
+  resetChat();
+  showStep(1);
+  el('compose-space').replaceChildren();
+  el('tree-panel').hidden = true;
+  el('page-tree').replaceChildren();
   el('use-prompt').checked = false;
   syncPrompt();
   publishing = null;
@@ -453,7 +487,7 @@ async function draftPost(path, body, signal) {
   if (!response.ok || data.detail) throw new Error(data.detail || '요청을 처리하지 못했습니다. 다시 시도해 주세요.');
   return data;
 }
-async function previewDraft() {
+async function previewDraft(storage = draftStorage, images = draftImages) {
   rendering?.abort();
   const request = new AbortController();
   rendering = request;
@@ -461,10 +495,11 @@ async function previewDraft() {
   el('preview-status').textContent = 'Confluence에서 미리보기를 불러오는 중입니다.';
   try {
     const result = await draftPost('/preview', {
-      storage: draftStorage, image_names: [...draftImages.keys()], parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
+      storage, image_names: [...images.keys()], parent_id: document.querySelector('[name="parent-page"]:checked')?.value || null,
     }, request.signal);
     if (request.signal.aborted) return;
-    if (result.storage) draftStorage = result.storage;
+    draftStorage = result.storage || storage;
+    draftImages = images;
     for (const image of result.formulas || []) draftImages.set(image.name, image);
     for (const name of draftImages.keys()) {
       if (name.startsWith('math-') && !draftStorage.includes(name)) draftImages.delete(name);
@@ -482,22 +517,26 @@ async function previewDraft() {
     }
     el('draft-view').hidden = false;
     el('preview-status').textContent = '';
+    return true;
   } catch (error) {
-    if (!request.signal.aborted) el('preview-status').textContent = error.message;
+    if (!request.signal.aborted) {
+      el('preview-status').textContent = error.message;
+      el('draft-view').hidden = !el('view-content').childElementCount;
+    }
+    return false;
   }
 }
 el('generate-draft').addEventListener('click', async () => {
   const instructions = el('use-prompt').checked ? el('draft-request').value.trim() : '';
   const file = sourceFile;
+  if (!document.querySelector('[name="parent-page"]:checked')) {
+    el('draft-status').textContent = '스페이스와 상위 페이지를 선택해 주세요.';
+    return;
+  }
   if (!instructions && !file) { el('draft-status').textContent = '자료를 첨부하거나 작성 방식 프롬프트를 입력해 주세요.'; return; }
   if (file && file.size > 8 * 1024 * 1024) { el('draft-status').textContent = '8 MB 이하의 문서를 첨부해 주세요.'; return; }
   const request = new AbortController();
   generation = request;
-  published = false;
-  draftStorage = '';
-  el('draft-view').hidden = true;
-  el('publish-status').replaceChildren();
-  el('preview-status').textContent = '초안을 생성하고 있습니다.';
   updatePublish();
   el('generate-draft').disabled = true;
   el('draft-status').textContent = '초안을 작성하고 있습니다.';
@@ -506,9 +545,13 @@ el('generate-draft').addEventListener('click', async () => {
     const draft = await draftPost('', { instructions, source }, request.signal);
     if (request.signal.aborted) return;
     draftImages = new Map((draft.images || []).map(image => [image.name, image]));
-    if (!el('draft-title').value.trim() || el('draft-title').value === el('draft-title').defaultValue) el('draft-title').value = draft.title;
-    el('draft-title').defaultValue = draft.title;
+    el('draft-title').value = draft.title.slice(0, 255);
     draftStorage = draft.storage;
+    published = false;
+    resetChat();
+    el('publish-status').replaceChildren();
+    el('view-content').replaceChildren();
+    showStep(2);
     el('draft-status').textContent = '초안을 작성했습니다.';
     await previewDraft();
   } catch (error) {
@@ -521,6 +564,54 @@ el('generate-draft').addEventListener('click', async () => {
       generation = null;
       el('generate-draft').disabled = false;
       updatePublish();
+    }
+  }
+});
+function chatBubble(text, user = false) {
+  const entry = document.createElement('p');
+  entry.className = user ? 'chat-user' : 'chat-agent';
+  entry.textContent = text;
+  el('chat-log').append(entry);
+  entry.scrollIntoView({ block: 'nearest' });
+  return entry;
+}
+el('chat-message').addEventListener('input', updatePublish);
+el('chat-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (el('chat-send').disabled) return;
+  const message = el('chat-message').value.trim();
+  const request = new AbortController();
+  revision = request;
+  const entry = chatBubble(message, true);
+  el('chat-message').value = '';
+  el('chat-status').textContent = '초안을 수정하고 있습니다.';
+  updatePublish();
+  try {
+    const result = await draftPost('/revise', {
+      message, history: chatHistory.slice(-10), title: el('draft-title').value, storage: draftStorage,
+      image_names: [...draftImages.keys()],
+    }, request.signal);
+    if (request.signal.aborted) return;
+    const assets = new Map(draftImages);
+    for (const image of result.formulas) assets.set(image.name, image);
+    const used = new Map(result.image_names.map(name => [name, assets.get(name)]));
+    if (!await previewDraft(result.storage, used)) throw new Error('수정된 문서를 표시하지 못했습니다. 다시 보내 주세요.');
+    if (request.signal.aborted) return;
+    el('draft-title').value = result.title;
+    chatHistory.push({ message, reply: result.reply.slice(0, 4000) });
+    chatBubble(result.reply);
+    el('chat-status').textContent = '';
+  } catch (error) {
+    if (!request.signal.aborted) {
+      entry.remove();
+      el('chat-message').value = message;
+      el('chat-status').textContent = error.message;
+    }
+  } finally {
+    if (revision === request) {
+      revision = null;
+      updatePublish();
+      el('chat-message').focus();
     }
   }
 });

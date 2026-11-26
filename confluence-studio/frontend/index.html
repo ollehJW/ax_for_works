@@ -115,38 +115,44 @@
           <button id="replace" type="button">토큰 변경</button>
         </section>
         <div id="compose-columns" hidden>
-          <div class="compose-sidebar">
-            <section class="source-panel" aria-labelledby="source-title">
-              <h2 id="source-title">작성 자료</h2>
-              <p>형식을 선택해 페이지 작성에 활용할 수 있는 이미지를 확인하세요.</p>
-              <div id="source-formats" aria-label="파일 형식"></div>
-              <div id="source-zone">
-                <button type="button" id="source-drop"><strong>파일 추가</strong><span>클릭하거나 문서 한 개를 끌어다 놓으세요</span></button>
-                <div id="source-files" hidden>
-                  <div class="source-summary" role="status">
-                    <span id="source-type" aria-hidden="true"></span>
-                    <div><strong id="source-name"></strong><small id="source-meta"></small></div>
-                  </div>
-                  <div class="source-actions">
-                    <button type="button" id="source-replace">파일 교체</button>
-                    <button type="button" id="source-remove">삭제</button>
+          <nav class="compose-steps" aria-label="페이지 작성 단계">
+            <button type="button" id="step-one" aria-current="step"><span>01</span> 초안 작성</button>
+            <button type="button" id="step-two" disabled><span>02</span> 초안 검토 및 수정</button>
+          </nav>
+          <fieldset id="compose-setup" aria-label="초안 작성">
+            <div class="compose-sidebar">
+              <section class="source-panel" aria-labelledby="source-title">
+                <h2 id="source-title">작성 자료</h2>
+                <p>형식을 선택해 페이지 작성에 활용할 수 있는 이미지를 확인하세요.</p>
+                <div id="source-formats" aria-label="파일 형식"></div>
+                <div id="source-zone">
+                  <button type="button" id="source-drop"><strong>파일 추가</strong><span>클릭하거나 문서 한 개를 끌어다 놓으세요</span></button>
+                  <div id="source-files" hidden>
+                    <div class="source-summary" role="status">
+                      <span id="source-type" aria-hidden="true"></span>
+                      <div><strong id="source-name"></strong><small id="source-meta"></small></div>
+                    </div>
+                    <div class="source-actions">
+                      <button type="button" id="source-replace">파일 교체</button>
+                      <button type="button" id="source-remove">삭제</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <input type="file" id="source-input" hidden>
-              <p id="source-error" role="status"></p>
-              <aside id="source-warning" hidden aria-live="polite">
-                <strong>페이지 작성 시 이미지 활용</strong>
-                <p></p>
-              </aside>
-            </section>
-            <section class="draft-editor" aria-labelledby="draft-heading">
-              <h2 id="draft-heading">초안 작성</h2>
-              <label class="prompt-toggle"><input type="checkbox" id="use-prompt" aria-controls="draft-request">작성 방식 프롬프트 추가</label>
-              <textarea id="draft-request" aria-label="작성 방식 프롬프트 추가" hidden disabled maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
-              <button type="button" class="primary" id="generate-draft">초안 생성</button>
-              <p id="draft-status" role="status"></p>
-            </section>
+                <input type="file" id="source-input" hidden>
+                <p id="source-error" role="status"></p>
+                <aside id="source-warning" hidden aria-live="polite">
+                  <strong>페이지 작성 시 이미지 활용</strong>
+                  <p></p>
+                </aside>
+              </section>
+              <section class="draft-editor" aria-labelledby="draft-heading">
+                <h2 id="draft-heading">초안 작성</h2>
+                <label class="prompt-toggle"><input type="checkbox" id="use-prompt" aria-controls="draft-request">작성 방식 프롬프트 추가</label>
+                <textarea id="draft-request" aria-label="작성 방식 프롬프트 추가" hidden disabled maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
+                <button type="button" class="primary" id="generate-draft">초안 생성</button>
+                <p id="draft-status" role="status"></p>
+              </section>
+            </div>
             <section id="compose-panel" aria-label="페이지 작성 위치">
               <label for="compose-space">스페이스 선택</label>
               <div class="space-picker">
@@ -162,19 +168,31 @@
                 <div id="page-tree" role="group" aria-label="상위 페이지 선택"></div>
               </section>
             </section>
+          </fieldset>
+          <div id="compose-review" hidden>
+            <aside class="chat-panel" aria-labelledby="chat-heading">
+              <h2 id="chat-heading">초안 수정</h2>
+              <div id="chat-log" role="log" aria-label="수정 대화"></div>
+              <form id="chat-form">
+                <label for="chat-message">수정 요청</label>
+                <textarea rows="3" id="chat-message" maxlength="4000" placeholder="예: 두 번째 챕터의 점검 항목을 표로 정리해 줘."></textarea>
+                <button type="submit" id="chat-send" class="primary">보내기</button>
+                <p id="chat-status" role="status"></p>
+              </form>
+            </aside>
+            <article id="draft-result" aria-label="작성할 문서">
+              <header class="document-header">
+                <label for="draft-title">페이지 제목</label>
+                <div class="document-title-row">
+                  <input id="draft-title" placeholder="페이지 제목을 입력하세요" maxlength="255">
+                  <button type="button" class="primary" id="publish-draft" disabled>작성</button>
+                </div>
+                <p id="publish-status" role="status"></p>
+              </header>
+              <p id="preview-status" role="status">초안을 생성하면 문서가 여기에 표시됩니다.</p>
+              <div id="draft-view" hidden><div id="view-content"></div></div>
+            </article>
           </div>
-          <article id="draft-result" aria-label="작성할 문서">
-            <header class="document-header">
-              <label for="draft-title">페이지 제목</label>
-              <div class="document-title-row">
-                <input id="draft-title" placeholder="페이지 제목을 입력하세요" maxlength="255">
-                <button type="button" class="primary" id="publish-draft" disabled>작성</button>
-              </div>
-              <p id="publish-status" role="status"></p>
-            </header>
-            <p id="preview-status" role="status">초안을 생성하면 문서가 여기에 표시됩니다.</p>
-            <div id="draft-view" hidden><div id="view-content"></div></div>
-          </article>
         </div>
       </main>
     </div>

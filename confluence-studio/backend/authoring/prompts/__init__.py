@@ -14,3 +14,7 @@ def _read(name):
 def system_prompt(filename):
     kind = FORMATS.get(Path(filename).suffix.lower()) if filename else None
     return _read('base') + ('\n\n' + _read(kind) if kind else '')
+
+
+def revision_prompt():
+    return system_prompt(None) + '\n\n' + _read('revision')

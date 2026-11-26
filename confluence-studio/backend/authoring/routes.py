@@ -16,9 +16,9 @@ from ..core.db import database
 from ..core.security import account, decrypt_token
 from ..sources.reader import source_material
 from .layout import prepare_layout
-from .prompts import system_prompt
-from .schemas import DraftRequest, PreviewRequest
-from .storage import ASSET_NAME, place_images, preview_storage, safe_view, validate_storage
+from .prompts import revision_prompt, system_prompt
+from .schemas import DraftRequest, PreviewRequest, RevisionRequest
+from .storage import RI, ASSET_NAME, place_images, preview_storage, safe_view, validate_storage
 
 router = APIRouter()
 SCHEMA = {'type': 'object', 'properties': {k: {'type': 'string'} for k in ('title', 'storage')},
@@ -31,6 +31,21 @@ def connected_token(user_id=Depends(account)):
     if not row:
         raise HTTPException(409, '먼저 Confluence 계정을 연결해 주세요.')
     return decrypt_token(row['token'])
+
+async def complete(prompt, content, schema=SCHEMA):
+    async with create_llm_client() as client:
+        answer = await client.chat.completions.create(
+            model=deployment(), max_completion_tokens=8000,
+            messages=[{'role':'system','content':prompt}, {'role':'user','content':content}],
+            response_format={'type':'json_schema','json_schema':{'name':'studio_draft','strict':True,'schema':schema}})
+    choice = answer.choices[0]
+    if choice.finish_reason != 'stop':
+        raise ValueError
+    result = json.loads(choice.message.content or '')
+    if not isinstance(result['title'],str) or not result['title'].strip() or not isinstance(result['storage'],str):
+        raise ValueError
+    return result
+
 
 @router.post('/api/draft')
 async def generate(body: DraftRequest, token=Depends(connected_token)):
@@ -47,17 +62,7 @@ async def generate(body: DraftRequest, token=Depends(connected_token)):
                 content.append({'type':'text','text':f"Source image {image['name']}; location: {image['locations']}"})
                 content.append({'type':'image_url','image_url':{
                     'url':'data:image/jpeg;base64,' + image['thumbnail']}})
-            async with create_llm_client() as client:
-                answer = await client.chat.completions.create(
-                    model=deployment(), max_completion_tokens=8000,
-                    messages=[{'role':'system','content':system_prompt(body.source.name if body.source else None)}, {'role':'user','content':content}],
-                    response_format={'type':'json_schema','json_schema':{'name':'studio_draft','strict':True,'schema':SCHEMA}})
-            choice = answer.choices[0]
-            if choice.finish_reason != 'stop':
-                raise ValueError
-            result = json.loads(choice.message.content or '')
-            if not isinstance(result['title'],str) or not result['title'].strip() or not isinstance(result['storage'],str):
-                raise ValueError
+            result = await complete(system_prompt(body.source.name if body.source else None), content)
             storage = place_images(result['storage'], images)
             storage, formulas = await run_in_threadpool(prepare_layout, storage, {i['name'] for i in images})
             validate_storage(storage, {i['name'] for i in images + formulas})
@@ -67,6 +72,10 @@ async def generate(body: DraftRequest, token=Depends(connected_token)):
             logging.getLogger(__name__).warning('Draft failed: %s status=%s',type(exc).__name__,getattr(exc,'status_code',None))
             return {'detail':'초안 생성에 실패했습니다. 작성 요청을 확인한 뒤 다시 시도해 주세요.'}
 
+    return stream_completion(completion)
+
+
+def stream_completion(completion):
     async def stream():
         task = asyncio.create_task(completion())
         try:
@@ -82,6 +91,30 @@ async def generate(body: DraftRequest, token=Depends(connected_token)):
             with contextlib.suppress(asyncio.CancelledError):
                 await task
     return StreamingResponse(stream(),media_type='application/json',headers={'X-Accel-Buffering':'no'})
+
+@router.post('/api/draft/revise')
+async def revise(body: RevisionRequest, token=Depends(connected_token)):
+    names = set(body.image_names)
+    if not body.message.strip() or any(not ASSET_NAME.fullmatch(name) for name in names):
+        raise HTTPException(422, '수정 요청과 자료 이미지를 확인해 주세요.')
+    validate_storage(body.storage, names)
+
+    async def revision():
+        try:
+            schema = {**SCHEMA, 'properties': {**SCHEMA['properties'], 'reply': {'type': 'string'}},
+                      'required': ['title', 'storage', 'reply']}
+            result = await complete(revision_prompt(), body.model_dump_json(exclude={'parent_id'}), schema)
+            storage, formulas = await run_in_threadpool(prepare_layout, result['storage'], names)
+            root = validate_storage(storage, names | {asset['name'] for asset in formulas})
+            used = sorted({node.get(f'{{{RI}}}filename') for node in root.iter(f'{{{RI}}}attachment')})
+            return {'title': result['title'].strip()[:255], 'storage': storage, 'formulas': formulas,
+                    'image_names': used, 'reply': result['reply']}
+        except (OpenAIError, ValueError, TypeError, KeyError, IndexError, HTTPException) as exc:
+            logging.getLogger(__name__).warning('Revision failed: %s', type(exc).__name__)
+            return {'detail': '초안을 수정하지 못했습니다. 수정 요청을 다시 보내 주세요.'}
+
+    return stream_completion(revision)
+
 
 @router.post('/api/draft/preview')
 def preview(body: PreviewRequest, token=Depends(connected_token)):
