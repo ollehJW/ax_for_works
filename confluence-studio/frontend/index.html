@@ -170,8 +170,10 @@
                   <label><input type="radio" name="writing-mode" id="use-prompt" aria-controls="draft-request">프롬프팅</label>
                 </div>
                 <div id="template-field" hidden>
-                  <label for="draft-template">템플릿 선택</label>
-                  <select id="draft-template" disabled><option value="">등록된 템플릿이 없습니다.</option></select>
+                  <div class="studio-picker">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M10 9v12"/></svg>
+                    <select id="draft-template" aria-label="템플릿 선택" disabled><option value="">등록된 템플릿이 없습니다.</option></select>
+                  </div>
                 </div>
                 <textarea id="draft-request" aria-label="작성 방식 프롬프트" hidden disabled maxlength="12000" rows="5" placeholder="예: 첨부한 자료를 팀 업무 가이드로 정리하고, 진행 순서를 표로 보여주세요."></textarea>
               </section>
@@ -181,7 +183,7 @@
                 <label for="compose-space">발행 위치</label>
                 <button type="button" id="open-space" aria-haspopup="dialog" aria-controls="space-dialog">신규 스페이스 등록</button>
               </div>
-              <div class="space-picker">
+              <div class="studio-picker">
                 <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
                 <select id="compose-space"></select>
                 <span id="selected-space-name" aria-hidden="true"></span>
