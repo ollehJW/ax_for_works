@@ -489,7 +489,7 @@ async function previewDraft() {
 el('generate-draft').addEventListener('click', async () => {
   const instructions = el('use-prompt').checked ? el('draft-request').value.trim() : '';
   const file = sourceFile;
-  if (!instructions && !file) { el('draft-status').textContent = '자료를 첨부하거나 작성 프롬프트를 입력해 주세요.'; return; }
+  if (!instructions && !file) { el('draft-status').textContent = '자료를 첨부하거나 작성 방식 프롬프트를 입력해 주세요.'; return; }
   if (file && file.size > 8 * 1024 * 1024) { el('draft-status').textContent = '8 MB 이하의 문서를 첨부해 주세요.'; return; }
   const request = new AbortController();
   generation = request;
