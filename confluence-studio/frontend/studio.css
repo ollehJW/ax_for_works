@@ -407,7 +407,6 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #library-cards button { display: grid; align-content: start; gap: 8px; padding: 20px; min-height: 110px; border: 1px solid #d2dfee; border-radius: 12px; background: #f8fbff; text-align: left; overflow-wrap: anywhere; color: #264b7d; }
 #library-cards button:hover { background: #edf4ff; border-color: #7a9cca; }
 #library-cards button span, .preview-label { font-size: 13px; color: #546d89; }
-#back-to-library { margin-bottom: 12px; padding: 8px 12px; background: #edf2f8; color: #34557b; }
 #template-entry { margin-bottom: 16px; }
 .preview-label { display: block; margin-bottom: 6px; }
 #blueprint h3 { margin-top: 0; }

@@ -134,7 +134,6 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
   el('template-source-form').addEventListener('submit', event => { event.preventDefault(); load(); });
   el('template-url').addEventListener('input', clearSource);
   el('new-template').addEventListener('click', () => { location.hash = 'templates/new'; });
-  el('back-to-library').addEventListener('click', () => { location.hash = 'templates'; });
   el('extract-template').addEventListener('click', async () => {
     if (!source || el('extract-template').disabled) return;
     const task = new AbortController();
