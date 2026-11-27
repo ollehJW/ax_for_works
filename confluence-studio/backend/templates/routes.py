@@ -1,9 +1,11 @@
 import base64
+import json
 import os
 import re
 from pathlib import Path
 from urllib.parse import parse_qs, unquote_plus, urlencode, urlsplit
 
+from cryptography.fernet import InvalidToken
 from fastapi import APIRouter, Depends, HTTPException
 from lxml import etree, html
 from openai import OpenAIError
@@ -17,7 +19,7 @@ from ..authoring.routes import stream_completion
 from ..authoring.storage import safe_view
 from ..core.confluence import confluence_get
 from ..core.db import database
-from ..core.security import account, decrypt_token
+from ..core.security import account, cipher, decrypt_token
 from ax_llm_client import create_llm_client, deployment
 
 router = APIRouter()
@@ -181,16 +183,40 @@ async def extract(body: Extraction, user=Depends(account)):
         except (OpenAIError, ValueError, IndexError):
             return {'detail':'템플릿을 추출하지 못했습니다. 다시 시도해 주세요.'}
 
-        def save():
-            with database() as db:
-                return db.execute("""INSERT INTO confluence_studio.templates
-                    (user_id,confluence_user_key,page_id,version,blueprint)
-                    SELECT user_id,confluence_user_key,%s,%s,%s FROM confluence_studio.connections
-                    WHERE user_id=%s AND confluence_user_key=%s
-                    ON CONFLICT (user_id,confluence_user_key,page_id) DO UPDATE
-                    SET version=excluded.version, blueprint=excluded.blueprint
-                    WHERE confluence_studio.templates.version <= excluded.version
-                    RETURNING page_id, blueprint""",
-                    (body.page_id, body.version, Jsonb({**blueprint.model_dump(), 'layout': visual_layout(sample)}), user, key)).fetchone()
-        return await run_in_threadpool(save) or {'detail':'페이지 또는 연결 정보가 변경되었습니다. 다시 확인해 주세요.'}
+        result = {**blueprint.model_dump(), 'layout': visual_layout(sample)}
+        payload = {'purpose': 'save-template', 'user': user, 'key': key, **body.model_dump(), 'blueprint': result}
+        ticket = cipher().encrypt(json.dumps(payload, ensure_ascii=False).encode()).decode()
+        return {'page_id': body.page_id, 'blueprint': result, 'ticket': ticket}
     return stream_completion(completion)
+
+
+class TemplateSave(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+    ticket: str = Field(min_length=1, max_length=2000000)
+
+
+@router.post('/api/templates/save')
+def save(body: TemplateSave, user=Depends(account)):
+    name = body.name.strip()
+    if not name:
+        raise HTTPException(422, '템플릿 이름을 입력해 주세요.')
+    try:
+        draft = json.loads(cipher().decrypt(body.ticket.encode()))
+    except (InvalidToken, ValueError):
+        raise HTTPException(422, '추출 결과를 확인할 수 없습니다. 다시 추출해 주세요.') from None
+    if draft.get('purpose') != 'save-template' or draft.get('user') != user:
+        raise HTTPException(403, '이 계정에서 추출한 템플릿만 저장할 수 있습니다.')
+    blueprint = {**draft['blueprint'], 'name': name}
+    with database() as db:
+        row = db.execute("""INSERT INTO confluence_studio.templates
+            (user_id,confluence_user_key,page_id,version,blueprint)
+            SELECT user_id,confluence_user_key,%s,%s,%s FROM confluence_studio.connections
+            WHERE user_id=%s AND confluence_user_key=%s
+            ON CONFLICT (user_id,confluence_user_key,page_id) DO UPDATE
+            SET version=excluded.version, blueprint=excluded.blueprint
+            WHERE confluence_studio.templates.version <= excluded.version
+            RETURNING page_id, blueprint""",
+            (draft['page_id'], draft['version'], Jsonb(blueprint), user, draft['key'])).fetchone()
+    if not row:
+        raise HTTPException(409, '페이지 또는 연결 정보가 변경되었습니다. 다시 확인해 주세요.')
+    return row

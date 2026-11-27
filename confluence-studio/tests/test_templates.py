@@ -53,3 +53,38 @@ class TemplateTests(unittest.TestCase):
         align_sections(model, sample)
         self.assertEqual([s.heading for s in model.sections], [labels[0], labels[-1]])
         self.assertEqual(model.sections[0].instruction, '점검 목록')
+
+    def test_extract_is_pending_until_named_save(self):
+        import asyncio
+        import json
+        from unittest.mock import AsyncMock
+        from cryptography.fernet import Fernet
+        from backend.templates import routes
+
+        async def run():
+            page = {'version': {'number': 1}, 'body': {'storage': {'value': '<p>내용</p>'}}}
+            with patch.object(routes, 'connection', return_value=('token', 'key')), \
+                 patch.object(routes, 'fetch_page', return_value=page), \
+                 patch.object(routes, 'create_llm_client') as client:
+                call = AsyncMock()
+                client.return_value.__aenter__.return_value.chat.completions.create = call
+                result = {'name':'제안 이름','purpose':'요약','sections':[{'heading':'요약','instruction':'기입'}], 'styles':[]}
+                choice = call.return_value.choices.__getitem__.return_value
+                choice.finish_reason = 'stop'
+                choice.message.content = json.dumps(result)
+                response = await routes.extract(routes.Extraction(page_id='1', version=1), user='user')
+                return json.loads(b''.join([chunk async for chunk in response.body_iterator]))
+
+        with patch.object(routes, 'cipher', return_value=Fernet(Fernet.generate_key())), \
+             patch.object(routes, 'database') as db:
+            item = asyncio.run(run())
+            db.assert_not_called()
+            body = routes.TemplateSave(name='  새 양식  ', ticket=item['ticket'])
+            with self.assertRaises(HTTPException):
+                routes.save(body, user='different')
+            with self.assertRaises(HTTPException):
+                routes.save(body.model_copy(update={'name':'  '}), user='user')
+            db.assert_not_called()
+            routes.save(body, user='user')
+            execute = db.return_value.__enter__.return_value.execute
+            self.assertEqual(execute.call_args.args[1][2].obj['name'], '새 양식')

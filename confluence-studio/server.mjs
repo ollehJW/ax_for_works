@@ -35,7 +35,7 @@ createServer(async (request, response) => {
     return;
   }
   const readConnection = path === '/api/connection' && request.method === 'GET';
-  const studioPost = request.method === 'POST' && ['/api/connection', '/api/spaces', '/api/templates/preview', '/api/templates/extract', '/api/pages', '/api/draft', '/api/draft/preview', '/api/draft/revise', '/api/draft/publish'].includes(path);
+  const studioPost = request.method === 'POST' && ['/api/connection', '/api/spaces', '/api/templates/preview', '/api/templates/extract', '/api/templates/save', '/api/pages', '/api/draft', '/api/draft/preview', '/api/draft/revise', '/api/draft/publish'].includes(path);
   if (readConnection || studioPost) {
     let body;
     if (request.method === 'POST') {
@@ -55,7 +55,7 @@ createServer(async (request, response) => {
       try {
         for await (const chunk of request) {
           size += chunk.length;
-          if (size > (path === '/api/draft/publish' ? 48000000 : path === '/api/draft' ? 11500000 : ['/api/draft/preview', '/api/draft/revise'].includes(path) ? 900000 : 12000)) {
+          if (size > (path === '/api/draft/publish' ? 48000000 : path === '/api/draft' ? 11500000 : path === '/api/templates/save' ? 2010000 : ['/api/draft/preview', '/api/draft/revise'].includes(path) ? 900000 : 12000)) {
             response.writeHead(413).end();
             return;
           }

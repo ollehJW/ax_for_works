@@ -414,3 +414,12 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #library-cards #new-template { place-content: center; justify-items: center; border: 2px dashed #9ab4d5; background: #f4f8ff; }
 #library-cards #new-template:hover { background: #eaf2ff; border-color: #6286b4; }
 #library-cards #new-template span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #deebff; color: #375f93; font-size: 22px; line-height: 1; }
+
+.template-actions { display: flex; gap: 8px; justify-content: flex-end; flex: none; }
+#template-name-dialog { width: min(420px, 90vw); padding: 24px; border: 1px solid #d9e3f0; border-radius: 14px; color: #253e5c; }
+#template-name-dialog::backdrop { background: #172e4e66; }
+#template-name-dialog h2 { margin: 0 0 20px; font-size: 20px; }
+#template-name { border: 1px solid #bacce2; border-radius: 8px; padding: 10px; }
+#template-name-dialog .template-actions { margin-top: 16px; }
+#template-name-dialog button { margin: 0; width: auto; padding: 8px 16px; }
+#template-save-error { color: #a24232; font-size: 13px; }

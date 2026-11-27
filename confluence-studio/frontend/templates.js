@@ -45,6 +45,7 @@ function drawTemplate(blueprint) {
 export function setupTemplates(el, syncWritingMode, goToLogin) {
   let templates = [];
   let source = null;
+  let extracted = null;
   let request = null;
   let currentRoute = null;
 
@@ -104,6 +105,9 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
   }
 
   function clearSource() {
+    extracted = null;
+    el('save-template').hidden = true;
+    if (el('template-name-dialog').open) el('template-name-dialog').close();
     showBlueprint(null);
     request?.abort();
     request = null;
@@ -139,18 +143,65 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
     const task = new AbortController();
     request = task;
     el('extract-template').disabled = true;
+    extracted = null;
+    el('save-template').hidden = true;
+    showBlueprint(null);
     el('template-status').textContent = '문서 구조와 스타일을 추출하고 있습니다.';
     try {
       const item = await post('extract', { page_id: source.page_id, version: source.version }, task.signal);
       if (request !== task) return;
-      templates = [item, ...templates.filter(entry => entry.page_id !== item.page_id)];
-      render(item.page_id);
+      extracted = item;
       showBlueprint(item);
-      el('template-status').textContent = 'My Templates에 저장했습니다. 페이지 작성에서 사용할 수 있습니다.';
+      el('save-template').hidden = false;
+      el('template-status').textContent = '추출이 완료되었습니다.';
     } catch (error) {
       if (request === task) el('template-status').textContent = error.message;
     } finally {
       if (request === task) el('extract-template').disabled = false;
+    }
+  });
+  const dialog = el('template-name-dialog');
+  const nameInput = el('template-name');
+  const confirm = el('confirm-template-save');
+  el('save-template').addEventListener('click', () => {
+    if (!extracted) return;
+    nameInput.value = extracted.blueprint.name.slice(0, 120);
+    el('template-save-error').textContent = '';
+    confirm.disabled = false;
+    dialog.showModal();
+    nameInput.focus();
+    nameInput.select();
+  });
+  el('cancel-template-save').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('cancel', event => { if (confirm.disabled) event.preventDefault(); });
+  el('template-name-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!extracted || confirm.disabled) return;
+    const name = nameInput.value.trim();
+    if (!name) {
+      el('template-save-error').textContent = '템플릿 이름을 입력해 주세요.';
+      nameInput.focus();
+      return;
+    }
+    const task = new AbortController();
+    request = task;
+    confirm.disabled = true;
+    el('cancel-template-save').disabled = true;
+    try {
+      const item = await post('save', { name, ticket: extracted.ticket }, task.signal);
+      if (request !== task) return;
+      templates = [item, ...templates.filter(entry => entry.page_id !== item.page_id)];
+      render(item.page_id);
+      showBlueprint(item);
+      extracted = null;
+      el('save-template').hidden = true;
+      dialog.close();
+      el('template-status').textContent = 'My Templates에 저장했습니다.';
+    } catch (error) {
+      if (request === task) el('template-save-error').textContent = error.message;
+    } finally {
+      confirm.disabled = false;
+      el('cancel-template-save').disabled = false;
     }
   });
   return {
