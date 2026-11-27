@@ -375,7 +375,7 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .template-workspace:has(#template-preview:not([hidden])):has(#blueprint:not([hidden])) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #template-preview h2 { margin: 0; overflow-wrap: anywhere; }
 #template-view { max-height: 64vh; }
-#template-status, #library-empty { font-size: 14px; color: #526983; }
+#template-status { font-size: 14px; color: #526983; }
 #template-status:empty { display: none; }
 #blueprint h3 { margin: 22px 0 6px; color: #234e89; }
 #blueprint p, #blueprint li { line-height: 1.6; overflow-wrap: anywhere; }

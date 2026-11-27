@@ -89,7 +89,6 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
       card.addEventListener('click', () => { location.hash = 'templates/' + item.page_id; });
       return card;
     }));
-    el('library-empty').hidden = !!templates.length;
     syncWritingMode();
   }
 
@@ -148,7 +147,7 @@ export function setupTemplates(el, syncWritingMode, goToLogin) {
       templates = [item, ...templates.filter(entry => entry.page_id !== item.page_id)];
       render(item.page_id);
       showBlueprint(item);
-      el('template-status').textContent = '내 템플릿에 저장했습니다. 페이지 작성에서 사용할 수 있습니다.';
+      el('template-status').textContent = 'My Templates에 저장했습니다. 페이지 작성에서 사용할 수 있습니다.';
     } catch (error) {
       if (request === task) el('template-status').textContent = error.message;
     } finally {
