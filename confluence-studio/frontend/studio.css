@@ -373,7 +373,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 .template-url-row input { min-width: 0; width: 100%; padding: 10px; border: 1px solid #bacce2; border-radius: 8px; font: inherit; }
 .template-card .primary { flex: none; margin: 0; width: auto; padding: 10px 16px; }
 .template-workspace:has(#template-preview:not([hidden])):has(#blueprint:not([hidden])) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-#template-preview h2 { margin: 0; overflow-wrap: anywhere; }
+#template-preview > header { align-items: flex-start; padding-bottom: 14px; border-bottom: 1px solid #e1e7ef; }
+#template-source-title { margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
 #template-view { max-height: 64vh; }
 #template-status { font-size: 14px; color: #526983; }
 #template-status:empty { display: none; }
@@ -406,9 +407,8 @@ button:focus-visible { outline: 3px solid #5689ca; outline-offset: 2px; }
 #library-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 14px; margin-top: 20px; }
 #library-cards button { display: grid; align-content: start; gap: 8px; padding: 20px; min-height: 110px; border: 1px solid #d2dfee; border-radius: 12px; background: #f8fbff; text-align: left; overflow-wrap: anywhere; color: #264b7d; }
 #library-cards button:hover { background: #edf4ff; border-color: #7a9cca; }
-#library-cards button span, .preview-label { font-size: 13px; color: #546d89; }
+#library-cards button span { font-size: 13px; color: #546d89; }
 #template-entry { margin-bottom: 16px; }
-.preview-label { display: block; margin-bottom: 6px; }
 #blueprint h3 { margin-top: 0; }
 
 #library-cards #new-template { place-content: center; justify-items: center; border: 2px dashed #9ab4d5; background: #f4f8ff; }
